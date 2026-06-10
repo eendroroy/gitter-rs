@@ -1,3 +1,4 @@
-pub mod cli;
-pub mod list;
+pub(crate) mod cli;
+pub(crate) mod list;
+pub(crate) mod completion;
 

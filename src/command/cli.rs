@@ -1,4 +1,4 @@
-use clap::{Parser, Subcommand};
+use clap::{Parser, Subcommand, ValueEnum};
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -29,4 +29,17 @@ pub(crate) enum Commands {
         #[arg(trailing_var_arg = true, allow_hyphen_values = true, num_args = 0..)]
         raw_args: Vec<String>,
     },
+    Completion {
+        #[arg(short, long)]
+        shell: Shell,
+    },
+}
+
+#[derive(Debug, Clone, PartialEq, ValueEnum)]
+pub(crate) enum Shell {
+    Bash,
+    Elvish,
+    Fish,
+    PowerShell,
+    Zsh,
 }

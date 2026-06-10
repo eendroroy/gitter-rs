@@ -4,6 +4,7 @@ pub mod core;
 
 use crate::colors::Colors;
 use crate::command::cli::{Cli, Commands};
+use crate::command::completion::completion;
 use crate::command::list::list;
 use crate::core::directory::find_repositories;
 use clap::Parser;
@@ -28,6 +29,9 @@ async fn main() {
         }
         Commands::Eval { raw_args } => {
             println!("eval {}", raw_args.join(" "));
+        }
+        Commands::Completion { shell } => {
+            completion(shell);
         }
     }
 }
