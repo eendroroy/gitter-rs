@@ -27,6 +27,9 @@ async fn main() {
         Commands::Exec { mut raw_args } => {
             println!("{} {}", raw_args.remove(0), raw_args.join(" "));
         }
+        Commands::Bash { path } => {
+            println!("bash {}", path);
+        }
         Commands::Eval { raw_args } => {
             println!("eval {}", raw_args.join(" "));
         }
