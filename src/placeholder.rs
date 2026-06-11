@@ -5,7 +5,7 @@ use regex::Regex;
 
 pub(crate) fn evaluate_placeholders(mut base_string: String, status: &Status) -> String {
     base_string = base_string.replace("{_name_}", status.name.as_str());
-    base_string = base_string.replace("{_path:r_}", status.path.as_str());
+    base_string = base_string.replace("{_path:r_}", status.relation_path.as_str());
     base_string = base_string.replace("{_path:a_}", status.absolute_path.as_str());
     base_string = base_string.replace("{_branch_}", status.branch.as_str());
     base_string = base_string.replace("{_commit:f_}", status.commit_hash.as_str());
@@ -20,11 +20,12 @@ pub(crate) fn evaluate_placeholders(mut base_string: String, status: &Status) ->
     base_string = RE
         .replace_all(&base_string, |caps: &regex::Captures| {
             if let Some(num_str) = caps.get(1)
-                && let Ok(requested_len) = num_str.as_str().parse::<usize>() {
-                    let full_hash = &status.commit_hash;
-                    let target_len = std::cmp::min(requested_len, full_hash.len());
-                    return full_hash[..target_len].to_string();
-                }
+                && let Ok(requested_len) = num_str.as_str().parse::<usize>()
+            {
+                let full_hash = &status.commit_hash;
+                let target_len = std::cmp::min(requested_len, full_hash.len());
+                return full_hash[..target_len].to_string();
+            }
             caps.get(0).unwrap().as_str().to_string()
         })
         .into_owned();

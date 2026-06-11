@@ -21,8 +21,13 @@ pub(crate) struct Gitter {
     #[command(subcommand)]
     pub(crate) command: Commands,
 
+    /// Working directory, if not provided current directory will be used
     #[arg(short = 'C', long = "pwd", default_value = ".", global = true)]
     pub(crate) directory: String,
+
+    /// Align components of each status line
+    #[arg(short, long, action = clap::ArgAction::SetTrue, global = true)]
+    pub(crate) align_status: bool,
 }
 
 #[derive(Subcommand, Debug)]

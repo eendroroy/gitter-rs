@@ -114,7 +114,7 @@ pub fn get_repo_status(path: &str, base_path: &str) -> Status {
 
     Status {
         absolute_path: path.to_string(),
-        path: relative_path,
+        relation_path: relative_path,
 
         // cross-platform directory name extraction
         name: fs::canonicalize(path)
