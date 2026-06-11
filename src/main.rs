@@ -82,8 +82,21 @@ async fn main() {
             });
         }
         Commands::Eval { ref raw_args } => {
-            let _repos = find_repos(&cli);
-            println!("eval {}", raw_args.join(" "));
+            let repos = find_repos(&cli).await;
+
+            let command_name = "bash".to_string();
+            let eval = &format!("eval {}", raw_args.join(" ").to_string());
+
+            repos.statuses.iter().for_each(|status| {
+                println!("{}", status_line(&status, Some(repos.lengths)));
+                println!("$ {} {} {}", command_name.green(), "eval".blue(), raw_args.join(" ").yellow());
+
+                let mut command = Command::new(command_name.clone());
+                command.current_dir(status.absolute_path.clone());
+                command.arg("-c");
+                command.arg(eval);
+                command.status().expect("Unable to eval command");
+            });
         }
         Commands::Completion { shell } => {
             let command = &mut Gitter::command();
