@@ -1,6 +1,65 @@
 # gitter-rs
 
-Run git or arbitrary command in multiple git repositories with filters in current directory
+A fast, concurrent CLI utility for running commands across multiple Git repositories.
+
+`gitter-rs` scans a directory tree, discovers Git repositories, collects repository metadata, and executes commands in each repository context. It is designed for monorepo-adjacent workflows, workspace maintenance, and bulk Git operations.
+
+## Features
+
+- 🔍 Automatically discovers Git repositories recursively
+- ⚡ Concurrent repository scanning and status collection using Tokio
+- 🧩 Placeholder system for dynamic command templating
+- 🎨 Colored and aligned repository status output
+- 🛠 Run:
+    - Git commands
+    - Arbitrary shell commands
+    - Script files
+    - Bash expressions
+- 🐚 Shell completion generation
+- 📏 Configurable output templates
+
+## Installation
+
+### From source
+
+```bash
+git clone https://github.com/eendroroy/gitter-rs.git
+cd gitter-rs
+cargo install --path .
+```
+
+Or build manually:
+
+```bash
+cargo build --release
+```
+
+Binary:
+
+```bash
+target/release/gitter
+```
+
+## Template Placeholders
+
+- `{_name_}` — Repository name
+- `{_branch_}` — Current branch
+- `{_path:r_}` — Relative repository path
+- `{_path:a_}` — Absolute repository path
+- `{_commit:f_}` — Full commit hash
+- `{_commit:8_}` — Short commit hash
+- `{_author:n_}` — Author name
+- `{_author:e_}` — Author email
+- `{_time:r_}` — Relative commit time
+- `{_time:d_}` — Absolute commit time
+
+## Examples
+
+```bash
+gitter git pull
+gitter exec cargo test
+gitter git checkout develop
+```
 
 ## License
 

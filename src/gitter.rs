@@ -31,6 +31,10 @@ pub(crate) struct Gitter {
     #[arg(short = 'C', long = "pwd", default_value = ".", global = true)]
     pub(crate) directory: String,
 
+    /// Max depth to traverse subdirectories
+    #[arg(short = 'd', long = "max-depth", default_value = "2", global = true)]
+    pub(crate) max_depth: usize,
+
     /// Repo status-line template
     #[arg(short = 'T', long = "template", global = true)]
     pub(crate) template: Option<String>,
@@ -57,8 +61,9 @@ pub(crate) enum Commands {
         #[arg(trailing_var_arg = true, allow_hyphen_values = true, num_args = 0..)]
         raw_args: Vec<String>,
     },
-    /// Execute a bash script file
+    /// Execute a script file
     #[clap(alias = "s")]
+    
     Script {
         #[command(subcommand)]
         shell: Option<Shell>,

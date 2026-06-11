@@ -32,7 +32,7 @@ impl Default for Palette {
         Self {
             path: ComponentStyle {
                 color: Color::TrueColor { r: 129, g: 161, b: 193 },
-                styles: vec![Styles::Underline],
+                styles: vec![Styles::Dimmed, Styles::Bold, Styles::Italic],
             },
             name: ComponentStyle {
                 color: Color::TrueColor { r: 216, g: 222, b: 233 },

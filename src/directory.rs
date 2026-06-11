@@ -1,8 +1,8 @@
 use std::path::PathBuf;
 use walkdir::WalkDir;
 
-pub fn find_repo_dirs(target_dir: &String) -> Vec<PathBuf> {
-    let mut it = WalkDir::new(target_dir).into_iter();
+pub fn find_repo_dirs(target_dir: &String, depth: usize) -> Vec<PathBuf> {
+    let mut it = WalkDir::new(target_dir).max_depth(depth + 1).into_iter();
 
     let mut repositories: Vec<PathBuf> = vec![];
 
@@ -17,7 +17,10 @@ pub fn find_repo_dirs(target_dir: &String) -> Vec<PathBuf> {
             if let Some(repo_path) = entry.path().parent() {
                 repositories.push(repo_path.into());
             }
-            it.skip_current_dir(); // Prune tree to save memory and time
+
+            if entry.file_type().is_dir() {
+                it.skip_current_dir();
+            }
         }
     }
 

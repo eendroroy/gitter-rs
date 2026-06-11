@@ -153,7 +153,7 @@ async fn main() {
 }
 
 async fn find_repos(cli: &Gitter) -> Repositories {
-    let repositories = find_repo_dirs(&cli.directory);
+    let repositories = find_repo_dirs(&cli.directory, cli.max_depth);
     let mut repos = Repositories::new(repositories, &cli.directory).await;
 
     repos.compute_lengths();
