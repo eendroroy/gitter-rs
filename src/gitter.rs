@@ -62,7 +62,9 @@ pub(crate) enum Commands {
         #[arg(short = 'p', long = "path", default_value = ".", global = true)]
         path: String,
     },
-    /// Evaluate a shell command - useful for complex commands involving pipes and redirections
+    /// Evaluate a shell command.
+    /// Kept for simple use cases like run grep in each repository.
+    /// For complex cases use `script` command
     #[clap(alias = "b")]
     Bash {
         #[arg(trailing_var_arg = true, allow_hyphen_values = true, num_args = 0..)]
