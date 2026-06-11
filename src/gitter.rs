@@ -1,8 +1,8 @@
-use clap::{Parser, Subcommand, ValueEnum};
 use clap::builder::Styles;
 use clap::builder::styling::AnsiColor::{Blue, Cyan, Green, Red, Yellow};
 use clap::builder::styling::Color::Ansi;
 use clap::builder::styling::Style;
+use clap::{Parser, Subcommand};
 
 pub const CLAP_STYLE: Styles = Styles::styled()
     .header(Style::new().bold().fg_color(Some(Ansi(Green))))
@@ -15,12 +15,12 @@ pub const CLAP_STYLE: Styles = Styles::styled()
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None, styles=CLAP_STYLE)]
-pub(crate) struct Cli {
+pub(crate) struct Gitter {
     #[command(subcommand)]
     pub(crate) command: Commands,
 
-    #[arg(short = 'P', long = "path", default_value = ".", global = true)]
-    pub(crate) path: String,
+    #[arg(short = 'C', long = "pwd", default_value = ".", global = true)]
+    pub(crate) directory: String,
 }
 
 #[derive(Subcommand, Debug)]
@@ -53,12 +53,12 @@ pub(crate) enum Commands {
     },
     /// Generate shell completion
     Completion {
-        #[arg(short, long)]
+        #[command(subcommand)]
         shell: Shell,
     },
 }
 
-#[derive(Debug, Clone, PartialEq, ValueEnum)]
+#[derive(Subcommand, Debug)]
 pub(crate) enum Shell {
     Bash,
     Elvish,
