@@ -16,7 +16,13 @@ pub const CLAP_STYLE: Styles = Styles::styled()
     .invalid(Style::new().fg_color(Some(Ansi(Yellow))));
 
 #[derive(Parser, Debug)]
-#[command(version, about, long_about = None, disable_help_subcommand = true, styles=CLAP_STYLE)]
+#[command(
+    name = "gitter",
+    version,
+    about, long_about = None,
+    disable_help_subcommand = true,
+    styles=CLAP_STYLE
+)]
 pub(crate) struct Gitter {
     #[command(subcommand)]
     pub(crate) command: Commands,
@@ -68,7 +74,7 @@ pub(crate) enum Commands {
         shell: Option<Shell>,
     },
     /// Help menu
-    /// Topics: placeholders
+    /// Run: `gitter help --help` for more details
     Help {
         #[command(subcommand)]
         topic: Option<Help>,
