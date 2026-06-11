@@ -54,7 +54,7 @@ pub(crate) enum Commands {
     /// Generate shell completion
     Completion {
         #[command(subcommand)]
-        shell: Shell,
+        shell: Option<Shell>,
     },
 }
 

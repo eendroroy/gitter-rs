@@ -12,10 +12,10 @@ use crate::repository::Repositories;
 use crate::status::status_line;
 use clap::{CommandFactory, Parser};
 use colored::Colorize;
-use std::path;
 use std::path::Path;
 use std::process::Command;
 use std::sync::LazyLock;
+use std::{env, path};
 
 pub static GLOBAL_COLORS: LazyLock<Colors> = LazyLock::new(Colors::default);
 
@@ -106,11 +106,24 @@ async fn main() {
         Commands::Completion { shell } => {
             let command = &mut Gitter::command();
             let clap_shell = match shell {
-                Shell::Bash => clap_complete::Shell::Bash,
-                Shell::Elvish => clap_complete::Shell::Elvish,
-                Shell::Fish => clap_complete::Shell::Fish,
-                Shell::PowerShell => clap_complete::Shell::PowerShell,
-                Shell::Zsh => clap_complete::Shell::Zsh,
+                Some(Shell::Bash) => clap_complete::Shell::Bash,
+                Some(Shell::Elvish) => clap_complete::Shell::Elvish,
+                Some(Shell::Fish) => clap_complete::Shell::Fish,
+                Some(Shell::PowerShell) => clap_complete::Shell::PowerShell,
+                Some(Shell::Zsh) => clap_complete::Shell::Zsh,
+                None => {
+                    let shell_var = env::var("SHELL").unwrap_or_else(|_| "/bin/sh".to_string());
+                    let shell_path = Path::new(&shell_var);
+
+                    // Extract just the file name (e.g., "/bin/zsh" -> "zsh")
+                    match shell_path.file_name().and_then(|os_str| os_str.to_str()) {
+                        Some("bash") => clap_complete::Shell::Bash,
+                        Some("zsh") => clap_complete::Shell::Zsh,
+                        Some("fish") => clap_complete::Shell::Fish,
+                        Some("elvish") => clap_complete::Shell::Elvish,
+                        _ => clap_complete::Shell::Bash, // Safe fallback default
+                    }
+                }
             };
 
             clap_complete::generate(clap_shell, command, "gitter", &mut std::io::stdout());
