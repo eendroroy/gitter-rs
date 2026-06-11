@@ -63,6 +63,7 @@ pub(crate) enum Shell {
     Bash,
     Elvish,
     Fish,
+    #[allow(clippy::enum_variant_names)]
     PowerShell,
     Zsh,
 }

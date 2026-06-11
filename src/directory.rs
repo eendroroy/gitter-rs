@@ -2,7 +2,7 @@ use std::path::PathBuf;
 use walkdir::WalkDir;
 
 pub fn find_repo_dirs(target_dir: &String) -> Vec<PathBuf> {
-    let mut it = WalkDir::new(&target_dir).into_iter();
+    let mut it = WalkDir::new(target_dir).into_iter();
 
     let mut repositories: Vec<PathBuf> = vec![];
 

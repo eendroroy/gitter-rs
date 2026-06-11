@@ -17,7 +17,7 @@ use std::path::Path;
 use std::process::Command;
 use std::sync::LazyLock;
 
-pub static GLOBAL_COLORS: LazyLock<Colors> = LazyLock::new(|| Colors::default());
+pub static GLOBAL_COLORS: LazyLock<Colors> = LazyLock::new(Colors::default);
 
 #[tokio::main]
 async fn main() {
@@ -28,7 +28,7 @@ async fn main() {
             let repos = find_repos(&cli).await;
 
             repos.statuses.iter().for_each(|status| {
-                println!("{}", status_line(&status, Some(repos.lengths)));
+                println!("{}", status_line(status, Some(repos.lengths)));
                 println!("$ {} {}", "git".green(), raw_args.join(" ").yellow());
 
                 let mut command = Command::new("git");
@@ -44,7 +44,7 @@ async fn main() {
             let repos = find_repos(&cli).await;
 
             repos.statuses.iter().for_each(|status| {
-                println!("{}", status_line(&status, Some(repos.lengths)));
+                println!("{}", status_line(status, Some(repos.lengths)));
             });
         }
         Commands::Exec { ref raw_args } => {
@@ -54,7 +54,7 @@ async fn main() {
             let command_name = args.remove(0);
 
             repos.statuses.iter().for_each(|status| {
-                println!("{}", status_line(&status, Some(repos.lengths)));
+                println!("{}", status_line(status, Some(repos.lengths)));
                 println!("$ {} {}", command_name.green(), args.join(" ").yellow());
 
                 let mut command = Command::new(command_name.clone());
@@ -72,7 +72,7 @@ async fn main() {
             let script = path::absolute(Path::new(&path.clone())).expect("Unable to find script");
 
             repos.statuses.iter().for_each(|status| {
-                println!("{}", status_line(&status, Some(repos.lengths)));
+                println!("{}", status_line(status, Some(repos.lengths)));
                 println!("$ {} {}", "bash".green(), script.to_string_lossy().yellow());
 
                 let mut command = Command::new("bash");
@@ -85,11 +85,16 @@ async fn main() {
             let repos = find_repos(&cli).await;
 
             let command_name = "bash".to_string();
-            let eval = &format!("eval {}", raw_args.join(" ").to_string());
+            let eval = &format!("eval {}", raw_args.join(" "));
 
             repos.statuses.iter().for_each(|status| {
-                println!("{}", status_line(&status, Some(repos.lengths)));
-                println!("$ {} {} {}", command_name.green(), "eval".blue(), raw_args.join(" ").yellow());
+                println!("{}", status_line(status, Some(repos.lengths)));
+                println!(
+                    "$ {} {} {}",
+                    command_name.green(),
+                    "eval".blue(),
+                    raw_args.join(" ").yellow()
+                );
 
                 let mut command = Command::new(command_name.clone());
                 command.current_dir(status.absolute_path.clone());

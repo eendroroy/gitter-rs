@@ -5,10 +5,7 @@ use std::fs;
 use std::path::Path;
 
 fn extract_config(config: &Option<Config>, property: &str) -> String {
-    config
-        .as_ref()
-        .and_then(|c| c.get_string(property).ok())
-        .unwrap_or_default()
+    config.as_ref().and_then(|c| c.get_string(property).ok()).unwrap_or_default()
 }
 
 fn format_relative_time(commit_time_epoch: i64) -> String {
@@ -72,12 +69,12 @@ pub fn get_repo_status(path: &str, base_path: &str) -> Status {
     let branch = repository
         .head()
         .ok()
-        .and_then(|h| {
-            Some(h.shorthand().map(|s| s.to_string()).or_else(|_| {
+        .map(|h| {
+            h.shorthand().map(|s| s.to_string()).or_else(|_| {
                 h.symbolic_target()
-                    .and_then(|s| Ok(s.expect("REASON").strip_prefix("refs/heads/")))
+                    .map(|s| s.expect("REASON").strip_prefix("refs/heads/"))
                     .map(|s| s.expect("REASON").to_string())
-            }))
+            })
         })
         .unwrap_or_else(|| Ok("DETACHED_HEAD".to_string()));
 

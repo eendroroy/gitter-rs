@@ -34,15 +34,15 @@ pub struct Repositories {
 }
 
 impl Repositories {
-    pub async fn new(repositories: Vec<PathBuf>, path: &String) -> Self {
-        let base_path = Arc::new(path.clone());
+    pub async fn new(repositories: Vec<PathBuf>, path: &str) -> Self {
+        let base_path = Arc::new(path.to_owned());
 
         let mut tasks = JoinSet::new();
 
         for repo in repositories {
             let base_path = Arc::clone(&base_path);
             tasks.spawn_blocking(move || {
-                get_repo_status(repo.to_str().expect("Invalid UTF-8 path"), &**base_path)
+                get_repo_status(repo.to_str().expect("Invalid UTF-8 path"), &base_path)
             });
         }
 

@@ -1,7 +1,6 @@
 use crate::GLOBAL_COLORS;
-use colored::Colorize;
 use crate::repository::{Status, StatusLengths};
-
+use colored::Colorize;
 
 pub(crate) fn status_line(status: &Status, status_lengths: Option<StatusLengths>) -> String {
     if let Some(lengths) = status_lengths {
