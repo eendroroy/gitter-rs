@@ -8,8 +8,8 @@ mod status;
 
 use crate::colors::Colors;
 use crate::directory::find_repo_dirs;
-use crate::gitter::{Commands, Gitter, Shell};
-use crate::placeholder::evaluate_placeholders;
+use crate::gitter::{Commands, Gitter, Help, Shell};
+use crate::placeholder::{evaluate_placeholders, print_placeholder_help};
 use crate::repository::Repositories;
 use crate::status::status_line;
 use clap::{CommandFactory, Parser};
@@ -118,6 +118,16 @@ async fn main() {
             };
 
             clap_complete::generate(clap_shell, command, "gitter", &mut std::io::stdout());
+        }
+        Commands::Help { ref topic } => {
+            if let Some(topic) = topic {
+                match topic {
+                    Help::Placeholder => print_placeholder_help(),
+                }
+            } else {
+                let mut cmd = Gitter::command();
+                cmd.print_help().unwrap();
+            }
         }
     }
 }

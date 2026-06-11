@@ -16,7 +16,7 @@ pub const CLAP_STYLE: Styles = Styles::styled()
     .invalid(Style::new().fg_color(Some(Ansi(Yellow))));
 
 #[derive(Parser, Debug)]
-#[command(version, about, long_about = None, styles=CLAP_STYLE)]
+#[command(version, about, long_about = None, disable_help_subcommand = true, styles=CLAP_STYLE)]
 pub(crate) struct Gitter {
     #[command(subcommand)]
     pub(crate) command: Commands,
@@ -62,6 +62,12 @@ pub(crate) enum Commands {
         #[command(subcommand)]
         shell: Option<Shell>,
     },
+    /// Help menu
+    /// Topics: placeholders
+    Help {
+        #[command(subcommand)]
+        topic: Option<Help>,
+    }
 }
 
 #[derive(Subcommand, Debug)]
@@ -87,4 +93,9 @@ impl Display for Shell {
         // Write the string slice directly into the formatter buffer
         write!(f, "{}", shell_str)
     }
+}
+
+#[derive(Subcommand, Debug)]
+pub(crate) enum Help {
+    Placeholder
 }
