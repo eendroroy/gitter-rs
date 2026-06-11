@@ -2,33 +2,68 @@ use crate::gitter::CLAP_STYLE;
 use crate::repository::Status;
 use lazy_static::lazy_static;
 use regex::Regex;
+use std::collections::HashMap;
 
-pub(crate) fn evaluate_placeholders(mut base_string: String, status: &Status) -> String {
-    base_string = base_string.replace("{_name_}", status.name.as_str());
-    base_string = base_string.replace("{_path:r_}", status.relation_path.as_str());
-    base_string = base_string.replace("{_path:a_}", status.absolute_path.as_str());
-    base_string = base_string.replace("{_branch_}", status.branch.as_str());
-    base_string = base_string.replace("{_commit:f_}", status.commit_hash.as_str());
-    base_string = base_string.replace("{_author:e_}", status.author_email.as_str());
-    base_string = base_string.replace("{_author:n_}", status.author_name.as_str());
-    base_string = base_string.replace("{_time:r_}", status.relative_time.as_str());
-    base_string = base_string.replace("{_time:d_}", status.absolute_time.as_str());
+pub(crate) fn evaluate_placeholders(
+    base_string: String,
+    status: &Status,
+) -> HashMap<String, String> {
+    let mut evaluation = HashMap::new();
+
+    if base_string.contains("{_name_}") {
+        evaluation.insert("{_name_}".to_string(), status.name.clone());
+    }
+    if base_string.contains("{_path:r_}") {
+        evaluation.insert("{_path:r_}".to_string(), status.relation_path.clone());
+    }
+    if base_string.contains("{_path:a_}") {
+        evaluation.insert("{_path:a_}".to_string(), status.absolute_path.clone());
+    }
+    if base_string.contains("{_branch_}") {
+        evaluation.insert("{_branch_}".to_string(), status.branch.clone());
+    }
+    if base_string.contains("{_commit:f_}") {
+        evaluation.insert("{_commit:f_}".to_string(), status.commit_hash.clone());
+    }
+    if base_string.contains("{_author:e_}") {
+        evaluation.insert("{_author:e_}".to_string(), status.author_email.clone());
+    }
+    if base_string.contains("{_author:n_}") {
+        evaluation.insert("{_author:n_}".to_string(), status.author_name.clone());
+    }
+    if base_string.contains("{_time:r_}") {
+        evaluation.insert("{_time:r_}".to_string(), status.relative_time.clone());
+    }
+    if base_string.contains("{_time:d_}") {
+        evaluation.insert("{_time:d_}".to_string(), status.absolute_time.clone());
+    }
 
     lazy_static! {
         static ref RE: Regex = Regex::new(r"\{_commit:(\d+)_\}").unwrap();
     }
-    base_string = RE
-        .replace_all(&base_string, |caps: &regex::Captures| {
-            if let Some(num_str) = caps.get(1)
-                && let Ok(requested_len) = num_str.as_str().parse::<usize>()
-            {
-                let full_hash = &status.commit_hash;
-                let target_len = std::cmp::min(requested_len, full_hash.len());
-                return full_hash[..target_len].to_string();
-            }
-            caps.get(0).unwrap().as_str().to_string()
-        })
-        .into_owned();
+    for caps in RE.captures_iter(&base_string) {
+        let full_match = caps.get(0).unwrap().as_str();
+
+        if let Some(num_str) = caps.get(1)
+            && let Ok(requested_len) = num_str.as_str().parse::<usize>()
+        {
+            let full_hash = &status.commit_hash;
+            let target_len = std::cmp::min(requested_len, full_hash.len());
+            let sliced_hash = full_hash[..target_len].to_string();
+            evaluation.insert(full_match.to_string(), sliced_hash);
+        }
+    }
+
+    evaluation
+}
+
+pub(crate) fn replace_placeholders(
+    mut base_string: String,
+    evaluation: HashMap<String, String>,
+) -> String {
+    for (placeholder_tag, evaluated_value) in evaluation {
+        base_string = base_string.replace(&placeholder_tag, &evaluated_value);
+    }
 
     base_string
 }

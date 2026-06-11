@@ -4,12 +4,14 @@ mod gitter;
 mod placeholder;
 mod repository;
 mod repository_helper;
+mod status;
 
 use crate::colors::Colors;
 use crate::directory::find_repo_dirs;
 use crate::gitter::{Commands, Gitter, Help, Shell};
-use crate::placeholder::{evaluate_placeholders, print_placeholder_help};
+use crate::placeholder::{evaluate_placeholders, print_placeholder_help, replace_placeholders};
 use crate::repository::Repositories;
+use crate::status::process_status;
 use clap::{CommandFactory, Parser};
 use colored::Colorize;
 use std::path::Path;
@@ -29,8 +31,9 @@ async fn main() {
             let args = raw_args.join(" ");
 
             repos.statuses.iter().for_each(|status| {
-                let args = evaluate_placeholders(args.clone(), status);
-                println!("{}", status.to_string(Some(repos.lengths), cli.align_status));
+                let evaluation = evaluate_placeholders(args.clone(), status);
+                let args = replace_placeholders(args.clone(), evaluation);
+                println!("{}", process_status(status, Some(repos.lengths), cli.align_status));
                 println!("$ {} {}", "git".green(), args.yellow());
 
                 let mut command = Command::new("git");
@@ -43,18 +46,19 @@ async fn main() {
             let repos = find_repos(&cli).await;
 
             repos.statuses.iter().for_each(|status| {
-                println!("{}", status.to_string(Some(repos.lengths), cli.align_status));
+                println!("{}", process_status(status, Some(repos.lengths), cli.align_status));
             });
         }
         Commands::Exec { ref raw_args } => {
             let repos = find_repos(&cli).await;
-            let mut args = raw_args.clone();
-
-            let command_name = args.remove(0);
+            let mut raw_args = raw_args.to_vec();
+            let command_name = raw_args.remove(0);
+            let args = raw_args.join(" ");
 
             repos.statuses.iter().for_each(|status| {
-                let args = evaluate_placeholders(args.join(" "), status);
-                println!("{}", status.to_string(Some(repos.lengths), cli.align_status));
+                let evaluation = evaluate_placeholders(args.clone(), status);
+                let args = replace_placeholders(args.clone(), evaluation);
+                println!("{}", process_status(status, Some(repos.lengths), cli.align_status));
                 println!("$ {} {}", command_name.green(), args.yellow());
 
                 let mut command = Command::new(command_name.clone());
@@ -75,7 +79,7 @@ async fn main() {
             let script = path::absolute(Path::new(&path.clone())).expect("Unable to find script");
 
             repos.statuses.iter().for_each(|status| {
-                println!("{}", status.to_string(Some(repos.lengths), cli.align_status));
+                println!("{}", process_status(status, Some(repos.lengths), cli.align_status));
                 println!("$ {} {}", command_name.green(), script.to_string_lossy().yellow());
 
                 let mut command = Command::new(command_name.clone());
@@ -91,8 +95,9 @@ async fn main() {
             let command_name = "bash".to_string();
 
             repos.statuses.iter().for_each(|status| {
-                let args = evaluate_placeholders(args.clone(), status);
-                println!("{}", status.to_string(Some(repos.lengths), cli.align_status));
+                let evaluation = evaluate_placeholders(args.clone(), status);
+                let args = replace_placeholders(args.clone(), evaluation);
+                println!("{}", process_status(status, Some(repos.lengths), cli.align_status));
                 println!("$ {} -c {}", command_name.green(), args.yellow());
 
                 let mut command = Command::new(command_name.clone());
