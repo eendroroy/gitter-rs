@@ -10,6 +10,7 @@ pub struct Status {
     pub path: String,
     pub name: String,
     pub branch: String,
+    pub commit_hash: String,
     pub author_name: String,
     pub author_email: String,
     pub relative_time: String,

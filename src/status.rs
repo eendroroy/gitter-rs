@@ -5,10 +5,11 @@ use colored::Colorize;
 pub(crate) fn status_line(status: &Status, status_lengths: Option<StatusLengths>) -> String {
     if let Some(lengths) = status_lengths {
         format!(
-            "{:<path$} {:<name$} {:<branch$} {:<author_name$} {:<author_email$} {:<relative_time$} {:<absolute_time$}",
+            "{:<path$} {:<name$} {:<branch$} {} {:<author_name$} {:<author_email$} {:<relative_time$} {:<absolute_time$}",
             status.path.color(GLOBAL_COLORS.path),
             status.name.color(GLOBAL_COLORS.name),
             status.branch.color(GLOBAL_COLORS.branch),
+            status.commit_hash.color(GLOBAL_COLORS.commit_hash),
             status.author_name.color(GLOBAL_COLORS.author_name),
             status.author_email.color(GLOBAL_COLORS.author_email),
             status.relative_time.color(GLOBAL_COLORS.relative_time),

@@ -1,11 +1,19 @@
 use crate::repository::Status;
 use chrono::{DateTime, Local, TimeZone, Utc};
-use git2::{Config, Repository};
+use git2::{Config, Error, Repository};
 use std::fs;
 use std::path::Path;
 
 fn extract_config(config: &Option<Config>, property: &str) -> String {
     config.as_ref().and_then(|c| c.get_string(property).ok()).unwrap_or_default()
+}
+
+fn get_current_commit_hash(repo: &Repository) -> Result<String, Error> {
+    let head = repo.head()?;
+    let oid = head.target().ok_or_else(|| {
+        Error::from_str("HEAD is a symbolic reference and does not point directly to a commit OID")
+    })?;
+    Ok(oid.to_string())
 }
 
 fn format_relative_time(commit_time_epoch: i64) -> String {
@@ -80,6 +88,7 @@ pub fn get_repo_status(path: &str, base_path: &str) -> Status {
 
     let config = repository.config().ok();
 
+    let commit_hash = get_current_commit_hash(&repository).unwrap();
     let author_name = extract_config(&config, "user.name");
     let author_email = extract_config(&config, "user.email");
 
@@ -116,6 +125,7 @@ pub fn get_repo_status(path: &str, base_path: &str) -> Status {
             .to_string(),
 
         branch: branch.expect("REASON"),
+        commit_hash,
         author_name,
         author_email,
         relative_time,

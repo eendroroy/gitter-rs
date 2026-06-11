@@ -67,7 +67,7 @@ pub(crate) enum Commands {
     Help {
         #[command(subcommand)]
         topic: Option<Help>,
-    }
+    },
 }
 
 #[derive(Subcommand, Debug)]
@@ -97,5 +97,5 @@ impl Display for Shell {
 
 #[derive(Subcommand, Debug)]
 pub(crate) enum Help {
-    Placeholder
+    Placeholder,
 }
