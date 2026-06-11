@@ -1,14 +1,14 @@
-mod colors;
 mod directory;
 mod gitter;
+mod palette;
 mod placeholder;
 mod repository;
 mod repository_helper;
 mod status;
 
-use crate::colors::Colors;
 use crate::directory::find_repo_dirs;
 use crate::gitter::{Commands, Gitter, Help, Shell};
+use crate::palette::Palette;
 use crate::placeholder::{evaluate_placeholders, print_placeholder_help, replace_placeholders};
 use crate::repository::Repositories;
 use crate::status::process_status;
@@ -19,7 +19,9 @@ use std::process::Command;
 use std::sync::LazyLock;
 use std::{env, path};
 
-pub static GLOBAL_COLORS: LazyLock<Colors> = LazyLock::new(Colors::default);
+pub static STYLE: LazyLock<Palette> = LazyLock::new(Palette::default);
+pub static STATUS: &str =
+    "{_path:r_}/{_name_} on {_branch_} [{_commit:8_}] by {_author:e_} {_time:r_}";
 
 #[tokio::main]
 async fn main() {
@@ -33,7 +35,10 @@ async fn main() {
             repos.statuses.iter().for_each(|status| {
                 let evaluation = evaluate_placeholders(args.clone(), status);
                 let args = replace_placeholders(args.clone(), evaluation);
-                println!("{}", process_status(status, Some(repos.lengths), cli.align_status));
+                println!(
+                    "{}",
+                    process_status(cli.template.clone(), status, Some(repos.lengths), cli.align)
+                );
                 println!("$ {} {}", "git".green(), args.yellow());
 
                 let mut command = Command::new("git");
@@ -46,7 +51,10 @@ async fn main() {
             let repos = find_repos(&cli).await;
 
             repos.statuses.iter().for_each(|status| {
-                println!("{}", process_status(status, Some(repos.lengths), cli.align_status));
+                println!(
+                    "{}",
+                    process_status(cli.template.clone(), status, Some(repos.lengths), cli.align)
+                );
             });
         }
         Commands::Exec { ref raw_args } => {
@@ -58,7 +66,10 @@ async fn main() {
             repos.statuses.iter().for_each(|status| {
                 let evaluation = evaluate_placeholders(args.clone(), status);
                 let args = replace_placeholders(args.clone(), evaluation);
-                println!("{}", process_status(status, Some(repos.lengths), cli.align_status));
+                println!(
+                    "{}",
+                    process_status(cli.template.clone(), status, Some(repos.lengths), cli.align)
+                );
                 println!("$ {} {}", command_name.green(), args.yellow());
 
                 let mut command = Command::new(command_name.clone());
@@ -79,7 +90,10 @@ async fn main() {
             let script = path::absolute(Path::new(&path.clone())).expect("Unable to find script");
 
             repos.statuses.iter().for_each(|status| {
-                println!("{}", process_status(status, Some(repos.lengths), cli.align_status));
+                println!(
+                    "{}",
+                    process_status(cli.template.clone(), status, Some(repos.lengths), cli.align)
+                );
                 println!("$ {} {}", command_name.green(), script.to_string_lossy().yellow());
 
                 let mut command = Command::new(command_name.clone());
@@ -97,7 +111,10 @@ async fn main() {
             repos.statuses.iter().for_each(|status| {
                 let evaluation = evaluate_placeholders(args.clone(), status);
                 let args = replace_placeholders(args.clone(), evaluation);
-                println!("{}", process_status(status, Some(repos.lengths), cli.align_status));
+                println!(
+                    "{}",
+                    process_status(cli.template.clone(), status, Some(repos.lengths), cli.align)
+                );
                 println!("$ {} -c {}", command_name.green(), args.yellow());
 
                 let mut command = Command::new(command_name.clone());

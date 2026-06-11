@@ -31,9 +31,13 @@ pub(crate) struct Gitter {
     #[arg(short = 'C', long = "pwd", default_value = ".", global = true)]
     pub(crate) directory: String,
 
+    /// Repo status-line template
+    #[arg(short = 'T', long = "template", global = true)]
+    pub(crate) template: Option<String>,
+
     /// Align components of each status line
     #[arg(short, long, action = clap::ArgAction::SetTrue, global = true)]
-    pub(crate) align_status: bool,
+    pub(crate) align: bool,
 }
 
 #[derive(Subcommand, Debug)]

@@ -1,76 +1,63 @@
-use crate::GLOBAL_COLORS;
+use crate::palette::ComponentStyle;
 use crate::placeholder::{evaluate_placeholders, replace_placeholders};
 use crate::repository::{Status, StatusLengths};
-use colored::Colorize;
+use crate::{STATUS, STYLE};
+use std::collections::HashMap;
 
-pub static DEFAULT_STATUS: &str =
-    "{_path:r_} {_name_} {_branch_} {_commit:8_} {_author:e_} {_time:r_}";
+fn update_evaluation_padding(evaluation: &mut HashMap<String, String>, key: &str, width: usize) {
+    if let Some(val) = evaluation.get_mut(key) {
+        *val = format!("{:<width$}", val, width = width);
+    }
+}
+
+fn update_evaluation_style(
+    evaluation: &mut HashMap<String, String>,
+    key: &str,
+    style: ComponentStyle,
+) {
+    if let Some(val) = evaluation.get_mut(key) {
+        *val = style.apply(val);
+    }
+}
 
 pub(crate) fn process_status(
+    template: Option<String>,
     status: &Status,
     lengths: Option<StatusLengths>,
     align: bool,
 ) -> String {
-    let mut evaluation = evaluate_placeholders(DEFAULT_STATUS.to_string(), status);
+    let mut evaluation = if let Some(template) = template {
+        evaluate_placeholders(template, status)
+    } else {
+        evaluate_placeholders(STATUS.to_string(), status)
+    };
 
-    // 2. If length parameters are provided, left-pad the items to ensure alignment
     if align && let Some(l) = lengths {
-        if let Some(val) = evaluation.get_mut("{_path:r_}") {
-            *val = format!("{:<width$}", val, width = l.path);
-        }
-        if let Some(val) = evaluation.get_mut("{_name_}") {
-            *val = format!("{:<width$}", val, width = l.name);
-        }
-        if let Some(val) = evaluation.get_mut("{_branch_}") {
-            *val = format!("{:<width$}", val, width = l.branch);
-        }
-        if let Some(val) = evaluation.get_mut("{_author:n_}") {
-            *val = format!("{:<width$}", val, width = l.author_name);
-        }
-        if let Some(val) = evaluation.get_mut("{_author:e_}") {
-            *val = format!("{:<width$}", val, width = l.author_email);
-        }
-        if let Some(val) = evaluation.get_mut("{_time:r_}") {
-            *val = format!("{:<width$}", val, width = l.relative_time);
-        }
-        if let Some(val) = evaluation.get_mut("{_time:d_}") {
-            *val = format!("{:<width$}", val, width = l.absolute_time);
-        }
+        update_evaluation_padding(&mut evaluation, "{_path:r_}", l.path);
+        update_evaluation_padding(&mut evaluation, "{_name_}", l.name);
+        update_evaluation_padding(&mut evaluation, "{_branch_}", l.branch);
+        update_evaluation_padding(&mut evaluation, "{_author:n_}", l.author_name);
+        update_evaluation_padding(&mut evaluation, "{_author:e_}", l.author_email);
+        update_evaluation_padding(&mut evaluation, "{_time:r_}", l.relative_time);
+        update_evaluation_padding(&mut evaluation, "{_time:d_}", l.absolute_time);
     }
 
-    // 3. Apply your color palettes over the padded strings
-    if let Some(val) = evaluation.get_mut("{_path:r_}") {
-        *val = val.color(GLOBAL_COLORS.path).to_string();
-    }
-    if let Some(val) = evaluation.get_mut("{_name_}") {
-        *val = val.color(GLOBAL_COLORS.name).to_string();
-    }
-    if let Some(val) = evaluation.get_mut("{_branch_}") {
-        *val = val.color(GLOBAL_COLORS.branch).to_string();
-    }
-    if let Some(val) = evaluation.get_mut("{_commit:f_}") {
-        *val = val.color(GLOBAL_COLORS.commit_hash).to_string();
-    }
-    if let Some(val) = evaluation.get_mut("{_author:n_}") {
-        *val = val.color(GLOBAL_COLORS.author_name).to_string();
-    }
-    if let Some(val) = evaluation.get_mut("{_author:e_}") {
-        *val = val.color(GLOBAL_COLORS.author_email).to_string();
-    }
-    if let Some(val) = evaluation.get_mut("{_time:r_}") {
-        *val = val.color(GLOBAL_COLORS.relative_time).to_string();
-    }
-    if let Some(val) = evaluation.get_mut("{_time:d_}") {
-        *val = val.color(GLOBAL_COLORS.absolute_time).to_string();
-    }
+    update_evaluation_style(&mut evaluation, "{_path:r_}", STYLE.path.clone());
+    update_evaluation_style(&mut evaluation, "{_name_}", STYLE.name.clone());
+    update_evaluation_style(&mut evaluation, "{_branch_}", STYLE.branch.clone());
+    update_evaluation_style(&mut evaluation, "{_commit:f_}", STYLE.commit_hash.clone());
+    update_evaluation_style(&mut evaluation, "{_author:n_}", STYLE.author_name.clone());
+    update_evaluation_style(&mut evaluation, "{_author:e_}", STYLE.author_email.clone());
+    update_evaluation_style(&mut evaluation, "{_time:r_}", STYLE.relative_time.clone());
+    update_evaluation_style(&mut evaluation, "{_time:d_}", STYLE.absolute_time.clone());
 
     // Also color custom variable-width commit tokens (like {_commit:8_}) stored in the map
     for (key, val) in evaluation.iter_mut() {
         if key.starts_with("{_commit:") {
-            *val = val.color(GLOBAL_COLORS.commit_hash).to_string();
+            *val = STYLE.commit_hash.apply(val);
         }
     }
 
     // 4. Merge all structural modifications back into your main template sequence
-    replace_placeholders(DEFAULT_STATUS.to_string(), evaluation)
+    replace_placeholders(STATUS.to_string(), evaluation)
 }
