@@ -3,6 +3,8 @@ use clap::builder::styling::AnsiColor::{Blue, Cyan, Green, Red, Yellow};
 use clap::builder::styling::Color::Ansi;
 use clap::builder::styling::Style;
 use clap::{Parser, Subcommand};
+use std::fmt;
+use std::fmt::{Display, Formatter};
 
 pub const CLAP_STYLE: Styles = Styles::styled()
     .header(Style::new().bold().fg_color(Some(Ansi(Green))))
@@ -41,13 +43,17 @@ pub(crate) enum Commands {
         raw_args: Vec<String>,
     },
     /// Execute a bash script file
-    Bash {
+    #[clap(alias = "s")]
+    Script {
+        #[command(subcommand)]
+        shell: Option<Shell>,
+
         #[arg(short = 'p', long = "path", default_value = ".", global = true)]
         path: String,
     },
     /// Evaluate a shell command - useful for complex commands involving pipes and redirections
-    #[clap(alias = "e")]
-    Eval {
+    #[clap(alias = "b")]
+    Bash {
         #[arg(trailing_var_arg = true, allow_hyphen_values = true, num_args = 0..)]
         raw_args: Vec<String>,
     },
@@ -66,4 +72,19 @@ pub(crate) enum Shell {
     #[allow(clippy::enum_variant_names)]
     PowerShell,
     Zsh,
+}
+
+impl Display for Shell {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        let shell_str = match self {
+            Shell::Bash => "bash",
+            Shell::Elvish => "elvish",
+            Shell::Fish => "fish",
+            Shell::PowerShell => "powershell",
+            Shell::Zsh => "zsh",
+        };
+
+        // Write the string slice directly into the formatter buffer
+        write!(f, "{}", shell_str)
+    }
 }

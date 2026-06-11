@@ -1,6 +1,7 @@
 mod colors;
 mod directory;
 mod gitter;
+mod placeholder;
 mod repository;
 mod repository_helper;
 mod status;
@@ -8,6 +9,7 @@ mod status;
 use crate::colors::Colors;
 use crate::directory::find_repo_dirs;
 use crate::gitter::{Commands, Gitter, Shell};
+use crate::placeholder::evaluate_placeholders;
 use crate::repository::Repositories;
 use crate::status::status_line;
 use clap::{CommandFactory, Parser};
@@ -26,17 +28,16 @@ async fn main() {
     match cli.command {
         Commands::Git { ref raw_args } => {
             let repos = find_repos(&cli).await;
+            let args = raw_args.join(" ");
 
             repos.statuses.iter().for_each(|status| {
+                let args = evaluate_placeholders(args.clone(), status);
                 println!("{}", status_line(status, Some(repos.lengths)));
-                println!("$ {} {}", "git".green(), raw_args.join(" ").yellow());
+                println!("$ {} {}", "git".green(), args.yellow());
 
                 let mut command = Command::new("git");
                 command.current_dir(status.absolute_path.clone());
-                raw_args.iter().for_each(|arg| {
-                    command.arg(arg);
-                });
-
+                command.arg(args);
                 command.status().expect("Unable to execute command");
             });
         }
@@ -54,76 +55,66 @@ async fn main() {
             let command_name = args.remove(0);
 
             repos.statuses.iter().for_each(|status| {
+                let args = evaluate_placeholders(args.join(" "), status);
                 println!("{}", status_line(status, Some(repos.lengths)));
-                println!("$ {} {}", command_name.green(), args.join(" ").yellow());
+                println!("$ {} {}", command_name.green(), args.yellow());
 
                 let mut command = Command::new(command_name.clone());
                 command.current_dir(status.absolute_path.clone());
-                args.iter().for_each(|arg| {
-                    command.arg(arg);
-                });
-
+                command.arg(args);
                 command.status().expect("Unable to execute command");
             });
         }
-        Commands::Bash { ref path } => {
+        Commands::Script { ref shell, ref path } => {
             let repos = find_repos(&cli).await;
+
+            let command_name = if let Some(shell) = shell {
+                shell.to_string()
+            } else {
+                get_default_shell().to_string()
+            };
 
             let script = path::absolute(Path::new(&path.clone())).expect("Unable to find script");
 
             repos.statuses.iter().for_each(|status| {
                 println!("{}", status_line(status, Some(repos.lengths)));
-                println!("$ {} {}", "bash".green(), script.to_string_lossy().yellow());
+                println!("$ {} {}", command_name.green(), script.to_string_lossy().yellow());
 
-                let mut command = Command::new("bash");
+                let mut command = Command::new(command_name.clone());
                 command.current_dir(status.absolute_path.clone());
                 command.arg(script.clone());
                 command.status().expect("Unable to execute command");
             });
         }
-        Commands::Eval { ref raw_args } => {
+        Commands::Bash { ref raw_args } => {
             let repos = find_repos(&cli).await;
+            let args = raw_args.join(" ");
 
             let command_name = "bash".to_string();
-            let eval = &format!("eval {}", raw_args.join(" "));
 
             repos.statuses.iter().for_each(|status| {
+                let args = evaluate_placeholders(args.clone(), status);
                 println!("{}", status_line(status, Some(repos.lengths)));
-                println!(
-                    "$ {} {} {}",
-                    command_name.green(),
-                    "eval".blue(),
-                    raw_args.join(" ").yellow()
-                );
+                println!("$ {} -c {}", command_name.green(), args.yellow());
 
                 let mut command = Command::new(command_name.clone());
                 command.current_dir(status.absolute_path.clone());
                 command.arg("-c");
-                command.arg(eval);
+                command.arg(args);
                 command.status().expect("Unable to eval command");
             });
         }
         Commands::Completion { shell } => {
             let command = &mut Gitter::command();
-            let clap_shell = match shell {
-                Some(Shell::Bash) => clap_complete::Shell::Bash,
-                Some(Shell::Elvish) => clap_complete::Shell::Elvish,
-                Some(Shell::Fish) => clap_complete::Shell::Fish,
-                Some(Shell::PowerShell) => clap_complete::Shell::PowerShell,
-                Some(Shell::Zsh) => clap_complete::Shell::Zsh,
-                None => {
-                    let shell_var = env::var("SHELL").unwrap_or_else(|_| "/bin/sh".to_string());
-                    let shell_path = Path::new(&shell_var);
 
-                    // Extract just the file name (e.g., "/bin/zsh" -> "zsh")
-                    match shell_path.file_name().and_then(|os_str| os_str.to_str()) {
-                        Some("bash") => clap_complete::Shell::Bash,
-                        Some("zsh") => clap_complete::Shell::Zsh,
-                        Some("fish") => clap_complete::Shell::Fish,
-                        Some("elvish") => clap_complete::Shell::Elvish,
-                        _ => clap_complete::Shell::Bash, // Safe fallback default
-                    }
-                }
+            let shell: Shell = if let Some(shell) = shell { shell } else { get_default_shell() };
+
+            let clap_shell = match shell {
+                Shell::Bash => clap_complete::Shell::Bash,
+                Shell::Elvish => clap_complete::Shell::Elvish,
+                Shell::Fish => clap_complete::Shell::Fish,
+                Shell::PowerShell => clap_complete::Shell::PowerShell,
+                Shell::Zsh => clap_complete::Shell::Zsh,
             };
 
             clap_complete::generate(clap_shell, command, "gitter", &mut std::io::stdout());
@@ -137,4 +128,17 @@ async fn find_repos(cli: &Gitter) -> Repositories {
 
     repos.compute_lengths();
     repos
+}
+
+fn get_default_shell() -> Shell {
+    let shell_var = env::var("SHELL").unwrap_or_else(|_| "/bin/sh".to_string());
+    let shell_path = Path::new(&shell_var);
+
+    match shell_path.file_name().and_then(|os_str| os_str.to_str()) {
+        Some("bash") => Shell::Bash,
+        Some("zsh") => Shell::Zsh,
+        Some("fish") => Shell::Fish,
+        Some("elvish") => Shell::Elvish,
+        _ => Shell::Bash,
+    }
 }
