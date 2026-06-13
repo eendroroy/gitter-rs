@@ -1,0 +1,3 @@
+[target.aarch64-pc-windows-gnullvm]
+dockerfile = "Cross.aarch64-pc-windows-gnullvm.Dockerfile"
+context = "."

@@ -1,0 +1,162 @@
+# ==============================================================================
+# PLATFORM-AGNOSTIC RUST PARALLEL TASK RUNNER (CARGO-MAKE CONFIG)
+# Works natively on macOS, Linux, and Windows hosts.
+# Handles 6 unique target distributions
+# Automated Artifact Structuring Enabled
+# ==============================================================================
+
+[config]
+skip_core_tasks = true
+
+# --- Global Environment Variables ---
+[env]
+BINARY_NAME = "gitter"
+CARGO_FLAGS = "--release"
+TARGET_DIR  = "target"
+ARTIFACT_DIR = "artifacts/release"
+
+# --- Main Pipelines ---
+[tasks.all]
+description = "Default pipeline to validate, build, and structure all distribution targets."
+dependencies = ["preflight-check", "build-matrix", "deploy"]
+
+[tasks.build-matrix]
+description = "Runs compilation matrix concurrently based on Host OS."
+run_task = { name = ["linux", "win", "mac"], parallel = true }
+
+[tasks.linux]
+dependencies = ["linux-x86", "linux-arm"]
+
+[tasks.win]
+dependencies = ["win-x86", "win-arm"]
+
+[tasks.mac]
+dependencies = ["mac-silicon", "mac-intel"]
+
+# ==============================================================================
+# PRE-FLIGHT DEPENDENCY CHECKS
+# ==============================================================================
+
+[tasks.preflight-check]
+description = "Ensures required local cross-compilation tooling is installed."
+script_runner = "bash"
+script = '''
+echo "Running pre-flight tool checks..."
+if ! command -v cross &> /dev/null; then
+    echo "ERROR: 'cross' is not installed. Please run: cargo install cross --git https://github.com/cross-rs/cross"
+    exit 1
+fi
+echo "Pre-flight checks passed."
+'''
+
+# ==============================================================================
+# CORE BUILD TASKS
+# ==============================================================================
+
+[tasks.linux-x86]
+description = "Builds a statically linked x86_64 Linux binary via Cross (Docker)"
+command = "cross"
+args = ["build", "--target", "x86_64-unknown-linux-musl", "${CARGO_FLAGS}"]
+
+[tasks.linux-arm]
+description = "Builds a statically linked 64-bit ARM Linux binary via Cross (Docker)"
+command = "cross"
+args = ["build", "--target", "aarch64-unknown-linux-musl", "${CARGO_FLAGS}"]
+
+[tasks.win-x86]
+description = "Builds an x86_64 Windows executable via Cross (Docker/MinGW)"
+command = "cross"
+args = ["build", "--target", "x86_64-pc-windows-gnu", "${CARGO_FLAGS}"]
+
+[tasks.win-arm]
+description = "Builds an ARM64 Windows executable via Cross (Docker/LLVM)"
+command = "cross"
+args = ["build", "--target", "aarch64-pc-windows-gnullvm", "${CARGO_FLAGS}"]
+
+# --- macOS Target Compilation (Conditional Execution) ---
+
+[tasks.mac-silicon]
+description = "Builds a native Apple Silicon macOS binary (Only active on macOS host)"
+command = "cargo"
+args = ["build", "--target", "aarch64-apple-darwin", "${CARGO_FLAGS}"]
+
+[tasks.mac-silicon.condition]
+platforms = ["mac"]
+fail_message = "[Skipped] Cannot compile Mac Silicon (aarch64-apple-darwin) on a non-macOS machine."
+
+[tasks.mac-intel]
+description = "Builds an Intel macOS binary locally (Only active on macOS host)"
+command = "cargo"
+args = ["build", "--target", "x86_64-apple-darwin", "${CARGO_FLAGS}"]
+
+[tasks.mac-intel.condition]
+platforms = ["mac"]
+fail_message = "[Skipped] Cannot compile Mac Intel (x86_64-apple-darwin) on a non-macOS machine."
+
+# ==============================================================================
+# ARTIFACT DEPLOYMENT & STRUCTURING TASK
+# ==============================================================================
+
+[tasks.deploy]
+description = "Collects built binaries and organizes them inside a predictable directory structure"
+script_runner = "bash"
+script = '''
+set -e # Fail-fast: Stop running immediately if a command or copy operation fails
+
+echo "Organizing files into standardized layout under ${ARTIFACT_DIR}/..."
+
+# 1. Structure Linux Outputs
+if [ -f "${TARGET_DIR}/x86_64-unknown-linux-musl/release/${BINARY_NAME}" ]; then
+    mkdir -p "${ARTIFACT_DIR}/linux/x86_64"
+    cp "${TARGET_DIR}/x86_64-unknown-linux-musl/release/${BINARY_NAME}" "${ARTIFACT_DIR}/linux/x86_64/"
+    echo  "${ARTIFACT_DIR}/linux/x86_64/${BINARY_NAME}"
+fi
+
+if [ -f "${TARGET_DIR}/aarch64-unknown-linux-musl/release/${BINARY_NAME}" ]; then
+    mkdir -p "${ARTIFACT_DIR}/linux/aarch64"
+    cp "${TARGET_DIR}/aarch64-unknown-linux-musl/release/${BINARY_NAME}" "${ARTIFACT_DIR}/linux/aarch64/"
+    echo  "${ARTIFACT_DIR}/linux/aarch64/${BINARY_NAME}"
+fi
+
+# 2. Structure Windows Outputs
+if [ -f "${TARGET_DIR}/x86_64-pc-windows-gnu/release/${BINARY_NAME}.exe" ]; then
+    mkdir -p "${ARTIFACT_DIR}/windows/x86_64"
+    cp "${TARGET_DIR}/x86_64-pc-windows-gnu/release/${BINARY_NAME}.exe" "${ARTIFACT_DIR}/windows/x86_64/"
+    echo "${ARTIFACT_DIR}/windows/x86_64/${BINARY_NAME}.exe"
+fi
+
+if [ -f "${TARGET_DIR}/aarch64-pc-windows-gnullvm/release/${BINARY_NAME}.exe" ]; then
+    mkdir -p "${ARTIFACT_DIR}/windows/aarch64"
+    cp "${TARGET_DIR}/aarch64-pc-windows-gnullvm/release/${BINARY_NAME}.exe" "${ARTIFACT_DIR}/windows/aarch64/"
+    echo "${ARTIFACT_DIR}/windows/aarch64/${BINARY_NAME}.exe"
+fi
+
+# 3. Structure macOS Outputs
+if [ -f "${TARGET_DIR}/x86_64-apple-darwin/release/${BINARY_NAME}" ]; then
+    mkdir -p "${ARTIFACT_DIR}/macos/x86_64"
+    cp "${TARGET_DIR}/x86_64-apple-darwin/release/${BINARY_NAME}" "${ARTIFACT_DIR}/macos/x86_64/"
+    echo "${ARTIFACT_DIR}/macos/x86_64/${BINARY_NAME}"
+fi
+
+if [ -f "${TARGET_DIR}/aarch64-apple-darwin/release/${BINARY_NAME}" ]; then
+    mkdir -p "${ARTIFACT_DIR}/macos/aarch64"
+    echo "${ARTIFACT_DIR}/macos/aarch64"
+    cp "${TARGET_DIR}/aarch64-apple-darwin/release/${BINARY_NAME}" "${ARTIFACT_DIR}/macos/aarch64/"
+    echo "${ARTIFACT_DIR}/macos/aarch64/${BINARY_NAME}"
+fi
+
+echo "Artifact organization completed successfully."
+'''
+
+# ==============================================================================
+# UTILITIES
+# ==============================================================================
+
+[tasks.clean]
+description = "Wipes the local target and artifacts directory structures"
+script_runner = "bash"
+script = '''
+rm -rf artifacts
+cargo clean
+echo "Target and artifact folders pristine."
+'''
