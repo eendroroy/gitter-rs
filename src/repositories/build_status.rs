@@ -1,8 +1,8 @@
-use crate::repository::Status;
 use chrono::{DateTime, Local, TimeZone, Utc};
 use git2::{Config, Error, Repository};
 use std::fs;
 use std::path::Path;
+use crate::repositories::repositories::Status;
 
 fn extract_config(config: &Option<Config>, property: &str) -> String {
     config.as_ref().and_then(|c| c.get_string(property).ok()).unwrap_or_default()
@@ -56,7 +56,7 @@ fn format_relative_time(commit_time_epoch: i64) -> String {
     format!("{} years ago", months / 12)
 }
 
-pub fn get_repo_status(path: &str, base_path: &str) -> Status {
+pub fn build_status(path: &str, base_path: &str) -> Status {
     let repository = Repository::open(path).expect("Failed to open git repository");
 
     let relative_path = Path::new(path)

@@ -23,29 +23,29 @@ pub const CLAP_STYLE: Styles = Styles::styled()
     disable_help_subcommand = true,
     styles=CLAP_STYLE
 )]
-pub(crate) struct Gitter {
+pub struct Gitter {
     #[command(subcommand)]
-    pub(crate) command: Commands,
+    pub command: Commands,
 
     /// Working directory, if not provided current directory will be used
     #[arg(short = 'C', long = "pwd", default_value = ".", global = true)]
-    pub(crate) directory: String,
+    pub directory: String,
 
     /// Max depth to traverse subdirectories
     #[arg(short = 'd', long = "max-depth", default_value = "2", global = true)]
-    pub(crate) max_depth: usize,
+    pub max_depth: usize,
 
     /// Repo status-line template
     #[arg(short = 'T', long = "template", global = true)]
-    pub(crate) template: Option<String>,
+    pub template: Option<String>,
 
     /// Align components of each status line
     #[arg(short, long, action = clap::ArgAction::SetTrue, global = true)]
-    pub(crate) align: bool,
+    pub align: bool,
 }
 
 #[derive(Subcommand, Debug)]
-pub(crate) enum Commands {
+pub enum Commands {
     /// List repositories
     #[clap(alias = "ls")]
     List,
@@ -63,7 +63,6 @@ pub(crate) enum Commands {
     },
     /// Execute a script file
     #[clap(alias = "s")]
-    
     Script {
         #[command(subcommand)]
         shell: Option<Shell>,
@@ -93,7 +92,7 @@ pub(crate) enum Commands {
 }
 
 #[derive(Subcommand, Debug)]
-pub(crate) enum Shell {
+pub enum Shell {
     Bash,
     Elvish,
     Fish,
@@ -118,6 +117,6 @@ impl Display for Shell {
 }
 
 #[derive(Subcommand, Debug)]
-pub(crate) enum Help {
+pub enum Help {
     Placeholder,
 }

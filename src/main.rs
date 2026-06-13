@@ -2,22 +2,20 @@ mod directory;
 mod gitter;
 mod palette;
 mod placeholder;
-mod repository;
-mod repository_helper;
-mod status;
+mod repositories;
 
 use crate::directory::find_repo_dirs;
 use crate::gitter::{Commands, Gitter, Help, Shell};
 use crate::palette::Palette;
 use crate::placeholder::{evaluate_placeholders, print_placeholder_help, replace_placeholders};
-use crate::repository::Repositories;
-use crate::status::process_status;
 use clap::{CommandFactory, Parser};
 use colored::Colorize;
 use std::path::Path;
 use std::process::Command;
 use std::sync::LazyLock;
 use std::{env, path};
+use crate::repositories::repositories::Repositories;
+use crate::repositories::print_status::print_status;
 
 pub static STYLE: LazyLock<Palette> = LazyLock::new(Palette::default);
 pub static STATUS: &str =
@@ -37,7 +35,7 @@ async fn main() {
                 let args = replace_placeholders(args.clone(), evaluation);
                 println!(
                     "{}",
-                    process_status(cli.template.clone(), status, Some(repos.lengths), cli.align)
+                    print_status(cli.template.clone(), status, Some(repos.lengths), cli.align)
                 );
                 println!("$ {} {}", "git".green(), args.yellow());
 
@@ -53,7 +51,7 @@ async fn main() {
             repos.statuses.iter().for_each(|status| {
                 println!(
                     "{}",
-                    process_status(cli.template.clone(), status, Some(repos.lengths), cli.align)
+                    print_status(cli.template.clone(), status, Some(repos.lengths), cli.align)
                 );
             });
         }
@@ -68,7 +66,7 @@ async fn main() {
                 let args = replace_placeholders(args.clone(), evaluation);
                 println!(
                     "{}",
-                    process_status(cli.template.clone(), status, Some(repos.lengths), cli.align)
+                    print_status(cli.template.clone(), status, Some(repos.lengths), cli.align)
                 );
                 println!("$ {} {}", command_name.green(), args.yellow());
 
@@ -92,7 +90,7 @@ async fn main() {
             repos.statuses.iter().for_each(|status| {
                 println!(
                     "{}",
-                    process_status(cli.template.clone(), status, Some(repos.lengths), cli.align)
+                    print_status(cli.template.clone(), status, Some(repos.lengths), cli.align)
                 );
                 println!("$ {} {}", command_name.green(), script.to_string_lossy().yellow());
 
@@ -113,7 +111,7 @@ async fn main() {
                 let args = replace_placeholders(args.clone(), evaluation);
                 println!(
                     "{}",
-                    process_status(cli.template.clone(), status, Some(repos.lengths), cli.align)
+                    print_status(cli.template.clone(), status, Some(repos.lengths), cli.align)
                 );
                 println!("$ {} -c {}", command_name.green(), args.yellow());
 

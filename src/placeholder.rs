@@ -1,10 +1,10 @@
 use crate::gitter::CLAP_STYLE;
-use crate::repository::Status;
 use lazy_static::lazy_static;
 use regex::Regex;
 use std::collections::HashMap;
+use crate::repositories::repositories::Status;
 
-pub(crate) fn evaluate_placeholders(
+pub fn evaluate_placeholders(
     base_string: String,
     status: &Status,
 ) -> HashMap<String, String> {
@@ -57,7 +57,7 @@ pub(crate) fn evaluate_placeholders(
     evaluation
 }
 
-pub(crate) fn replace_placeholders(
+pub fn replace_placeholders(
     mut base_string: String,
     evaluation: HashMap<String, String>,
 ) -> String {
@@ -68,7 +68,7 @@ pub(crate) fn replace_placeholders(
     base_string
 }
 
-pub(crate) fn print_placeholder_help() {
+pub fn print_placeholder_help() {
     let header = CLAP_STYLE.get_header();
     let usage = CLAP_STYLE.get_usage();
     let literal = CLAP_STYLE.get_literal();

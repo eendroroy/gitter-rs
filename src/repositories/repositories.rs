@@ -1,8 +1,8 @@
-use crate::repository_helper::get_repo_status;
 use std::cmp::max;
 use std::path::PathBuf;
 use std::sync::Arc;
 use tokio::task::JoinSet;
+use crate::repositories::build_status::build_status;
 
 #[derive(Debug, Default, Clone)]
 pub struct Status {
@@ -43,7 +43,7 @@ impl Repositories {
         for repo in repositories {
             let base_path = Arc::clone(&base_path);
             tasks.spawn_blocking(move || {
-                get_repo_status(repo.to_str().expect("Invalid UTF-8 path"), &base_path)
+                build_status(repo.to_str().expect("Invalid UTF-8 path"), &base_path)
             });
         }
 

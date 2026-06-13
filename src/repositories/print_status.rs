@@ -1,6 +1,6 @@
 use crate::palette::ComponentStyle;
 use crate::placeholder::{evaluate_placeholders, replace_placeholders};
-use crate::repository::{Status, StatusLengths};
+use crate::repositories::repositories::{Status, StatusLengths};
 use crate::{STATUS, STYLE};
 use std::collections::HashMap;
 
@@ -20,7 +20,7 @@ fn update_evaluation_style(
     }
 }
 
-pub(crate) fn process_status(
+pub fn print_status(
     template: Option<String>,
     status: &Status,
     lengths: Option<StatusLengths>,
