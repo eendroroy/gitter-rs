@@ -39,6 +39,10 @@ pub struct Gitter {
     #[arg(short = 'T', long = "template", global = true)]
     pub template: Option<String>,
 
+    /// Filter string
+    #[arg(short, long, global = true)]
+    pub filter: Option<String>,
+
     /// Align components of each status line
     #[arg(short, long, action = clap::ArgAction::SetTrue, global = true)]
     pub align: bool,
@@ -119,4 +123,5 @@ impl Display for Shell {
 pub enum Help {
     Placeholder,
     Gitterignore,
+    Filter,
 }

@@ -7,9 +7,10 @@ mod repository;
 
 use crate::directory::find_repo_dirs::find_repo_dirs;
 use crate::gitter::{Commands, Gitter, Help, Shell};
-use crate::help::{print_gitterignore_help, print_placeholder_help};
+use crate::help::{print_filter_help, print_gitterignore_help, print_placeholder_help};
 use crate::palette::Palette;
 use crate::placeholder::{evaluate_placeholders, replace_placeholders};
+use crate::repository::filter_repositories::filter_repositories;
 use crate::repository::print_status::print_status;
 use crate::repository::repositories::Repositories;
 use clap::{CommandFactory, Parser};
@@ -144,6 +145,7 @@ async fn main() {
                 match topic {
                     Help::Placeholder => print_placeholder_help(),
                     Help::Gitterignore => print_gitterignore_help(),
+                    Help::Filter => print_filter_help(),
                 }
             } else {
                 let mut cmd = Gitter::command();
@@ -156,6 +158,9 @@ async fn main() {
 async fn find_repos(cli: &Gitter) -> Repositories {
     let repositories = find_repo_dirs(&cli.directory, cli.max_depth);
     let mut repos = Repositories::new(repositories, &cli.directory).await;
+    if let Some(filter) = &cli.filter {
+        repos = filter_repositories(&mut repos, filter);
+    }
 
     repos.compute_lengths();
     repos
