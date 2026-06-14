@@ -1,12 +1,15 @@
+pub mod directory;
 mod gitter;
+pub mod help;
 mod palette;
 mod placeholder;
 mod repository;
 
+use crate::directory::find_repo_dirs::find_repo_dirs;
 use crate::gitter::{Commands, Gitter, Help, Shell};
+use crate::help::{print_gitterignore_help, print_placeholder_help};
 use crate::palette::Palette;
-use crate::placeholder::{evaluate_placeholders, print_placeholder_help, replace_placeholders};
-use crate::repository::find_repo_dirs::find_repo_dirs;
+use crate::placeholder::{evaluate_placeholders, replace_placeholders};
 use crate::repository::print_status::print_status;
 use crate::repository::repositories::Repositories;
 use clap::{CommandFactory, Parser};
@@ -140,6 +143,7 @@ async fn main() {
             if let Some(topic) = topic {
                 match topic {
                     Help::Placeholder => print_placeholder_help(),
+                    Help::Gitterignore => print_gitterignore_help(),
                 }
             } else {
                 let mut cmd = Gitter::command();

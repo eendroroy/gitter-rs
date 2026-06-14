@@ -119,4 +119,5 @@ impl Display for Shell {
 #[derive(Subcommand, Debug)]
 pub enum Help {
     Placeholder,
+    Gitterignore,
 }
