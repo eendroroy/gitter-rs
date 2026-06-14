@@ -1,7 +1,7 @@
 use chrono::{Local, TimeZone};
 use git2::Repository;
 
-pub fn get_absolute_time(repository: Repository) -> String {
+pub fn get_absolute_time(repository: &Repository) -> String {
     repository
         .head()
         .and_then(|head| head.peel_to_commit())

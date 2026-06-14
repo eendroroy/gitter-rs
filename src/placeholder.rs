@@ -22,6 +22,9 @@ pub fn evaluate_placeholders(base_string: String, status: &Properties) -> HashMa
     if base_string.contains("{_commit:f_}") {
         evaluation.insert("{_commit:f_}".to_string(), status.commit_hash.clone());
     }
+    if base_string.contains("{_commit:c_}") {
+        evaluation.insert("{_commit:c_}".to_string(), status.commit_count.to_string());
+    }
     if base_string.contains("{_author:e_}") {
         evaluation.insert("{_author:e_}".to_string(), status.author_email.clone());
     }
@@ -101,6 +104,10 @@ pub fn print_placeholder_help() {
     println!(
         "  {: <padding$} The full 40-character Git commit hash string.",
         format!("{literal}{{_commit:f_}}{literal:#}")
+    );
+    println!(
+        "  {: <padding$} Number of commits in current branch",
+        format!("{literal}{{_commit:c_}}{literal:#}")
     );
     println!(
         "  {: <padding$} A variable length commit SHA slice where 'n' is any integer.",

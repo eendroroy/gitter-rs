@@ -6,6 +6,7 @@ mod get_relative_path;
 mod get_relative_time;
 mod get_repo_name;
 mod property_names;
+mod get_commit_count;
 
 pub use extract_config::extract_config;
 pub use get_absolute_time::get_absolute_time;
@@ -14,5 +15,6 @@ pub use get_current_commit_hash::get_current_commit_hash;
 pub use get_relative_path::get_relative_path;
 pub use get_relative_time::get_relative_time;
 pub use get_repo_name::get_repo_name;
+pub use get_commit_count::get_commit_count;
 
 pub use property_names::*;

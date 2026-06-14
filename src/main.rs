@@ -18,7 +18,7 @@ use std::{env, path};
 
 pub static STYLE: LazyLock<Palette> = LazyLock::new(Palette::default);
 pub static STATUS: &str =
-    "{_path:r_}/{_name_} on {_branch_} [{_commit:8_}] by {_author:e_} {_time:r_}";
+    "{_path:r_}/{_name_} on {_branch_} [{_commit:8_}] ({_commit:c_}) by {_author:e_} {_time:r_}";
 
 #[tokio::main]
 async fn main() {
@@ -29,12 +29,12 @@ async fn main() {
             let repos = find_repos(&cli).await;
             let args = raw_args.join(" ");
 
-            repos.statuses.iter().for_each(|status| {
+            repos.props.iter().for_each(|status| {
                 let evaluation = evaluate_placeholders(args.clone(), status);
                 let args = replace_placeholders(args.clone(), evaluation);
                 println!(
                     "{}",
-                    print_status(cli.template.clone(), status, Some(repos.lengths), cli.align)
+                    print_status(cli.template.clone(), status, Some(repos.lens), cli.align)
                 );
                 println!("$ {} {}", "git".green(), args.yellow());
 
@@ -47,10 +47,10 @@ async fn main() {
         Commands::List => {
             let repos = find_repos(&cli).await;
 
-            repos.statuses.iter().for_each(|status| {
+            repos.props.iter().for_each(|status| {
                 println!(
                     "{}",
-                    print_status(cli.template.clone(), status, Some(repos.lengths), cli.align)
+                    print_status(cli.template.clone(), status, Some(repos.lens), cli.align)
                 );
             });
         }
@@ -60,12 +60,12 @@ async fn main() {
             let command_name = raw_args.remove(0);
             let args = raw_args.join(" ");
 
-            repos.statuses.iter().for_each(|status| {
+            repos.props.iter().for_each(|status| {
                 let evaluation = evaluate_placeholders(args.clone(), status);
                 let args = replace_placeholders(args.clone(), evaluation);
                 println!(
                     "{}",
-                    print_status(cli.template.clone(), status, Some(repos.lengths), cli.align)
+                    print_status(cli.template.clone(), status, Some(repos.lens), cli.align)
                 );
                 println!("$ {} {}", command_name.green(), args.yellow());
 
@@ -86,10 +86,10 @@ async fn main() {
 
             let script = path::absolute(Path::new(&path.clone())).expect("Unable to find script");
 
-            repos.statuses.iter().for_each(|status| {
+            repos.props.iter().for_each(|status| {
                 println!(
                     "{}",
-                    print_status(cli.template.clone(), status, Some(repos.lengths), cli.align)
+                    print_status(cli.template.clone(), status, Some(repos.lens), cli.align)
                 );
                 println!("$ {} {}", command_name.green(), script.to_string_lossy().yellow());
 
@@ -105,12 +105,12 @@ async fn main() {
 
             let command_name = "bash".to_string();
 
-            repos.statuses.iter().for_each(|status| {
+            repos.props.iter().for_each(|status| {
                 let evaluation = evaluate_placeholders(args.clone(), status);
                 let args = replace_placeholders(args.clone(), evaluation);
                 println!(
                     "{}",
-                    print_status(cli.template.clone(), status, Some(repos.lengths), cli.align)
+                    print_status(cli.template.clone(), status, Some(repos.lens), cli.align)
                 );
                 println!("$ {} -c {}", command_name.green(), args.yellow());
 
