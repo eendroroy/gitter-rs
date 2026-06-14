@@ -25,7 +25,7 @@ pub const CLAP_STYLE: Styles = Styles::styled()
 )]
 pub struct Gitter {
     #[command(subcommand)]
-    pub command: Commands,
+    pub command: Option<GitterCommand>,
 
     /// Working directory, if not provided current directory will be used
     #[arg(short = 'C', long = "pwd", default_value = ".", global = true)]
@@ -46,25 +46,25 @@ pub struct Gitter {
     /// Align components of each status line
     #[arg(short, long, action = clap::ArgAction::SetTrue, global = true)]
     pub align: bool,
+
+    /// Raw arguments passed after '--' or if no subcommand is specified.
+    /// These are typically passed to the default 'git' command.
+    #[arg(trailing_var_arg = true, allow_hyphen_values = true, num_args = 0.., global = true)]
+    pub raw_args: Vec<String>,
 }
 
-#[derive(Subcommand, Debug)]
-pub enum Commands {
+#[derive(Subcommand, Debug, Default)]
+pub enum GitterCommand {
+    /// Run a git command
+    #[clap(alias = "g")]
+    #[default]
+    Git,
     /// List repositories
     #[clap(alias = "ls")]
     List,
-    /// Run a git command
-    #[clap(alias = "g")]
-    Git {
-        #[arg(trailing_var_arg = true, allow_hyphen_values = true, num_args = 0..)]
-        raw_args: Vec<String>,
-    },
     /// Run an arbitrary command
     #[clap(alias = "x")]
-    Exec {
-        #[arg(trailing_var_arg = true, allow_hyphen_values = true, num_args = 0..)]
-        raw_args: Vec<String>,
-    },
+    Exec,
     /// Execute a script file
     #[clap(alias = "s")]
     Script {
@@ -78,10 +78,7 @@ pub enum Commands {
     /// Kept for simple use cases like run grep in each repository.
     /// For complex cases use `script` command
     #[clap(alias = "b")]
-    Bash {
-        #[arg(trailing_var_arg = true, allow_hyphen_values = true, num_args = 0..)]
-        raw_args: Vec<String>,
-    },
+    Bash,
     /// Generate shell completion
     Completion {
         #[command(subcommand)]

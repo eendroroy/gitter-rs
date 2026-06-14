@@ -1,12 +1,12 @@
-pub mod directory;
+mod directory;
 mod gitter;
-pub mod help;
+mod help;
 mod palette;
 mod placeholder;
 mod repository;
 
 use crate::directory::find_repo_dirs::find_repo_dirs;
-use crate::gitter::{Commands, Gitter, Help, Shell};
+use crate::gitter::{Gitter, GitterCommand, Help, Shell};
 use crate::help::{print_filter_help, print_gitterignore_help, print_placeholder_help};
 use crate::palette::Palette;
 use crate::placeholder::{evaluate_placeholders, replace_placeholders};
@@ -28,10 +28,16 @@ pub static STATUS: &str =
 async fn main() {
     let cli = Gitter::parse();
 
-    match cli.command {
-        Commands::Git { ref raw_args } => {
+    let command = if let Some(command) = &cli.command {
+        command
+    } else {
+        &GitterCommand::Git
+    };
+
+    match command {
+        GitterCommand::Git => {
             let repos = find_repos(&cli).await;
-            let args = raw_args.join(" ");
+            let args = cli.raw_args.join(" ");
 
             repos.props.iter().for_each(|status| {
                 let evaluation = evaluate_placeholders(args.clone(), status);
@@ -48,7 +54,7 @@ async fn main() {
                 command.status().expect("Unable to execute command");
             });
         }
-        Commands::List => {
+        GitterCommand::List => {
             let repos = find_repos(&cli).await;
 
             repos.props.iter().for_each(|status| {
@@ -58,9 +64,9 @@ async fn main() {
                 );
             });
         }
-        Commands::Exec { ref raw_args } => {
+        GitterCommand::Exec => {
             let repos = find_repos(&cli).await;
-            let mut raw_args = raw_args.to_vec();
+            let mut raw_args = cli.raw_args.to_vec();
             let command_name = raw_args.remove(0);
             let args = raw_args.join(" ");
 
@@ -79,7 +85,7 @@ async fn main() {
                 command.status().expect("Unable to execute command");
             });
         }
-        Commands::Script { ref shell, ref path } => {
+        GitterCommand::Script { shell, path } => {
             let repos = find_repos(&cli).await;
 
             let command_name = if let Some(shell) = shell {
@@ -103,9 +109,9 @@ async fn main() {
                 command.status().expect("Unable to execute command");
             });
         }
-        Commands::Bash { ref raw_args } => {
+        GitterCommand::Bash => {
             let repos = find_repos(&cli).await;
-            let args = raw_args.join(" ");
+            let args = cli.raw_args.join(" ");
 
             let command_name = "bash".to_string();
 
@@ -125,10 +131,10 @@ async fn main() {
                 command.status().expect("Unable to eval command");
             });
         }
-        Commands::Completion { shell } => {
+        GitterCommand::Completion { shell } => {
             let command = &mut Gitter::command();
 
-            let shell: Shell = if let Some(shell) = shell { shell } else { get_default_shell() };
+            let shell: &Shell = if let Some(shell) = shell { shell } else { &get_default_shell() };
 
             let clap_shell = match shell {
                 Shell::Bash => clap_complete::Shell::Bash,
@@ -140,7 +146,7 @@ async fn main() {
 
             clap_complete::generate(clap_shell, command, "gitter", &mut std::io::stdout());
         }
-        Commands::Help { ref topic } => {
+        GitterCommand::Help { topic } => {
             if let Some(topic) = topic {
                 match topic {
                     Help::Placeholder => print_placeholder_help(),
