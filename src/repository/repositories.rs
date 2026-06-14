@@ -1,11 +1,11 @@
+use crate::repository::generate_properties::generate_properties;
 use std::cmp::max;
 use std::path::PathBuf;
 use std::sync::Arc;
 use tokio::task::JoinSet;
-use crate::repositories::build_status::build_status;
 
 #[derive(Debug, Default, Clone)]
-pub struct Status {
+pub struct Properties {
     pub absolute_path: String,
     pub relation_path: String,
     pub name: String,
@@ -18,7 +18,7 @@ pub struct Status {
 }
 
 #[derive(Debug, Default, Clone, Copy)]
-pub struct StatusLengths {
+pub struct PropertyLengths {
     pub path: usize,
     pub name: usize,
     pub branch: usize,
@@ -30,8 +30,8 @@ pub struct StatusLengths {
 
 #[derive(Debug, Clone)]
 pub struct Repositories {
-    pub statuses: Vec<Status>,
-    pub lengths: StatusLengths,
+    pub statuses: Vec<Properties>,
+    pub lengths: PropertyLengths,
 }
 
 impl Repositories {
@@ -43,11 +43,11 @@ impl Repositories {
         for repo in repositories {
             let base_path = Arc::clone(&base_path);
             tasks.spawn_blocking(move || {
-                build_status(repo.to_str().expect("Invalid UTF-8 path"), &base_path)
+                generate_properties(repo.to_str().expect("Invalid UTF-8 path"), &base_path)
             });
         }
 
-        let mut statuses: Vec<Status> = Vec::new();
+        let mut statuses: Vec<Properties> = Vec::new();
 
         while let Some(result) = tasks.join_next().await {
             match result {
@@ -59,7 +59,7 @@ impl Repositories {
         statuses.sort_by(|a, b| a.name.cmp(&b.name));
         let repos: Self = Self {
             statuses,
-            lengths: StatusLengths::default(),
+            lengths: PropertyLengths::default(),
         };
         repos
     }

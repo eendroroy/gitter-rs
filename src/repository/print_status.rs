@@ -1,6 +1,6 @@
 use crate::palette::ComponentStyle;
 use crate::placeholder::{evaluate_placeholders, replace_placeholders};
-use crate::repositories::repositories::{Status, StatusLengths};
+use crate::repository::repositories::{Properties, PropertyLengths};
 use crate::{STATUS, STYLE};
 use std::collections::HashMap;
 
@@ -22,8 +22,8 @@ fn update_evaluation_style(
 
 pub fn print_status(
     template: Option<String>,
-    status: &Status,
-    lengths: Option<StatusLengths>,
+    status: &Properties,
+    lengths: Option<PropertyLengths>,
     align: bool,
 ) -> String {
     let mut evaluation = if let Some(template) = template {

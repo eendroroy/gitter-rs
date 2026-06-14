@@ -1,13 +1,10 @@
 use crate::gitter::CLAP_STYLE;
+use crate::repository::repositories::Properties;
 use lazy_static::lazy_static;
 use regex::Regex;
 use std::collections::HashMap;
-use crate::repositories::repositories::Status;
 
-pub fn evaluate_placeholders(
-    base_string: String,
-    status: &Status,
-) -> HashMap<String, String> {
+pub fn evaluate_placeholders(base_string: String, status: &Properties) -> HashMap<String, String> {
     let mut evaluation = HashMap::new();
 
     if base_string.contains("{_name_}") {

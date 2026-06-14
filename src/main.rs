@@ -1,21 +1,20 @@
-mod directory;
 mod gitter;
 mod palette;
 mod placeholder;
-mod repositories;
+mod repository;
 
-use crate::directory::find_repo_dirs;
 use crate::gitter::{Commands, Gitter, Help, Shell};
 use crate::palette::Palette;
 use crate::placeholder::{evaluate_placeholders, print_placeholder_help, replace_placeholders};
+use crate::repository::find_repo_dirs::find_repo_dirs;
+use crate::repository::print_status::print_status;
+use crate::repository::repositories::Repositories;
 use clap::{CommandFactory, Parser};
 use colored::Colorize;
 use std::path::Path;
 use std::process::Command;
 use std::sync::LazyLock;
 use std::{env, path};
-use crate::repositories::repositories::Repositories;
-use crate::repositories::print_status::print_status;
 
 pub static STYLE: LazyLock<Palette> = LazyLock::new(Palette::default);
 pub static STATUS: &str =
