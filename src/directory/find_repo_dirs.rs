@@ -51,7 +51,7 @@ pub fn find_repo_dirs(target_dir: &String, depth: usize) -> Vec<PathBuf> {
                 let all_active_rules: Vec<&IgnoreRule> =
                     active_ignore_rules_stack.iter().flat_map(|(_, rules)| rules.iter()).collect();
 
-                if !is_ignored(repo_name, &repo_path.to_path_buf(), &all_active_rules) {
+                if !is_ignored(repo_name, repo_path, &all_active_rules) {
                     repositories.push(repo_path.into());
                 }
             }

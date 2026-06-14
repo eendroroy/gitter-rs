@@ -1,6 +1,6 @@
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 #[derive(Debug)]
 pub enum IgnoreRule {
@@ -25,56 +25,50 @@ pub fn ignore_patterns(ignore_file_path: &str) -> Vec<IgnoreRule> {
     let reader = BufReader::new(file);
     let mut rules = Vec::new();
 
-    for line in reader.lines() {
-        if let Ok(l) = line {
-            let trimmed_line = l.trim();
-            if trimmed_line.is_empty() || trimmed_line.starts_with('#') {
-                continue; // Skip empty lines and comments
-            }
+    for l in reader.lines().map_while(Result::ok) {
+        let trimmed_line = l.trim();
+        if trimmed_line.is_empty() || trimmed_line.starts_with('#') {
+            continue; // Skip empty lines and comments
+        }
 
-            if let Some((rule_type, pattern)) = trimmed_line.split_once(':') {
-                let pattern_str = pattern.trim().to_string();
-                match rule_type.trim() {
-                    "name" => {
-                        if pattern_str.starts_with('*') && pattern_str.ends_with('*') {
-                            rules.push(IgnoreRule::NameContains(
-                                pattern_str[1..pattern_str.len() - 1].to_string(),
-                            ));
-                        } else if pattern_str.starts_with('*') {
-                            rules.push(IgnoreRule::NameEndsWith(pattern_str[1..].to_string()));
-                        } else if pattern_str.ends_with('*') {
-                            rules.push(IgnoreRule::NameStartsWith(
-                                pattern_str[0..pattern_str.len() - 1].to_string(),
-                            ));
+        if let Some((rule_type, pattern)) = trimmed_line.split_once(':') {
+            let pattern_str = pattern.trim().to_string();
+            match rule_type.trim() {
+                "name" => {
+                    if let Some(stripped_prefix) = pattern_str.strip_prefix('*') {
+                        if let Some(stripped_both) = stripped_prefix.strip_suffix('*') {
+                            rules.push(IgnoreRule::NameContains(stripped_both.to_string()));
                         } else {
-                            rules.push(IgnoreRule::NameExact(pattern_str));
+                            rules.push(IgnoreRule::NameEndsWith(stripped_prefix.to_string()));
                         }
+                    } else if let Some(stripped_suffix) = pattern_str.strip_suffix('*') {
+                        rules.push(IgnoreRule::NameStartsWith(stripped_suffix.to_string()));
+                    } else {
+                        rules.push(IgnoreRule::NameExact(pattern_str));
                     }
-                    "path" => {
-                        if pattern_str.starts_with('*') && pattern_str.ends_with('*') {
-                            rules.push(IgnoreRule::PathContains(
-                                pattern_str[1..pattern_str.len() - 1].to_string(),
-                            ));
-                        } else if pattern_str.starts_with('*') {
-                            rules.push(IgnoreRule::PathEndsWith(pattern_str[1..].to_string()));
-                        } else if pattern_str.ends_with('*') {
-                            rules.push(IgnoreRule::PathStartsWith(
-                                pattern_str[0..pattern_str.len() - 1].to_string(),
-                            ));
-                        } else {
-                            rules.push(IgnoreRule::PathExact(pattern_str));
-                        }
-                    }
-                    "child" => rules.push(IgnoreRule::Child(pattern_str)),
-                    _ => { /* unknown rule type, ignore */ }
                 }
+                "path" => {
+                    if let Some(stripped_prefix) = pattern_str.strip_prefix('*') {
+                        if let Some(stripped_both) = stripped_prefix.strip_suffix('*') {
+                            rules.push(IgnoreRule::PathContains(stripped_both.to_string()));
+                        } else {
+                            rules.push(IgnoreRule::PathEndsWith(stripped_prefix.to_string()));
+                        }
+                    } else if let Some(stripped_suffix) = pattern_str.strip_suffix('*') {
+                        rules.push(IgnoreRule::PathStartsWith(stripped_suffix.to_string()));
+                    } else {
+                        rules.push(IgnoreRule::PathExact(pattern_str));
+                    }
+                }
+                "child" => rules.push(IgnoreRule::Child(pattern_str)),
+                _ => { /* unknown rule type, ignore */ }
             }
         }
     }
     rules
 }
 
-pub fn is_ignored(repo_name: &str, repo_path: &PathBuf, rules: &Vec<&IgnoreRule>) -> bool {
+pub fn is_ignored(repo_name: &str, repo_path: &Path, rules: &Vec<&IgnoreRule>) -> bool {
     for rule in rules {
         match rule {
             IgnoreRule::NameExact(pattern) => {
