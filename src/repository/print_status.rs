@@ -35,7 +35,9 @@ pub fn print_status(
     if align && let Some(l) = lengths {
         update_evaluation_padding(&mut evaluation, "{_path:r_}", l.path);
         update_evaluation_padding(&mut evaluation, "{_name_}", l.name);
-        update_evaluation_padding(&mut evaluation, "{_branch_}", l.branch);
+        update_evaluation_padding(&mut evaluation, "{_branch:n_}", l.branch);
+        update_evaluation_padding(&mut evaluation, "{_branch:c_}", l.branch_count);
+        update_evaluation_padding(&mut evaluation, "{_commit:c_}", l.commit_count);
         update_evaluation_padding(&mut evaluation, "{_author:n_}", l.author_name);
         update_evaluation_padding(&mut evaluation, "{_author:e_}", l.author_email);
         update_evaluation_padding(&mut evaluation, "{_time:r_}", l.relative_time);
@@ -44,7 +46,7 @@ pub fn print_status(
 
     update_evaluation_style(&mut evaluation, "{_path:r_}", STYLE.path.clone());
     update_evaluation_style(&mut evaluation, "{_name_}", STYLE.name.clone());
-    update_evaluation_style(&mut evaluation, "{_branch_}", STYLE.branch.clone());
+    update_evaluation_style(&mut evaluation, "{_branch:n_}", STYLE.branch.clone());
     update_evaluation_style(&mut evaluation, "{_commit:f_}", STYLE.commit_hash.clone());
     update_evaluation_style(&mut evaluation, "{_author:n_}", STYLE.author_name.clone());
     update_evaluation_style(&mut evaluation, "{_author:e_}", STYLE.author_email.clone());
