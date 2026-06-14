@@ -1,6 +1,7 @@
 use crate::repository::helper::{
-    USER_EMAIL, USER_NAME, extract_config, get_absolute_time, get_commit_count, get_current_branch,
-    get_current_commit_hash, get_relative_path, get_relative_time, get_repo_name,
+    USER_EMAIL, USER_NAME, extract_config, get_absolute_time, get_branch_count, get_commit_count,
+    get_current_branch, get_current_commit_hash, get_relative_path, get_relative_time,
+    get_repo_name,
 };
 use git2::Repository;
 use std::cmp::max;
@@ -14,6 +15,7 @@ pub struct Properties {
     pub relative_path: String,
     pub name: String,
     pub branch: String,
+    pub branch_count: usize,
     pub commit_hash: String,
     pub commit_count: usize,
     pub author_name: String,
@@ -23,33 +25,35 @@ pub struct Properties {
 }
 
 impl Properties {
-    pub fn new(path: &str, base_path: &str) -> Self {
-        let repository = Repository::open(path).expect("Failed to open git repository");
+    pub fn new(path: &str, base_path: &str) -> Option<Self> {
+        let repository = Repository::open(path).ok()?;
         let config = repository.config().ok();
 
         let absolute_path = path.to_string();
         let relative_path = get_relative_path(path, base_path);
-        let name = get_repo_name(&path);
+        let name = get_repo_name(path);
         let branch = get_current_branch(&repository);
-        let commit_hash = get_current_commit_hash(&repository).unwrap();
+        let branch_count = get_branch_count(&repository);
+        let commit_hash = get_current_commit_hash(&repository);
         let commit_count = get_commit_count(&repository);
         let author_name = extract_config(&config, USER_NAME);
         let author_email = extract_config(&config, USER_EMAIL);
         let relative_time = get_relative_time(&repository);
         let absolute_time = get_absolute_time(&repository);
 
-        Self {
+        Some(Self {
             absolute_path,
             relative_path,
             name,
             branch,
+            branch_count,
             commit_hash,
             commit_count,
             author_name,
             author_email,
             relative_time,
             absolute_time,
-        }
+        })
     }
 }
 
@@ -58,6 +62,7 @@ pub struct PropertyLengths {
     pub path: usize,
     pub name: usize,
     pub branch: usize,
+    pub branch_count: usize,
     pub commit_count: usize,
     pub author_name: usize,
     pub author_email: usize,
@@ -88,25 +93,28 @@ impl Repositories {
 
         while let Some(result) = tasks.join_next().await {
             match result {
-                Ok(status) => statuses.push(status),
+                Ok(Some(status)) => statuses.push(status),
+                Ok(None) => {}
                 Err(e) => eprintln!("Task failed: {e}"),
             }
         }
 
         statuses.sort_by(|a, b| a.name.cmp(&b.name));
-        let repos: Self = Self {
+        Self {
             props: statuses,
             lens: PropertyLengths::default(),
-        };
-        repos
+        }
     }
 
     pub fn compute_lengths(&mut self) {
+        let digit_len = |n: usize| if n == 0 { 1 } else { (n as f64).log10().floor() as usize + 1 };
+
         self.props.iter().for_each(|s| {
             self.lens.path = max(self.lens.path, s.relative_path.len());
             self.lens.name = max(self.lens.name, s.name.len());
             self.lens.branch = max(self.lens.branch, s.branch.len());
-            self.lens.commit_count = max(self.lens.commit_count, s.commit_count.to_string().len());
+            self.lens.branch_count = max(self.lens.branch_count, digit_len(s.branch_count));
+            self.lens.commit_count = max(self.lens.commit_count, digit_len(s.commit_count));
             self.lens.author_name = max(self.lens.author_name, s.author_name.len());
             self.lens.author_email = max(self.lens.author_email, s.author_email.len());
             self.lens.relative_time = max(self.lens.relative_time, s.relative_time.len());

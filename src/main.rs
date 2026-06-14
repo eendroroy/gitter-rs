@@ -18,7 +18,7 @@ use std::{env, path};
 
 pub static STYLE: LazyLock<Palette> = LazyLock::new(Palette::default);
 pub static STATUS: &str =
-    "{_path:r_}/{_name_} on {_branch_} [{_commit:8_}] ({_commit:c_}) by {_author:e_} {_time:r_}";
+    "{_path:r_}/{_name_} on {_branch:n_} [{_commit:8_}] by {_author:e_} {_time:r_}";
 
 #[tokio::main]
 async fn main() {

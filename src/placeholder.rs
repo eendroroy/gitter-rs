@@ -16,8 +16,11 @@ pub fn evaluate_placeholders(base_string: String, status: &Properties) -> HashMa
     if base_string.contains("{_path:a_}") {
         evaluation.insert("{_path:a_}".to_string(), status.absolute_path.clone());
     }
-    if base_string.contains("{_branch_}") {
-        evaluation.insert("{_branch_}".to_string(), status.branch.clone());
+    if base_string.contains("{_branch:n_}") {
+        evaluation.insert("{_branch:n_}".to_string(), status.branch.clone());
+    }
+    if base_string.contains("{_branch:c_}") {
+        evaluation.insert("{_branch:c_}".to_string(), status.branch_count.to_string());
     }
     if base_string.contains("{_commit:f_}") {
         evaluation.insert("{_commit:f_}".to_string(), status.commit_hash.clone());
@@ -99,7 +102,11 @@ pub fn print_placeholder_help() {
     );
     println!(
         "  {: <padding$} The active checked-out Git branch head.",
-        format!("{literal}{{_branch_}}{literal:#}")
+        format!("{literal}{{_branch:n_}}{literal:#}")
+    );
+    println!(
+        "  {: <padding$} Total number of branches",
+        format!("{literal}{{_branch:c_}}{literal:#}")
     );
     println!(
         "  {: <padding$} The full 40-character Git commit hash string.",
