@@ -11,7 +11,7 @@ pub fn evaluate_placeholders(base_string: String, status: &Properties) -> HashMa
         evaluation.insert("{_name_}".to_string(), status.name.clone());
     }
     if base_string.contains("{_path:r_}") {
-        evaluation.insert("{_path:r_}".to_string(), status.relation_path.clone());
+        evaluation.insert("{_path:r_}".to_string(), status.relative_path.clone());
     }
     if base_string.contains("{_path:a_}") {
         evaluation.insert("{_path:a_}".to_string(), status.absolute_path.clone());

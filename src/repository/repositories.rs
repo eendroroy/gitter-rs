@@ -7,7 +7,7 @@ use tokio::task::JoinSet;
 #[derive(Debug, Default, Clone)]
 pub struct Properties {
     pub absolute_path: String,
-    pub relation_path: String,
+    pub relative_path: String,
     pub name: String,
     pub branch: String,
     pub commit_hash: String,
@@ -66,7 +66,7 @@ impl Repositories {
 
     pub fn compute_lengths(&mut self) {
         self.statuses.iter().for_each(|s| {
-            self.lengths.path = max(self.lengths.path, s.relation_path.len());
+            self.lengths.path = max(self.lengths.path, s.relative_path.len());
             self.lengths.name = max(self.lengths.name, s.name.len());
             self.lengths.branch = max(self.lengths.branch, s.branch.len());
             self.lengths.author_name = max(self.lengths.author_name, s.author_name.len());
