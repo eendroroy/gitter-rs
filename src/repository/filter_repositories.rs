@@ -103,7 +103,7 @@ impl ParsedFilter {
                 Some('<') => FilterCondition::ActiveLessThan(duration),
                 Some('>') => FilterCondition::ActiveGreaterThan(duration),
                 None => FilterCondition::ActiveExact(duration),
-                _ => return None, // This case should ideally not be reached
+                _ => return None,
             }
         } else if value_str.starts_with('+') && value_str.ends_with('+') && value_str.len() > 2 {
             FilterCondition::Contains(value_str[1..value_str.len() - 1].to_string())

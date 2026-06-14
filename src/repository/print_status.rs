@@ -53,13 +53,11 @@ pub fn print_status(
     update_evaluation_style(&mut evaluation, "{_time:r_}", STYLE.relative_time.clone());
     update_evaluation_style(&mut evaluation, "{_time:d_}", STYLE.absolute_time.clone());
 
-    // Also color custom variable-width commit tokens (like {_commit:8_}) stored in the map
     for (key, val) in evaluation.iter_mut() {
         if key.starts_with("{_commit:") {
             *val = STYLE.commit_hash.apply(val);
         }
     }
 
-    // 4. Merge all structural modifications back into your main template sequence
     replace_placeholders(STATUS.to_string(), evaluation)
 }
