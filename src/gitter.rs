@@ -111,7 +111,6 @@ impl Display for Shell {
             Shell::Zsh => "zsh",
         };
 
-        // Write the string slice directly into the formatter buffer
         write!(f, "{}", shell_str)
     }
 }

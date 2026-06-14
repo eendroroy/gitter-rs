@@ -5,7 +5,7 @@ pub fn print_gitterignore_help() {
     let usage = CLAP_STYLE.get_usage();
     let literal = CLAP_STYLE.get_literal();
 
-    let padding = 25; // Adjusted padding for better alignment
+    let padding = 40;
 
     println!("{header}Gitterignore File Format{header:#}");
 
@@ -30,8 +30,8 @@ pub fn print_gitterignore_help() {
 
     println!("\n{header}Available Rule Types:{header:#}");
 
-    println!("\n{literal}name:{literal:#}");
-    println!("  Matches against the repository's name (the directory name of the repository).");
+    print!("\n{literal}name:{literal:#}");
+    println!("    Matches against the repository's name (the directory name of the repository).");
     println!(
         "  {: <padding$} - Ignores repositories with the exact name \"exact_name\".",
         format!("{literal}name:exact_name{literal:#}")
@@ -49,8 +49,8 @@ pub fn print_gitterignore_help() {
         format!("{literal}name:*contains*{literal:#}")
     );
 
-    println!("\n{literal}path:{literal:#}");
-    println!("  Matches against the repository's absolute path.");
+    print!("\n{literal}path:{literal:#}");
+    println!("    Matches against the repository's absolute path.");
     println!(
         "  {: <padding$} - Ignores repositories with the exact absolute path \"exact_path\".",
         format!("{literal}path:/home/user/repo{literal:#}")
@@ -66,13 +66,6 @@ pub fn print_gitterignore_help() {
     println!(
         "  {: <padding$} - Ignores repositories whose path contains \"contains\".",
         format!("{literal}path:*contains*{literal:#}")
-    );
-
-    println!("\n{literal}child:{literal:#}");
-    println!("  Matches against the immediate parent directory name of the repository.");
-    println!(
-        "  {: <padding$} - Ignores repositories whose immediate parent directory is \"parent_dir\".",
-        format!("{literal}child:parent_dir{literal:#}")
     );
 
     println!("\n{usage}Example .gitterignore:{usage:#}");

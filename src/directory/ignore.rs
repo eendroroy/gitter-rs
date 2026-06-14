@@ -19,7 +19,7 @@ pub fn ignore_patterns(ignore_file_path: &str) -> Vec<IgnoreRule> {
     let path = PathBuf::from(ignore_file_path);
     let file = match File::open(&path) {
         Ok(f) => f,
-        Err(_) => return Vec::new(), // Return empty if file not found
+        Err(_) => return Vec::new(),
     };
 
     let reader = BufReader::new(file);
@@ -28,7 +28,7 @@ pub fn ignore_patterns(ignore_file_path: &str) -> Vec<IgnoreRule> {
     for l in reader.lines().map_while(Result::ok) {
         let trimmed_line = l.trim();
         if trimmed_line.is_empty() || trimmed_line.starts_with('#') {
-            continue; // Skip empty lines and comments
+            continue;
         }
 
         if let Some((rule_type, pattern)) = trimmed_line.split_once(':') {

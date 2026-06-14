@@ -33,7 +33,6 @@ pub fn find_repo_dirs(target_dir: &String, depth: usize) -> Vec<PathBuf> {
             }
         }
 
-        // If the current entry is a directory, check for a .gitterignore file
         if entry.file_type().is_dir() {
             let gitterignore_path = current_entry_path.join(".gitterignore");
             if gitterignore_path.exists() {
