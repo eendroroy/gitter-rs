@@ -5,7 +5,7 @@ pub fn print_filter_help() {
     let usage = CLAP_STYLE.get_usage();
     let literal = CLAP_STYLE.get_literal();
 
-    let padding = 40; // Adjust padding as needed for alignment
+    let padding = 40;
 
     println!("{header}Filter Syntax Help{header:#}");
 
@@ -42,6 +42,7 @@ pub fn print_filter_help() {
     println!("  - {literal}path{literal:#}: Filters by the relative path of the repository.");
     println!("  - {literal}name{literal:#}: Filters by the name of the repository.");
     println!("  - {literal}branch{literal:#}: Filters by the current branch name.");
+    println!("  - {literal}active{literal:#}: Filters by the age of the last commit.");
 
     println!("\n{header}Value Patterns:{header:#}");
     println!("  - {literal}value{literal:#}: Exact match.");
@@ -52,6 +53,30 @@ pub fn print_filter_help() {
     println!(
         "  - {literal}+value+{literal:#}: Contains {literal}value{literal:#} (substring match)."
     );
+
+    println!("\n{usage}Active Filter Value Patterns:{usage:#}");
+    println!(
+        "  These patterns are used with the {literal}active{literal:#} prefix to filter by commit age."
+    );
+    println!(
+        "  Duration units: {literal}d{literal:#} (days), {literal}h{literal:#} (hours), {literal}m{literal:#} (minutes), {literal}w{literal:#} (weeks), {literal}M{literal:#} (months), {literal}y{literal:#} (years)."
+    );
+    println!("  Units can be combined (e.g., {literal}1y3M2d{literal:#}).");
+    println!();
+    println!(
+        "  - {literal}<duration{literal:#}: Last commit was less than the specified duration ago."
+    );
+    println!("    Example: {literal}active:<7d{literal:#} (last commit within the last 7 days).");
+    println!();
+    println!(
+        "  - {literal}>duration{literal:#}: Last commit was more than the specified duration ago."
+    );
+    println!("    Example: {literal}active:>1M{literal:#} (last commit older than 1 month).");
+    println!();
+    println!(
+        "  - {literal}duration{literal:#}: Last commit was approximately the specified duration ago."
+    );
+    println!("    Example: {literal}active:2w{literal:#} (last commit around 2 weeks ago).");
 
     println!("\n{header}Examples:{header:#}");
     println!("  - {literal}name:my-repo{literal:#}");
@@ -65,6 +90,12 @@ pub fn print_filter_help() {
     println!();
     println!("  - {literal}name:+feature+{literal:#}");
     println!("    Matches repositories whose name contains \"feature\".");
+    println!();
+    println!("  - {literal}active:<7d{literal:#}");
+    println!("    Matches repositories with a last commit within the last 7 days.");
+    println!();
+    println!("  - {literal}active:>1y3M{literal:#}");
+    println!("    Matches repositories with a last commit older than 1 year and 3 months.");
     println!();
     println!("  - {literal}name:repo1 || name:repo2{literal:#}");
     println!("    Matches repositories named \"repo1\" OR \"repo2\".");

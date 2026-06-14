@@ -1,10 +1,47 @@
 use crate::repository::repositories::{Properties, PropertyLengths, Repositories};
+use chrono::{DateTime, Duration, Utc};
+use lazy_static::lazy_static;
+use regex::Regex;
+
+lazy_static! {
+    static ref DURATION_REGEX: Regex = Regex::new(r"(\d+)([yMwdhm])").unwrap();
+}
+
+fn parse_duration_string(s: &str) -> Option<Duration> {
+    let mut total_duration = Duration::zero();
+    let mut matched_any = false;
+
+    for cap in DURATION_REGEX.captures_iter(s) {
+        matched_any = true;
+        let value = cap[1].parse::<i64>().ok()?;
+        let unit = &cap[2];
+
+        match unit {
+            "y" => total_duration += Duration::days(value * 365),
+            "M" => total_duration += Duration::days(value * 30),
+            "w" => total_duration += Duration::weeks(value),
+            "d" => total_duration += Duration::days(value),
+            "h" => total_duration += Duration::hours(value),
+            "m" => total_duration += Duration::minutes(value),
+            _ => return None,
+        }
+    }
+
+    if matched_any
+        && DURATION_REGEX.find_iter(s).map(|m| m.as_str().len()).sum::<usize>() == s.len()
+    {
+        Some(total_duration)
+    } else {
+        None
+    }
+}
 
 #[derive(Debug, PartialEq)]
 enum FilterType {
     Path,
     Name,
     Branch,
+    Active,
 }
 
 #[derive(Debug, PartialEq)]
@@ -13,6 +50,9 @@ enum FilterCondition {
     StartsWith(String),
     EndsWith(String),
     Contains(String),
+    ActiveLessThan(Duration),
+    ActiveGreaterThan(Duration),
+    ActiveExact(Duration),
 }
 
 #[derive(Debug, PartialEq)]
@@ -44,35 +84,90 @@ impl ParsedFilter {
             "path" => FilterType::Path,
             "name" => FilterType::Name,
             "branch" => FilterType::Branch,
+            "active" => FilterType::Active,
             _ => return None,
         };
 
-        let condition =
-            if value_str.starts_with('+') && value_str.ends_with('+') && value_str.len() > 2 {
-                FilterCondition::Contains(value_str[1..value_str.len() - 1].to_string())
-            } else if value_str.starts_with('+') && value_str.len() > 1 {
-                FilterCondition::EndsWith(value_str[1..].to_string())
-            } else if value_str.ends_with('+') && value_str.len() > 1 {
-                FilterCondition::StartsWith(value_str[0..value_str.len() - 1].to_string())
+        let condition = if filter_type == FilterType::Active {
+            let (op, duration_str) = if let Some(stripped) = value_str.strip_prefix('<') {
+                (Some('<'), stripped)
+            } else if let Some(stripped) = value_str.strip_prefix('>') {
+                (Some('>'), stripped)
             } else {
-                FilterCondition::Exact(value_str.to_string())
+                (None, value_str)
             };
+
+            let duration = parse_duration_string(duration_str)?;
+
+            match op {
+                Some('<') => FilterCondition::ActiveLessThan(duration),
+                Some('>') => FilterCondition::ActiveGreaterThan(duration),
+                None => FilterCondition::ActiveExact(duration),
+                _ => return None, // This case should ideally not be reached
+            }
+        } else if value_str.starts_with('+') && value_str.ends_with('+') && value_str.len() > 2 {
+            FilterCondition::Contains(value_str[1..value_str.len() - 1].to_string())
+        } else if value_str.starts_with('+') && value_str.len() > 1 {
+            FilterCondition::EndsWith(value_str[1..].to_string())
+        } else if value_str.ends_with('+') && value_str.len() > 1 {
+            FilterCondition::StartsWith(value_str[0..value_str.len() - 1].to_string())
+        } else {
+            FilterCondition::Exact(value_str.to_string())
+        };
 
         Some(ParsedFilter { filter_type, condition, negate })
     }
 
     fn matches(&self, repo_prop: &Properties) -> bool {
-        let target_string = match self.filter_type {
-            FilterType::Path => &repo_prop.relative_path,
-            FilterType::Name => &repo_prop.name,
-            FilterType::Branch => &repo_prop.branch,
-        };
+        let matched = match &self.filter_type {
+            FilterType::Path => {
+                let target_string = &repo_prop.relative_path;
+                match &self.condition {
+                    FilterCondition::Exact(s) => target_string == s,
+                    FilterCondition::StartsWith(s) => target_string.starts_with(s),
+                    FilterCondition::EndsWith(s) => target_string.ends_with(s),
+                    FilterCondition::Contains(s) => target_string.contains(s),
+                    _ => false,
+                }
+            }
+            FilterType::Name => {
+                let target_string = &repo_prop.name;
+                match &self.condition {
+                    FilterCondition::Exact(s) => target_string == s,
+                    FilterCondition::StartsWith(s) => target_string.starts_with(s),
+                    FilterCondition::EndsWith(s) => target_string.ends_with(s),
+                    FilterCondition::Contains(s) => target_string.contains(s),
+                    _ => false,
+                }
+            }
+            FilterType::Branch => {
+                let target_string = &repo_prop.branch;
+                match &self.condition {
+                    FilterCondition::Exact(s) => target_string == s,
+                    FilterCondition::StartsWith(s) => target_string.starts_with(s),
+                    FilterCondition::EndsWith(s) => target_string.ends_with(s),
+                    FilterCondition::Contains(s) => target_string.contains(s),
+                    _ => false,
+                }
+            }
+            FilterType::Active => {
+                let commit_time = match DateTime::parse_from_rfc3339(&repo_prop.absolute_time) {
+                    Ok(dt) => dt.with_timezone(&Utc),
+                    Err(_) => return false,
+                };
+                let now = Utc::now();
+                let age = now.signed_duration_since(commit_time);
 
-        let matched = match &self.condition {
-            FilterCondition::Exact(s) => target_string == s,
-            FilterCondition::StartsWith(s) => target_string.starts_with(s),
-            FilterCondition::EndsWith(s) => target_string.ends_with(s),
-            FilterCondition::Contains(s) => target_string.contains(s),
+                match &self.condition {
+                    FilterCondition::ActiveLessThan(duration) => age < *duration,
+                    FilterCondition::ActiveGreaterThan(duration) => age > *duration,
+                    FilterCondition::ActiveExact(duration) => {
+                        let tolerance = Duration::minutes(1);
+                        age >= *duration - tolerance && age <= *duration + tolerance
+                    }
+                    _ => false,
+                }
+            }
         };
 
         if self.negate { !matched } else { matched }
