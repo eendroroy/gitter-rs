@@ -11,74 +11,43 @@ pub fn print_gitterignore_help() {
 
     println!("\n{usage}Description:{usage:#}");
     println!(
-        "  The {literal}.gitterignore{literal:#} file allows you to specify repositories that should be ignored by gitter."
+        "  The {literal}.gitterignore{literal:#} file specifies repositories to be ignored by gitter."
     );
     println!(
-        "  It supports various patterns based on repository name, path, and parent directory."
-    );
-    println!(
-        "  Rules are applied hierarchically: a {literal}.gitterignore{literal:#} file in a subdirectory will apply"
-    );
-    println!(
-        "  to that directory and its children, potentially overriding rules from parent directories."
+        "  Each line is a pattern. Empty lines and lines starting with {literal}#{literal:#} are comments."
     );
 
-    println!("\n{usage}Rule Format:{usage:#}");
-    println!("  Each line in the {literal}.gitterignore{literal:#} file represents a single rule.");
-    println!("  Empty lines and lines starting with {literal}#{literal:#} are ignored (comments).");
-    println!("  Rules are defined using a {literal}key:pattern{literal:#} format.");
-
-    println!("\n{header}Available Rule Types:{header:#}");
-
-    print!("\n{literal}name:{literal:#}");
-    println!("    Matches against the repository's name (the directory name of the repository).");
-    println!(
-        "  {: <padding$} - Ignores repositories with the exact name \"exact_name\".",
-        format!("{literal}name:exact_name{literal:#}")
-    );
-    println!(
-        "  {: <padding$} - Ignores repositories whose name starts with \"prefix\".",
-        format!("{literal}name:prefix*{literal:#}")
-    );
-    println!(
-        "  {: <padding$} - Ignores repositories whose name ends with \"suffix\".",
-        format!("{literal}name:*suffix{literal:#}")
-    );
-    println!(
-        "  {: <padding$} - Ignores repositories whose name contains \"contains\".",
-        format!("{literal}name:*contains*{literal:#}")
-    );
-
-    print!("\n{literal}path:{literal:#}");
-    println!("    Matches against the repository's absolute path.");
-    println!(
-        "  {: <padding$} - Ignores repositories with the exact absolute path \"exact_path\".",
-        format!("{literal}path:/home/user/repo{literal:#}")
-    );
-    println!(
-        "  {: <padding$} - Ignores repositories whose path starts with \"prefix\".",
-        format!("{literal}path:/home/user/prefix*{literal:#}")
-    );
-    println!(
-        "  {: <padding$} - Ignores repositories whose path ends with \"suffix\".",
-        format!("{literal}path:*suffix{literal:#}")
-    );
-    println!(
-        "  {: <padding$} - Ignores repositories whose path contains \"contains\".",
-        format!("{literal}path:*contains*{literal:#}")
-    );
-
-    println!("\n{usage}Example .gitterignore:{usage:#}");
-    println!("  # Ignore a specific repository by name");
-    println!("  name:my_secret_repo");
+    println!("\n{header}Patterns:{header:#}");
+    println!("  Patterns are interpreted based on their format:");
     println!();
-    println!("  # Ignore all repositories whose name starts with 'temp'");
-    println!("  name:temp*");
+    println!(
+        "  {: <padding$} - Ignores repositories with the exact name.",
+        format!("{literal}repo_name{literal:#}")
+    );
+    println!(
+        "  {: <padding$} - Ignores repositories with the exact relative path.",
+        format!("{literal}relative/path/to/repo{literal:#}")
+    );
+    println!(
+        "  {: <padding$} - Ignores if any path component is 'dir_name'.",
+        format!("{literal}*/dir_name{literal:#}")
+    );
+    println!(
+        "  {: <padding$} - Ignores if the top-level directory is 'dir_name'.",
+        format!("{literal}dir_name/*{literal:#}")
+    );
+
+    println!("\n{usage}Examples:{usage:#}");
+    println!("  # Ignore a specific repository by exact name");
+    println!("  my_secret_repo");
     println!();
-    println!("  # Ignore repositories in a specific absolute path");
-    println!("  path:/home/user/projects/old_stuff");
+    println!("  # Ignore a repository by its exact relative path");
+    println!("  src/projects/old_stuff");
     println!();
-    println!("  # Ignore all repositories directly under a 'node_modules' directory");
-    println!("  child:node_modules");
+    println!("  # Ignore repositories if any path component is 'build'");
+    println!("  */build");
+    println!();
+    println!("  # Ignore repositories if their top-level directory is 'vendor'");
+    println!("  vendor/*");
     println!();
 }

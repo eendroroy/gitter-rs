@@ -5,14 +5,9 @@ use std::path::{Path, PathBuf};
 #[derive(Debug)]
 pub enum IgnoreRule {
     NameExact(String),
-    NameStartsWith(String),
-    NameEndsWith(String),
-    NameContains(String),
     PathExact(String),
-    PathStartsWith(String),
-    PathEndsWith(String),
-    PathContains(String),
-    Child(String),
+    ChildAnyComponent(String),
+    ChildTopLevel(String),
 }
 
 pub fn ignore_patterns(ignore_file_path: &str) -> Vec<IgnoreRule> {
@@ -31,88 +26,55 @@ pub fn ignore_patterns(ignore_file_path: &str) -> Vec<IgnoreRule> {
             continue;
         }
 
-        if let Some((rule_type, pattern)) = trimmed_line.split_once(':') {
-            let pattern_str = pattern.trim().to_string();
-            match rule_type.trim() {
-                "name" => {
-                    if let Some(stripped_prefix) = pattern_str.strip_prefix('*') {
-                        if let Some(stripped_both) = stripped_prefix.strip_suffix('*') {
-                            rules.push(IgnoreRule::NameContains(stripped_both.to_string()));
-                        } else {
-                            rules.push(IgnoreRule::NameEndsWith(stripped_prefix.to_string()));
-                        }
-                    } else if let Some(stripped_suffix) = pattern_str.strip_suffix('*') {
-                        rules.push(IgnoreRule::NameStartsWith(stripped_suffix.to_string()));
-                    } else {
-                        rules.push(IgnoreRule::NameExact(pattern_str));
-                    }
-                }
-                "path" => {
-                    if let Some(stripped_prefix) = pattern_str.strip_prefix('*') {
-                        if let Some(stripped_both) = stripped_prefix.strip_suffix('*') {
-                            rules.push(IgnoreRule::PathContains(stripped_both.to_string()));
-                        } else {
-                            rules.push(IgnoreRule::PathEndsWith(stripped_prefix.to_string()));
-                        }
-                    } else if let Some(stripped_suffix) = pattern_str.strip_suffix('*') {
-                        rules.push(IgnoreRule::PathStartsWith(stripped_suffix.to_string()));
-                    } else {
-                        rules.push(IgnoreRule::PathExact(pattern_str));
-                    }
-                }
-                "child" => rules.push(IgnoreRule::Child(pattern_str)),
-                _ => { /* unknown rule type, ignore */ }
-            }
+        if trimmed_line.ends_with("/*") && trimmed_line.len() > 2 {
+            let dir_name = trimmed_line.strip_suffix("/*").unwrap();
+            rules.push(IgnoreRule::ChildTopLevel(dir_name.to_string()));
+        } else if trimmed_line.starts_with("*/") && trimmed_line.len() > 2 {
+            let dir_name = trimmed_line.strip_prefix("*/").unwrap();
+            rules.push(IgnoreRule::ChildAnyComponent(dir_name.to_string()));
+        } else if trimmed_line.contains('/') || trimmed_line.contains('\\') {
+            rules.push(IgnoreRule::PathExact(trimmed_line.to_string()));
+        } else {
+            rules.push(IgnoreRule::NameExact(trimmed_line.to_string()));
         }
     }
     rules
 }
 
-pub fn is_ignored(repo_name: &str, repo_path: &Path, rules: &Vec<&IgnoreRule>) -> bool {
+pub fn is_ignored(repo_abs_path: &Path, base_path: &Path, rules: &Vec<&IgnoreRule>) -> bool {
+    let repo_name = repo_abs_path.file_name().and_then(|s| s.to_str()).unwrap_or("");
+
+    let relative_path_str = repo_abs_path
+        .strip_prefix(base_path)
+        .ok()
+        .and_then(|p| p.to_str())
+        .unwrap_or_else(|| repo_abs_path.to_str().unwrap_or(""));
+
     for rule in rules {
         match rule {
             IgnoreRule::NameExact(pattern) => {
-                if repo_name == pattern {
-                    return true;
-                }
-            }
-            IgnoreRule::NameStartsWith(pattern) => {
-                if repo_name.starts_with(pattern) {
-                    return true;
-                }
-            }
-            IgnoreRule::NameEndsWith(pattern) => {
-                if repo_name.ends_with(pattern) {
-                    return true;
-                }
-            }
-            IgnoreRule::NameContains(pattern) => {
-                if repo_name.contains(pattern) {
+                if repo_name == *pattern {
                     return true;
                 }
             }
             IgnoreRule::PathExact(pattern) => {
-                if repo_path.to_str().is_some_and(|s| s == pattern) {
+                if relative_path_str == *pattern {
                     return true;
                 }
             }
-            IgnoreRule::PathStartsWith(pattern) => {
-                if repo_path.to_str().is_some_and(|s| s.starts_with(pattern)) {
+            IgnoreRule::ChildAnyComponent(component) => {
+                let relative_path_buf = PathBuf::from(relative_path_str);
+                if relative_path_buf.components().any(|c| c.as_os_str() == component.as_str()) {
                     return true;
                 }
             }
-            IgnoreRule::PathEndsWith(pattern) => {
-                if repo_path.to_str().is_some_and(|s| s.ends_with(pattern)) {
-                    return true;
-                }
-            }
-            IgnoreRule::PathContains(pattern) => {
-                if repo_path.to_str().is_some_and(|s| s.contains(pattern)) {
-                    return true;
-                }
-            }
-            IgnoreRule::Child(parent_dir) => {
-                if repo_path.parent().is_some_and(|p| p.ends_with(parent_dir)) {
+            IgnoreRule::ChildTopLevel(top_level_dir) => {
+                let relative_path_buf = PathBuf::from(relative_path_str);
+                if relative_path_buf
+                    .components()
+                    .next()
+                    .is_some_and(|c| c.as_os_str() == top_level_dir.as_str())
+                {
                     return true;
                 }
             }
