@@ -43,11 +43,13 @@ target/release/gitter
 ## Template Placeholders
 
 - `{_name_}` — Repository name
-- `{_branch_}` — Current branch
+- `{_branch:n_}` — Current branch
+- `{_branch:c_}` — Total number of branches
 - `{_path:r_}` — Relative repository path
 - `{_path:a_}` — Absolute repository path
 - `{_commit:f_}` — Full commit hash
 - `{_commit:8_}` — Short commit hash
+- `{_commit:c_}` — Total number of commits in current branch
 - `{_author:n_}` — Author name
 - `{_author:e_}` — Author email
 - `{_time:r_}` — Relative commit time
