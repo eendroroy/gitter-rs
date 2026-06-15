@@ -56,44 +56,46 @@ pub struct Gitter {
 #[derive(Subcommand, Debug, Default)]
 pub enum GitterCommand {
     /// Run a git command
-    #[clap(alias = "g")]
+    #[clap(visible_alias = "g")]
     #[default]
     Git,
     /// List repositories
-    #[clap(alias = "ls")]
+    #[clap(visible_alias = "ls")]
+    #[clap(visible_alias = "l")]
     List,
     /// Run an arbitrary command
-    #[clap(alias = "x")]
+    #[clap(visible_alias = "e")]
     Exec,
     /// Execute a script file
-    #[clap(alias = "s")]
+    #[clap(visible_alias = "s")]
     Script {
         #[command(subcommand)]
-        shell: Option<Shell>,
+        shell: Option<CompShell>,
 
         #[arg(short = 'p', long = "path", default_value = ".", global = true)]
         path: String,
     },
-    /// Evaluate a shell command.
-    /// Kept for simple use cases like run grep in each repository.
+    /// Execute simple bash commands - `bash -c 'command'`
     /// For complex cases use `script` command
-    #[clap(alias = "b")]
+    #[clap(visible_alias = "b")]
     Bash,
     /// Generate shell completion
+    #[clap(visible_alias = "c")]
+    #[clap(visible_alias = "comp")]
     Completion {
         #[command(subcommand)]
-        shell: Option<Shell>,
+        shell: Option<CompShell>,
     },
     /// Help menu
     /// Run: `gitter help --help` for more details
     Help {
         #[command(subcommand)]
-        topic: Option<Help>,
+        topic: Option<HelpTopic>,
     },
 }
 
 #[derive(Subcommand, Debug)]
-pub enum Shell {
+pub enum CompShell {
     Bash,
     Elvish,
     Fish,
@@ -102,14 +104,14 @@ pub enum Shell {
     Zsh,
 }
 
-impl Display for Shell {
+impl Display for CompShell {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let shell_str = match self {
-            Shell::Bash => "bash",
-            Shell::Elvish => "elvish",
-            Shell::Fish => "fish",
-            Shell::PowerShell => "powershell",
-            Shell::Zsh => "zsh",
+            CompShell::Bash => "bash",
+            CompShell::Elvish => "elvish",
+            CompShell::Fish => "fish",
+            CompShell::PowerShell => "powershell",
+            CompShell::Zsh => "zsh",
         };
 
         write!(f, "{}", shell_str)
@@ -117,7 +119,7 @@ impl Display for Shell {
 }
 
 #[derive(Subcommand, Debug)]
-pub enum Help {
+pub enum HelpTopic {
     Placeholder,
     Gitterignore,
     Filter,

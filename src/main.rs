@@ -6,7 +6,7 @@ mod placeholder;
 mod repository;
 
 use crate::directory::find_repo_dirs::find_repo_dirs;
-use crate::gitter::{Gitter, GitterCommand, Help, Shell};
+use crate::gitter::{CompShell, Gitter, GitterCommand, HelpTopic};
 use crate::help::{
     print_completion_help, print_filter_help, print_gitterignore_help, print_placeholder_help,
 };
@@ -136,14 +136,15 @@ async fn main() {
         GitterCommand::Completion { shell } => {
             let command = &mut Gitter::command();
 
-            let shell: &Shell = if let Some(shell) = shell { shell } else { &get_default_shell() };
+            let shell: &CompShell =
+                if let Some(shell) = shell { shell } else { &get_default_shell() };
 
             let clap_shell = match shell {
-                Shell::Bash => clap_complete::Shell::Bash,
-                Shell::Elvish => clap_complete::Shell::Elvish,
-                Shell::Fish => clap_complete::Shell::Fish,
-                Shell::PowerShell => clap_complete::Shell::PowerShell,
-                Shell::Zsh => clap_complete::Shell::Zsh,
+                CompShell::Bash => clap_complete::Shell::Bash,
+                CompShell::Elvish => clap_complete::Shell::Elvish,
+                CompShell::Fish => clap_complete::Shell::Fish,
+                CompShell::PowerShell => clap_complete::Shell::PowerShell,
+                CompShell::Zsh => clap_complete::Shell::Zsh,
             };
 
             clap_complete::generate(clap_shell, command, "gitter", &mut std::io::stdout());
@@ -151,10 +152,10 @@ async fn main() {
         GitterCommand::Help { topic } => {
             if let Some(topic) = topic {
                 match topic {
-                    Help::Placeholder => print_placeholder_help(),
-                    Help::Gitterignore => print_gitterignore_help(),
-                    Help::Filter => print_filter_help(),
-                    Help::Completion => print_completion_help(),
+                    HelpTopic::Placeholder => print_placeholder_help(),
+                    HelpTopic::Gitterignore => print_gitterignore_help(),
+                    HelpTopic::Filter => print_filter_help(),
+                    HelpTopic::Completion => print_completion_help(),
                 }
             } else {
                 let mut cmd = Gitter::command();
@@ -175,15 +176,15 @@ async fn find_repos(cli: &Gitter) -> Repositories {
     repos
 }
 
-fn get_default_shell() -> Shell {
+fn get_default_shell() -> CompShell {
     let shell_var = env::var("SHELL").unwrap_or_else(|_| "/bin/sh".to_string());
     let shell_path = Path::new(&shell_var);
 
     match shell_path.file_name().and_then(|os_str| os_str.to_str()) {
-        Some("bash") => Shell::Bash,
-        Some("zsh") => Shell::Zsh,
-        Some("fish") => Shell::Fish,
-        Some("elvish") => Shell::Elvish,
-        _ => Shell::Bash,
+        Some("bash") => CompShell::Bash,
+        Some("zsh") => CompShell::Zsh,
+        Some("fish") => CompShell::Fish,
+        Some("elvish") => CompShell::Elvish,
+        _ => CompShell::Bash,
     }
 }
