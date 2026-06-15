@@ -52,7 +52,7 @@ async fn main() {
 
                 let mut command = Command::new("git");
                 command.current_dir(status.absolute_path.clone());
-                command.arg(args);
+                command.args(args.split(" "));
                 command.status().expect("Unable to execute command");
             });
         }
@@ -83,7 +83,7 @@ async fn main() {
 
                 let mut command = Command::new(command_name.clone());
                 command.current_dir(status.absolute_path.clone());
-                command.arg(args);
+                command.args(args.split(" "));
                 command.status().expect("Unable to execute command");
             });
         }
