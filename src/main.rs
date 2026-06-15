@@ -7,7 +7,9 @@ mod repository;
 
 use crate::directory::find_repo_dirs::find_repo_dirs;
 use crate::gitter::{Gitter, GitterCommand, Help, Shell};
-use crate::help::{print_filter_help, print_gitterignore_help, print_placeholder_help};
+use crate::help::{
+    print_completion_help, print_filter_help, print_gitterignore_help, print_placeholder_help,
+};
 use crate::palette::Palette;
 use crate::placeholder::{evaluate_placeholders, replace_placeholders};
 use crate::repository::filter_repositories::filter_repositories;
@@ -152,6 +154,7 @@ async fn main() {
                     Help::Placeholder => print_placeholder_help(),
                     Help::Gitterignore => print_gitterignore_help(),
                     Help::Filter => print_filter_help(),
+                    Help::Completion => print_completion_help(),
                 }
             } else {
                 let mut cmd = Gitter::command();

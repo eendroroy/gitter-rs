@@ -121,4 +121,5 @@ pub enum Help {
     Placeholder,
     Gitterignore,
     Filter,
+    Completion,
 }
