@@ -13,7 +13,7 @@ pub fn print_placeholder_help() {
     println!(
         "  Pass these tags within string sequences to dynamically extract local repository data."
     );
-    println!("  Example: gitter eval -- echo \"Current branch is: {{_branch_}}\"");
+    println!("  Example: gitter bash -- echo \"Current branch name is: {{_branch:n_}}\"");
 
     println!("\n{header}Available Placeholders:{header:#}");
 
@@ -66,5 +66,4 @@ pub fn print_placeholder_help() {
         "  {: <padding$} The precise absolute date stamp signature format.",
         format!("{literal}{{_time:d_}}{literal:#}")
     );
-    println!();
 }

@@ -1,5 +1,5 @@
 use crate::directory::ignore::{IgnoreRule, ignore_patterns, is_ignored};
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use walkdir::WalkDir;
 
 pub fn find_repo_dirs(target_dir: &String, depth: usize) -> Vec<PathBuf> {
@@ -48,7 +48,7 @@ pub fn find_repo_dirs(target_dir: &String, depth: usize) -> Vec<PathBuf> {
                 let all_active_rules: Vec<&IgnoreRule> =
                     active_ignore_rules_stack.iter().flat_map(|(_, rules)| rules.iter()).collect();
 
-                if !is_ignored(repo_path, Path::new(target_dir), &all_active_rules) {
+                if !is_ignored(repo_path, &all_active_rules) {
                     repositories.push(repo_path.into());
                 }
             }

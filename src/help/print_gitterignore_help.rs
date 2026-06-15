@@ -5,7 +5,7 @@ pub fn print_gitterignore_help() {
     let usage = CLAP_STYLE.get_usage();
     let literal = CLAP_STYLE.get_literal();
 
-    let padding = 40;
+    let padding = 30;
 
     println!("{header}Gitterignore File Format{header:#}");
 
@@ -21,33 +21,19 @@ pub fn print_gitterignore_help() {
     println!("  Patterns are interpreted based on their format:");
     println!();
     println!(
-        "  {: <padding$} - Ignores repositories with the exact name.",
-        format!("{literal}repo_name{literal:#}")
+        "  {: <padding$} - Ignores repositories with the exact relative path or name.",
+        format!("{literal}path/to/repo{literal:#}")
     );
     println!(
-        "  {: <padding$} - Ignores repositories with the exact relative path.",
-        format!("{literal}relative/path/to/repo{literal:#}")
+        "  {: <padding$} - Ignores repositories whose relative path or name starts with a given prefix.",
+        format!("{literal}prefix*{literal:#}")
     );
     println!(
-        "  {: <padding$} - Ignores if any path component is 'dir_name'.",
-        format!("{literal}*/dir_name{literal:#}")
-    );
-    println!(
-        "  {: <padding$} - Ignores if the top-level directory is 'dir_name'.",
+        "  {: <padding$} - Ignores repositories if their immediate sub-directory (relative to the .gitterignore file) is an exact name.",
         format!("{literal}dir_name/*{literal:#}")
     );
-
-    println!("\n{usage}Examples:{usage:#}");
-    println!("  # Ignore a specific repository by exact name");
-    println!("  my_secret_repo");
-    println!();
-    println!("  # Ignore a repository by its exact relative path");
-    println!("  src/projects/old_stuff");
-    println!();
-    println!("  # Ignore repositories if any path component is 'build'");
-    println!("  */build");
-    println!();
-    println!("  # Ignore repositories if their top-level directory is 'vendor'");
-    println!("  vendor/*");
-    println!();
+    println!(
+        "  {: <padding$} - Ignores repositories if their immediate sub-directory (relative to the .gitterignore file) starts with a given prefix.",
+        format!("{literal}dir_prefix*/*{literal:#}")
+    );
 }
