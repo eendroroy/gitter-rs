@@ -27,9 +27,9 @@ pub fn print_status(
     align: bool,
 ) -> String {
     let mut evaluation = if let Some(template) = template {
-        evaluate_placeholders(template, status)
+        evaluate_placeholders(&template, status)
     } else {
-        evaluate_placeholders(STATUS.to_string(), status)
+        evaluate_placeholders(STATUS, status)
     };
 
     if align && let Some(l) = lengths {
@@ -59,5 +59,5 @@ pub fn print_status(
         }
     }
 
-    replace_placeholders(STATUS.to_string(), evaluation)
+    replace_placeholders(STATUS, &evaluation)
 }

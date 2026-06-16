@@ -42,8 +42,8 @@ async fn main() {
             let args = raw_args.join(" ");
 
             repos.props.iter().for_each(|status| {
-                let evaluation = evaluate_placeholders(args.clone(), status);
-                let args = replace_placeholders(args.clone(), evaluation);
+                let evaluation = evaluate_placeholders(&args.clone(), status);
+                let args = replace_placeholders(&args.clone(), &evaluation);
                 println!(
                     "{}",
                     print_status(cli.template.clone(), status, Some(repos.lens), cli.align)
@@ -72,8 +72,8 @@ async fn main() {
             let args = raw_args[1..].join(" ");
 
             repos.props.iter().for_each(|status| {
-                let evaluation = evaluate_placeholders(args.clone(), status);
-                let args = replace_placeholders(args.clone(), evaluation);
+                let evaluation = evaluate_placeholders(&args.clone(), status);
+                let args = replace_placeholders(&args.clone(), &evaluation);
                 println!(
                     "{}",
                     print_status(cli.template.clone(), status, Some(repos.lens), cli.align)
@@ -117,8 +117,8 @@ async fn main() {
             let command_name = "bash".to_string();
 
             repos.props.iter().for_each(|status| {
-                let evaluation = evaluate_placeholders(args.clone(), status);
-                let args = replace_placeholders(args.clone(), evaluation);
+                let evaluation = evaluate_placeholders(&args.clone(), status);
+                let args = replace_placeholders(&args.clone(), &evaluation);
                 println!(
                     "{}",
                     print_status(cli.template.clone(), status, Some(repos.lens), cli.align)

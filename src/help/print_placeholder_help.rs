@@ -23,7 +23,12 @@ macro_rules! placeholder_template {
   {literal}{{_author:e_}}{literal:#}         The email marker boundary of the commit author.
   {literal}{{_time:r_}}{literal:#}           The human-readable relative time interval (e.g., '2 hours ago').
   {literal}{{_time:d_}}{literal:#}           The precise absolute date stamp signature format.
-  {literal}{{_dirty_}}{literal:#}            Marker for uncommitted changes. 
+  {literal}{{_dirty_}}{literal:#}            Marker for uncommitted changes.
+  {literal}{{_contrib:cc_}}{literal:#}       Total number of commits.
+  {literal}{{_contrib:ac_}}{literal:#}       Total number of authors.
+  {literal}{{_contrib:tan_}}{literal:#}      Top author name.
+  {literal}{{_contrib:tae_}}{literal:#}      Top author email.
+  {literal}{{_contrib:tcc_}}{literal:#}      Total number of commits by top author.
 "
     };
 }

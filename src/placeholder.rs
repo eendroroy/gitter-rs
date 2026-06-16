@@ -1,77 +1,72 @@
 use crate::repository::repositories::Properties;
 use lazy_static::lazy_static;
-use regex::Regex;
+use regex::{Captures, Regex};
 use std::collections::HashMap;
 
-pub fn evaluate_placeholders(base_string: String, status: &Properties) -> HashMap<String, String> {
+lazy_static! {
+    static ref PLACEHOLDER_RE: Regex = Regex::new(r"\{_([a-z:]+?)(?::(\d+))?_\}").unwrap();
+}
+
+pub fn evaluate_placeholders(base_string: &str, status: &Properties) -> HashMap<String, String> {
     let mut evaluation = HashMap::new();
 
-    if base_string.contains("{_name_}") {
-        evaluation.insert("{_name_}".to_string(), status.name.clone());
-    }
-    if base_string.contains("{_path:r_}") {
-        evaluation.insert("{_path:r_}".to_string(), status.relative_path.clone());
-    }
-    if base_string.contains("{_path:a_}") {
-        evaluation.insert("{_path:a_}".to_string(), status.absolute_path.clone());
-    }
-    if base_string.contains("{_branch:n_}") {
-        evaluation.insert("{_branch:n_}".to_string(), status.branch.clone());
-    }
-    if base_string.contains("{_branch:c_}") {
-        evaluation.insert("{_branch:c_}".to_string(), status.branch_count.to_string());
-    }
-    if base_string.contains("{_commit:f_}") {
-        evaluation.insert("{_commit:f_}".to_string(), status.commit_hash.clone());
-    }
-    if base_string.contains("{_commit:c_}") {
-        evaluation.insert("{_commit:c_}".to_string(), status.commit_count.to_string());
-    }
-    if base_string.contains("{_author:e_}") {
-        evaluation.insert("{_author:e_}".to_string(), status.author_email.clone());
-    }
-    if base_string.contains("{_author:n_}") {
-        evaluation.insert("{_author:n_}".to_string(), status.author_name.clone());
-    }
-    if base_string.contains("{_time:r_}") {
-        evaluation.insert("{_time:r_}".to_string(), status.relative_time.clone());
-    }
-    if base_string.contains("{_time:d_}") {
-        evaluation.insert("{_time:d_}".to_string(), status.absolute_time.clone());
-    }
-    if base_string.contains("{_dirty_}") {
-        evaluation.insert(
-            "{_dirty_}".to_string(),
-            if status.is_dirty { "DIRTY" } else { "CLEAN" }.to_string(),
-        );
-    }
+    for caps in PLACEHOLDER_RE.captures_iter(base_string) {
+        let full_tag = caps.get(0).unwrap().as_str();
 
-    lazy_static! {
-        static ref RE: Regex = Regex::new(r"\{_commit:(\d+)_\}").unwrap();
-    }
-    for caps in RE.captures_iter(&base_string) {
-        let full_match = caps.get(0).unwrap().as_str();
-
-        if let Some(num_str) = caps.get(1)
-            && let Ok(requested_len) = num_str.as_str().parse::<usize>()
-        {
-            let full_hash = &status.commit_hash;
-            let target_len = std::cmp::min(requested_len, full_hash.len());
-            let sliced_hash = full_hash[..target_len].to_string();
-            evaluation.insert(full_match.to_string(), sliced_hash);
+        if evaluation.contains_key(full_tag) {
+            continue;
         }
+
+        let key = caps.get(1).unwrap().as_str();
+        let value = match key {
+            "name" => status.name.clone(),
+            "path:r" => status.relative_path.clone(),
+            "path:a" => status.absolute_path.clone(),
+            "branch:n" => status.branch.clone(),
+            "branch:c" => status.branch_count.to_string(),
+            "commit:f" => status.commit_hash.clone(),
+            "commit:c" => status.commit_count.to_string(),
+            "author:e" => status.author_email.clone(),
+            "author:n" => status.author_name.clone(),
+            "time:r" => status.relative_time.clone(),
+            "time:d" => status.absolute_time.clone(),
+            "dirty" => (if status.is_dirty { "DIRTY" } else { "CLEAN" }).to_string(),
+            "contrib:cc" => status.contribution_summary.commit_count.to_string(),
+            "contrib:ac" => status.contribution_summary.author_count.to_string(),
+            "contrib:tan" => status.contribution_summary.top_author_name.to_string(),
+            "contrib:tae" => status.contribution_summary.top_author_email.to_string(),
+            "contrib:tcc" => status.contribution_summary.top_commit_count.to_string(),
+
+            "commit" => {
+                if let Some(len_match) = caps.get(2) {
+                    if let Ok(req_len) = len_match.as_str().parse::<usize>() {
+                        let target_len = std::cmp::min(req_len, status.commit_hash.len());
+                        status.commit_hash[..target_len].to_string()
+                    } else {
+                        continue;
+                    }
+                } else {
+                    continue;
+                }
+            }
+            _ => continue, // Ignore unrecognized tags
+        };
+
+        evaluation.insert(full_tag.to_string(), value);
     }
 
     evaluation
 }
 
-pub fn replace_placeholders(
-    mut base_string: String,
-    evaluation: HashMap<String, String>,
-) -> String {
-    for (placeholder_tag, evaluated_value) in evaluation {
-        base_string = base_string.replace(&placeholder_tag, &evaluated_value);
-    }
+pub fn replace_placeholders(base_string: &str, evaluation: &HashMap<String, String>) -> String {
+    PLACEHOLDER_RE
+        .replace_all(base_string, |caps: &Captures| {
+            let full_tag = caps.get(0).unwrap().as_str();
 
-    base_string
+            match evaluation.get(full_tag) {
+                Some(evaluated_value) => evaluated_value.clone(),
+                None => full_tag.to_string(),
+            }
+        })
+        .into_owned()
 }

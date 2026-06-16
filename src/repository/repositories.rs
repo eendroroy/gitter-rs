@@ -1,13 +1,22 @@
 use crate::repository::helper::{
     USER_EMAIL, USER_NAME, extract_config, get_absolute_time, get_branch_count, get_commit_count,
-    get_current_branch, get_current_commit_hash, get_is_dirty, get_relative_path,
-    get_relative_time, get_repo_name,
+    get_contributor_summary, get_current_branch, get_current_commit_hash, get_is_dirty,
+    get_relative_path, get_relative_time, get_repo_name,
 };
 use git2::Repository;
 use std::cmp::max;
 use std::path::PathBuf;
 use std::sync::Arc;
 use tokio::task::JoinSet;
+
+#[derive(Debug, Default, Clone)]
+pub struct ContributionSummary {
+    pub author_count: usize,
+    pub commit_count: usize,
+    pub top_commit_count: usize,
+    pub top_author_name: String,
+    pub top_author_email: String,
+}
 
 #[derive(Debug, Default, Clone)]
 pub struct Properties {
@@ -23,6 +32,7 @@ pub struct Properties {
     pub relative_time: String,
     pub absolute_time: String,
     pub is_dirty: bool,
+    pub contribution_summary: ContributionSummary,
 }
 
 impl Properties {
@@ -42,6 +52,7 @@ impl Properties {
         let relative_time = get_relative_time(&repository);
         let absolute_time = get_absolute_time(&repository);
         let is_dirty = get_is_dirty(&repository);
+        let contribution_summary = get_contributor_summary(&repository);
 
         Some(Self {
             absolute_path,
@@ -56,6 +67,7 @@ impl Properties {
             relative_time,
             absolute_time,
             is_dirty,
+            contribution_summary,
         })
     }
 }
@@ -71,6 +83,11 @@ pub struct PropertyLengths {
     pub author_email: usize,
     pub relative_time: usize,
     pub absolute_time: usize,
+    pub author_count: usize,
+    pub contribution_count: usize,
+    pub top_commit_count: usize,
+    pub top_author_name: usize,
+    pub top_author_email: usize,
 }
 
 #[derive(Debug, Clone)]
@@ -122,6 +139,16 @@ impl Repositories {
             self.lens.author_email = max(self.lens.author_email, s.author_email.len());
             self.lens.relative_time = max(self.lens.relative_time, s.relative_time.len());
             self.lens.absolute_time = max(self.lens.absolute_time, s.absolute_time.len());
+            self.lens.author_count =
+                max(self.lens.author_count, digit_len(s.contribution_summary.author_count));
+            self.lens.contribution_count =
+                max(self.lens.contribution_count, digit_len(s.contribution_summary.commit_count));
+            self.lens.top_commit_count =
+                max(self.lens.top_commit_count, digit_len(s.contribution_summary.top_commit_count));
+            self.lens.top_author_name =
+                max(self.lens.top_author_name, s.contribution_summary.top_author_name.len());
+            self.lens.top_author_email =
+                max(self.lens.top_author_email, s.contribution_summary.top_author_email.len());
         });
     }
 }
