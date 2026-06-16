@@ -6,7 +6,7 @@ mod placeholder;
 mod repository;
 
 use crate::directory::find_repo_dirs::find_repo_dirs;
-use crate::gitter::{CompShell, Gitter, GitterCommand, HelpTopic};
+use crate::gitter::{CompShell, Gitter, GitterCommand, HelpTopic, RawArgsBlock};
 use crate::help::{
     print_completion_help, print_filter_help, print_gitterignore_help, print_placeholder_help,
 };
@@ -33,13 +33,13 @@ async fn main() {
     let command = if let Some(command) = &cli.command {
         command
     } else {
-        &GitterCommand::Git
+        &GitterCommand::Git(RawArgsBlock { raw_args: cli.raw_args.clone() })
     };
 
     match command {
-        GitterCommand::Git => {
+        GitterCommand::Git(RawArgsBlock { raw_args }) => {
             let repos = find_repos(&cli).await;
-            let args = cli.raw_args.join(" ");
+            let args = raw_args.join(" ");
 
             repos.props.iter().for_each(|status| {
                 let evaluation = evaluate_placeholders(args.clone(), status);
@@ -66,11 +66,10 @@ async fn main() {
                 );
             });
         }
-        GitterCommand::Exec => {
+        GitterCommand::Exec(RawArgsBlock { raw_args }) => {
             let repos = find_repos(&cli).await;
-            let mut raw_args = cli.raw_args.to_vec();
-            let command_name = raw_args.remove(0);
-            let args = raw_args.join(" ");
+            let command_name = raw_args[0].clone();
+            let args = raw_args[1..].join(" ");
 
             repos.props.iter().for_each(|status| {
                 let evaluation = evaluate_placeholders(args.clone(), status);
@@ -111,9 +110,9 @@ async fn main() {
                 command.status().expect("Unable to execute command");
             });
         }
-        GitterCommand::Bash => {
+        GitterCommand::Bash(RawArgsBlock { raw_args }) => {
             let repos = find_repos(&cli).await;
-            let args = cli.raw_args.join(" ");
+            let args = raw_args.join(" ");
 
             let command_name = "bash".to_string();
 

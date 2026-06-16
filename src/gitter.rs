@@ -2,7 +2,7 @@ use clap::builder::Styles;
 use clap::builder::styling::AnsiColor::{Blue, Cyan, Green, Red, Yellow};
 use clap::builder::styling::Color::Ansi;
 use clap::builder::styling::Style;
-use clap::{Parser, Subcommand};
+use clap::{Args, Parser, Subcommand};
 use std::fmt;
 use std::fmt::{Display, Formatter};
 
@@ -53,19 +53,27 @@ pub struct Gitter {
     pub raw_args: Vec<String>,
 }
 
-#[derive(Subcommand, Debug, Default)]
+/// Reusable trailing argument wrapper for subcommands
+#[derive(Args, Debug, Default, Clone)]
+pub struct RawArgsBlock {
+    /// Raw arguments passed after '--' or if no subcommand is specified.
+    /// These are typically passed to the default 'git' command.
+    #[arg(trailing_var_arg = true, allow_hyphen_values = true, num_args = 0.., global = true)]
+    pub raw_args: Vec<String>,
+}
+
+#[derive(Subcommand, Debug)]
 pub enum GitterCommand {
-    /// Run a git command
-    #[clap(visible_alias = "g")]
-    #[default]
-    Git,
     /// List repositories
     #[clap(visible_alias = "ls")]
     #[clap(visible_alias = "l")]
     List,
+    /// Run a git command
+    #[clap(visible_alias = "g")]
+    Git(RawArgsBlock),
     /// Run an arbitrary command
     #[clap(visible_alias = "e")]
-    Exec,
+    Exec(RawArgsBlock),
     /// Execute a script file
     #[clap(visible_alias = "s")]
     Script {
@@ -78,7 +86,7 @@ pub enum GitterCommand {
     /// Execute simple bash commands - `bash -c 'command'`
     /// For complex cases use `script` command
     #[clap(visible_alias = "b")]
-    Bash,
+    Bash(RawArgsBlock),
     /// Generate shell completion
     #[clap(visible_alias = "c")]
     #[clap(visible_alias = "comp")]
