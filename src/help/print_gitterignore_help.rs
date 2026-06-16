@@ -8,7 +8,7 @@ macro_rules! gitterignore_template {
 {usage}Description:{usage:#}
   The {literal}.gitterignore{literal:#} file specifies repositories to be ignored by gitter.
   Each line is a pattern. Empty lines and lines starting with {literal}#{literal:#} are comments.
-  All path should be relative to the .gitterignore file.{}
+  All path should be relative to the .gitterignore file.
 
 {header}Patterns:{header:#}
   Patterns are interpreted based on their format:
@@ -26,5 +26,5 @@ pub fn print_gitterignore_help() {
     let usage = CLAP_STYLE.get_usage();
     let literal = CLAP_STYLE.get_literal();
 
-    print!(gitterignore_template!(), header = header, usage = usage, literal = literal,);
+    print!(gitterignore_template!(), header = header, usage = usage, literal = literal);
 }
