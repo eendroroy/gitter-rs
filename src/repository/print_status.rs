@@ -20,7 +20,16 @@ fn update_evaluation_style(
     }
 }
 
-pub fn print_status(
+pub fn print_status_line(
+    template: Option<String>,
+    status: &Properties,
+    lengths: Option<PropertyLengths>,
+    align: bool,
+) {
+    println!("{}", get_status_line(template, status, lengths, align));
+}
+
+pub fn get_status_line(
     template: Option<String>,
     status: &Properties,
     lengths: Option<PropertyLengths>,

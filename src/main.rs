@@ -13,7 +13,7 @@ use crate::help::{
 use crate::palette::Palette;
 use crate::placeholder::{evaluate_placeholders, replace_placeholders};
 use crate::repository::filter_repositories::filter_repositories;
-use crate::repository::print_status::print_status;
+use crate::repository::print_status::print_status_line;
 use crate::repository::repositories::Repositories;
 use clap::{CommandFactory, Parser};
 use colored::Colorize;
@@ -44,10 +44,8 @@ async fn main() {
             repos.props.iter().for_each(|status| {
                 let evaluation = evaluate_placeholders(&args.clone(), status);
                 let args = replace_placeholders(&args.clone(), &evaluation);
-                println!(
-                    "{}",
-                    print_status(cli.template.clone(), status, Some(repos.lens), cli.align)
-                );
+
+                print_status_line(cli.template.clone(), status, Some(repos.lens), cli.align);
                 println!("$ {} {}", "git".green(), args.yellow());
 
                 let mut command = Command::new("git");
@@ -60,10 +58,7 @@ async fn main() {
             let repos = find_repos(&cli).await;
 
             repos.props.iter().for_each(|status| {
-                println!(
-                    "{}",
-                    print_status(cli.template.clone(), status, Some(repos.lens), cli.align)
-                );
+                print_status_line(cli.template.clone(), status, Some(repos.lens), cli.align);
             });
         }
         GitterCommand::Exec(RawArgsBlock { raw_args }) => {
@@ -74,10 +69,8 @@ async fn main() {
             repos.props.iter().for_each(|status| {
                 let evaluation = evaluate_placeholders(&args.clone(), status);
                 let args = replace_placeholders(&args.clone(), &evaluation);
-                println!(
-                    "{}",
-                    print_status(cli.template.clone(), status, Some(repos.lens), cli.align)
-                );
+
+                print_status_line(cli.template.clone(), status, Some(repos.lens), cli.align);
                 println!("$ {} {}", command_name.green(), args.yellow());
 
                 let mut command = Command::new(command_name.clone());
@@ -98,10 +91,7 @@ async fn main() {
             let script = path::absolute(Path::new(&path.clone())).expect("Unable to find script");
 
             repos.props.iter().for_each(|status| {
-                println!(
-                    "{}",
-                    print_status(cli.template.clone(), status, Some(repos.lens), cli.align)
-                );
+                print_status_line(cli.template.clone(), status, Some(repos.lens), cli.align);
                 println!("$ {} {}", command_name.green(), script.to_string_lossy().yellow());
 
                 let mut command = Command::new(command_name.clone());
@@ -119,10 +109,8 @@ async fn main() {
             repos.props.iter().for_each(|status| {
                 let evaluation = evaluate_placeholders(&args.clone(), status);
                 let args = replace_placeholders(&args.clone(), &evaluation);
-                println!(
-                    "{}",
-                    print_status(cli.template.clone(), status, Some(repos.lens), cli.align)
-                );
+
+                print_status_line(cli.template.clone(), status, Some(repos.lens), cli.align);
                 println!("$ {} -c {}", command_name.green(), args.yellow());
 
                 let mut command = Command::new(command_name.clone());
