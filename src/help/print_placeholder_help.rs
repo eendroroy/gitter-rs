@@ -15,10 +15,10 @@ macro_rules! placeholder_template {
   {literal}{{_path:a_}}{literal:#}           The complete absolute file path on the system filesystem.
   {literal}{{_branch:n_}}{literal:#}         The active checked-out Git branch head.
   {literal}{{_branch:c_}}{literal:#}         Total number of branches.
-  {literal}{{_commit:f_}}{literal:#}         The full 40-character Git commit hash string.
   {literal}{{_commit:c_}}{literal:#}         Total number of commits in current branch.
-  {literal}{{_commit:<n>_}}{literal:#}       A variable length commit SHA slice where '{literal}n{literal:#}' is any integer.\
-                                             (Ex: {literal}{{_commit:12_}}{literal:#} = 12-character)
+  {literal}{{_hash:f_}}{literal:#}           The full 40-character Git commit hash string.
+  {literal}{{_hash:<n>_}}{literal:#}         A variable length commit SHA slice where '{literal}n{literal:#}' is any integer.\
+                                             (Ex: {literal}{{_hash:12_}}{literal:#} = 12-character)
   {literal}{{_author:n_}}{literal:#}         The name signature of the individual behind the latest commit.
   {literal}{{_author:e_}}{literal:#}         The email marker boundary of the commit author.
   {literal}{{_time:r_}}{literal:#}           The human-readable relative time interval (e.g., '2 hours ago').

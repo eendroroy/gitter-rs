@@ -24,7 +24,7 @@ pub fn evaluate_placeholders(base_string: &str, status: &Properties) -> HashMap<
             "path:a" => status.absolute_path.clone(),
             "branch:n" => status.branch.clone(),
             "branch:c" => status.branch_count.to_string(),
-            "commit:f" => status.commit_hash.clone(),
+            "hash:f" => status.commit_hash.clone(),
             "commit:c" => status.commit_count.to_string(),
             "author:e" => status.author_email.clone(),
             "author:n" => status.author_name.clone(),
@@ -37,7 +37,7 @@ pub fn evaluate_placeholders(base_string: &str, status: &Properties) -> HashMap<
             "contrib:tae" => status.contribution_summary.top_author_email.to_string(),
             "contrib:tcc" => status.contribution_summary.top_commit_count.to_string(),
 
-            "commit" => {
+            "hash" => {
                 if let Some(len_match) = caps.get(2) {
                     if let Ok(req_len) = len_match.as_str().parse::<usize>() {
                         let target_len = std::cmp::min(req_len, status.commit_hash.len());

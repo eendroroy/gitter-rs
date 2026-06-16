@@ -58,7 +58,6 @@ pub fn get_status_line(
     update_evaluation_style(&mut evaluation, "{_path:r_}", STYLE.path.clone());
     update_evaluation_style(&mut evaluation, "{_name_}", STYLE.name.clone());
     update_evaluation_style(&mut evaluation, "{_branch:n_}", STYLE.branch.clone());
-    update_evaluation_style(&mut evaluation, "{_commit:f_}", STYLE.commit_hash.clone());
     update_evaluation_style(&mut evaluation, "{_author:n_}", STYLE.author_name.clone());
     update_evaluation_style(&mut evaluation, "{_author:e_}", STYLE.author_email.clone());
     update_evaluation_style(&mut evaluation, "{_time:r_}", STYLE.relative_time.clone());
@@ -70,7 +69,7 @@ pub fn get_status_line(
     update_evaluation_style(&mut evaluation, "{_contrib:tcc_}", STYLE.cs_top_author_email.clone());
 
     for (key, val) in evaluation.iter_mut() {
-        if key.starts_with("{_commit:") {
+        if key.starts_with("{_hash:") {
             *val = STYLE.commit_hash.apply(val);
         }
     }
