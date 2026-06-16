@@ -20,6 +20,20 @@ A fast, concurrent CLI utility for running commands across multiple Git reposito
 
 ## Installation
 
+### Using `cargo`
+
+```bash
+cargo install gitter-rs
+```
+
+### Using homebrew (mac and linux)
+
+```bash
+brew tap eendroroy/tools               # tap
+brew trust eendroroy/tools             # trust
+brew install eendroroy/tools/gitter-rs # install
+```
+
 ### From source
 
 ```bash
@@ -39,6 +53,10 @@ Binary:
 ```bash
 target/release/gitter
 ```
+
+### Releases
+
+Prebuilt binaries available at [GitHub releases](https://github.com/eendroroy/gitter-rs/releases/)
 
 ## Template Placeholders
 
