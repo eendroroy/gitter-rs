@@ -21,7 +21,13 @@ pub const CLAP_STYLE: Styles = Styles::styled()
     version,
     about, long_about = None,
     disable_help_subcommand = true,
-    styles=CLAP_STYLE
+    styles=CLAP_STYLE,
+    help_template = "\
+{about-with-newline}
+{usage-heading} \x1b[1;34mgitter \x1b[36m[COMMAND] [OPTIONS] [-- <RAW_ARGS>...]\x1b[0m
+
+{all-args}{after-help}\
+"
 )]
 pub struct Gitter {
     #[command(subcommand)]
@@ -48,7 +54,6 @@ pub struct Gitter {
     pub align: bool,
 
     /// Raw arguments passed after '--' or if no subcommand is specified.
-    /// These are typically passed to the default 'git' command.
     #[arg(trailing_var_arg = true, allow_hyphen_values = true, num_args = 0.., global = true)]
     pub raw_args: Vec<String>,
 }
@@ -57,7 +62,6 @@ pub struct Gitter {
 #[derive(Args, Debug, Default, Clone)]
 pub struct RawArgsBlock {
     /// Raw arguments passed after '--' or if no subcommand is specified.
-    /// These are typically passed to the default 'git' command.
     #[arg(trailing_var_arg = true, allow_hyphen_values = true, num_args = 0.., global = true)]
     pub raw_args: Vec<String>,
 }
