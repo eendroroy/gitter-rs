@@ -22,6 +22,7 @@ pub const CLAP_STYLE: Styles = Styles::styled()
     about, long_about = None,
     disable_help_subcommand = true,
     styles=CLAP_STYLE,
+    max_term_width = 150,
     help_template = "\
 {about-with-newline}
 {usage-heading} \x1b[1;34mgitter \x1b[36m[COMMAND] [OPTIONS] [-- <RAW_ARGS>...]\x1b[0m
@@ -42,8 +43,8 @@ pub struct Gitter {
     pub max_depth: usize,
 
     /// Repo status-line template
-    #[arg(short = 'T', long = "template", global = true)]
-    pub template: Option<String>,
+    #[arg(short, long, global = true)]
+    pub status_template: Option<String>,
 
     /// Filter string
     #[arg(short, long, global = true)]
@@ -53,6 +54,7 @@ pub struct Gitter {
     #[arg(short, long, action = clap::ArgAction::SetTrue, global = true)]
     pub align: bool,
 
+    /// Hides the command being executed
     #[arg(short = 'H', long, action = clap::ArgAction::SetTrue, global = true)]
     pub hide_command: bool,
 

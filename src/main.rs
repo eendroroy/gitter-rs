@@ -44,7 +44,7 @@ async fn main() {
             repos.props.iter().for_each(|status| {
                 let evaluation = evaluate_placeholders(&args.clone(), status);
                 let args = replace_placeholders(&args.clone(), &evaluation);
-                print_status_line(cli.template.clone(), status, Some(repos.lens), cli.align);
+                print_status_line(cli.status_template.clone(), status, Some(repos.lens), cli.align);
                 if !cli.hide_command {
                     println!("$ {} {}", "git".green(), args.yellow());
                 }
@@ -59,7 +59,7 @@ async fn main() {
             let repos = find_repos(&cli).await;
 
             repos.props.iter().for_each(|status| {
-                print_status_line(cli.template.clone(), status, Some(repos.lens), cli.align);
+                print_status_line(cli.status_template.clone(), status, Some(repos.lens), cli.align);
             });
         }
         GitterCommand::Exec(RawArgsBlock { raw_args }) => {
@@ -71,7 +71,7 @@ async fn main() {
                 let evaluation = evaluate_placeholders(&args.clone(), status);
                 let args = replace_placeholders(&args.clone(), &evaluation);
 
-                print_status_line(cli.template.clone(), status, Some(repos.lens), cli.align);
+                print_status_line(cli.status_template.clone(), status, Some(repos.lens), cli.align);
                 if !cli.hide_command {
                     println!("$ {} {}", command_name.green(), args.yellow());
                 }
@@ -94,7 +94,7 @@ async fn main() {
             let script = path::absolute(Path::new(&path.clone())).expect("Unable to find script");
 
             repos.props.iter().for_each(|status| {
-                print_status_line(cli.template.clone(), status, Some(repos.lens), cli.align);
+                print_status_line(cli.status_template.clone(), status, Some(repos.lens), cli.align);
                 if !cli.hide_command {
                     println!("$ {} {}", command_name.green(), script.to_string_lossy().yellow());
                 }
@@ -115,7 +115,7 @@ async fn main() {
                 let evaluation = evaluate_placeholders(&args.clone(), status);
                 let args = replace_placeholders(&args.clone(), &evaluation);
 
-                print_status_line(cli.template.clone(), status, Some(repos.lens), cli.align);
+                print_status_line(cli.status_template.clone(), status, Some(repos.lens), cli.align);
                 if !cli.hide_command {
                     println!("$ {} -c {}", command_name.green(), args.yellow());
                 }
