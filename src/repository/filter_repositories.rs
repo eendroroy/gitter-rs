@@ -232,7 +232,12 @@ impl<'a> Tokenizer<'a> {
             }
             '&' => {
                 self.advance();
-                Ok(Token::And)
+                if self.cursor < self.input.len() && self.current_char() == '&' {
+                    self.advance();
+                    Ok(Token::And)
+                } else {
+                    Ok(Token::And)
+                }
             }
             '|' => {
                 self.advance();
@@ -240,7 +245,7 @@ impl<'a> Tokenizer<'a> {
                     self.advance();
                     Ok(Token::Or)
                 } else {
-                    Err("Expected '||' for OR operator, but found single '|'".to_string())
+                    Ok(Token::Or)
                 }
             }
             '!' => {
@@ -283,16 +288,16 @@ impl<'a> Tokenizer<'a> {
     }
 }
 
-struct Parser<'a> {
+struct FilterParser<'a> {
     tokenizer: Tokenizer<'a>,
     current_token: Token,
 }
 
-impl<'a> Parser<'a> {
+impl<'a> FilterParser<'a> {
     fn new(input: &'a str) -> Result<Self, String> {
         let mut tokenizer = Tokenizer::new(input);
         let current_token = tokenizer.next_token()?;
-        Ok(Parser { tokenizer, current_token })
+        Ok(FilterParser { tokenizer, current_token })
     }
 
     fn consume(&mut self, expected: Token) -> Result<(), String> {
@@ -366,7 +371,7 @@ pub fn filter_repositories(repositories: &mut Repositories, filter_str: &str) ->
         return repositories.clone();
     }
 
-    let mut parser = match Parser::new(filter_str) {
+    let mut parser = match FilterParser::new(filter_str) {
         Ok(p) => p,
         Err(e) => {
             eprintln!("Error initializing parser: {}", e);
