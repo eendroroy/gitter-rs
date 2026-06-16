@@ -1,7 +1,18 @@
 [package]
 name = "gitter-rs"
 version = "0.1.0"
+authors = ["indrajit"]
 edition = "2024"
+rust-version = "1.96.0"
+description = "A fast, concurrent CLI utility for running commands across multiple Git repositories."
+documentation = "https://docs.rs/gitter-rs"
+readme = "README.md"
+homepage = "https://eendroroy.github.io/gitter-rs"
+repository = "https://github.com/eendroroy/gitter-rs"
+license = "AGPL-3.0"
+keywords = ["git"]
+categories = ["development-tools", "command-line-utilities"]
+exclude = ["target", ".github", ".cargo/cross", "Cross.toml", "Makefile.toml"]
 
 [dependencies]
 chrono = "0.4.45"
