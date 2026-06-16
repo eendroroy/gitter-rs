@@ -24,6 +24,7 @@ macro_rules! placeholder_template {
   {literal}{{_time:r_}}{literal:#}           The human-readable relative time interval (e.g., '2 hours ago').
   {literal}{{_time:a_}}{literal:#}           The precise absolute date stamp signature format.
   {literal}{{_dirty_}}{literal:#}            Marker for uncommitted changes.
+  {literal}{{_bare_}}{literal:#}             Marker for bare status.
   {literal}{{_contrib:ac_}}{literal:#}       Total number of authors in current branch.
   {literal}{{_contrib:tan_}}{literal:#}      Top author name in current branch.
   {literal}{{_contrib:tae_}}{literal:#}      Top author email in current branch.

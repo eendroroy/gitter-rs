@@ -43,6 +43,7 @@ enum FilterType {
     Branch,
     Active,
     Dirty,
+    Bare,
 }
 
 #[derive(Debug, PartialEq)]
@@ -87,6 +88,7 @@ impl ParsedFilter {
             "branch" => FilterType::Branch,
             "active" => FilterType::Active,
             "dirty" => FilterType::Dirty,
+            "bare" => FilterType::Bare,
             _ => return None,
         };
 
@@ -171,6 +173,7 @@ impl ParsedFilter {
                 }
             }
             FilterType::Dirty => repo_prop.is_dirty,
+            FilterType::Bare => repo_prop.is_bare,
         };
 
         if self.negate { !matched } else { matched }

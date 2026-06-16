@@ -48,6 +48,7 @@ pub fn get_status_line(
         update_evaluation_padding(&mut evaluation, "{_author:e_}", l.author_email);
         update_evaluation_padding(&mut evaluation, "{_time:r_}", l.relative_time);
         update_evaluation_padding(&mut evaluation, "{_time:a_}", l.absolute_time);
+        update_evaluation_padding(&mut evaluation, "{_bare_}", l.bare);
         update_evaluation_padding(&mut evaluation, "{_contrib:ac_}", l.cs_commit_count);
         update_evaluation_padding(&mut evaluation, "{_contrib:tan_}", l.cs_top_commit_count);
         update_evaluation_padding(&mut evaluation, "{_contrib:tae_}", l.cs_top_author_name);
@@ -62,6 +63,7 @@ pub fn get_status_line(
     update_evaluation_style(&mut evaluation, "{_author:e_}", STYLE.author_email.clone());
     update_evaluation_style(&mut evaluation, "{_time:r_}", STYLE.relative_time.clone());
     update_evaluation_style(&mut evaluation, "{_time:a_}", STYLE.absolute_time.clone());
+    update_evaluation_style(&mut evaluation, "{_bare_}", STYLE.bare_style.clone());
     update_evaluation_style(&mut evaluation, "{_contrib:ac_}", STYLE.cs_commit_count.clone());
     update_evaluation_style(&mut evaluation, "{_contrib:tan_}", STYLE.cs_top_commit_count.clone());
     update_evaluation_style(&mut evaluation, "{_contrib:tae_}", STYLE.cs_top_author_name.clone());
