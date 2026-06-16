@@ -2,7 +2,7 @@ use clap::builder::Styles;
 use clap::builder::styling::AnsiColor::{Blue, Cyan, Green, Red, Yellow};
 use clap::builder::styling::Color::Ansi;
 use clap::builder::styling::Style;
-use clap::{Args, Parser, Subcommand};
+use clap::{Args, Parser, Subcommand, ValueEnum};
 use std::fmt;
 use std::fmt::{Display, Formatter};
 
@@ -54,9 +54,13 @@ pub struct Gitter {
     #[arg(short, long, action = clap::ArgAction::SetTrue, global = true)]
     pub align: bool,
 
-    /// Hides the command being executed
-    #[arg(short = 'H', long, action = clap::ArgAction::SetTrue, global = true)]
-    pub hide_command: bool,
+    /// Hides/Shows the command being executed
+    #[arg(short = 'c', long, default_value = "always", global = true)]
+    pub show_command: BoolChoice,
+
+    /// Hides the stdout
+    #[arg(short, long, action = clap::ArgAction::SetTrue, global = true)]
+    pub quiet: bool,
 
     /// Raw arguments passed after '--' or if no subcommand is specified.
     #[arg(trailing_var_arg = true, allow_hyphen_values = true, num_args = 0.., global = true)]
@@ -141,4 +145,10 @@ pub enum HelpTopic {
     Gitterignore,
     Filter,
     Completion,
+}
+
+#[derive(Debug, Clone, ValueEnum, PartialEq)]
+pub enum BoolChoice {
+    Always,
+    Never,
 }

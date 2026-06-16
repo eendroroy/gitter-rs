@@ -6,7 +6,7 @@ mod placeholder;
 mod repository;
 
 use crate::directory::find_repo_dirs::find_repo_dirs;
-use crate::gitter::{CompShell, Gitter, GitterCommand, HelpTopic, RawArgsBlock};
+use crate::gitter::{BoolChoice, CompShell, Gitter, GitterCommand, HelpTopic, RawArgsBlock};
 use crate::help::{
     print_completion_help, print_filter_help, print_gitterignore_help, print_placeholder_help,
 };
@@ -18,7 +18,7 @@ use crate::repository::repositories::Repositories;
 use clap::{CommandFactory, Parser};
 use colored::Colorize;
 use std::path::Path;
-use std::process::Command;
+use std::process::{Command, Stdio};
 use std::sync::LazyLock;
 use std::{env, path};
 
@@ -45,13 +45,16 @@ async fn main() {
                 let evaluation = evaluate_placeholders(&args.clone(), status);
                 let args = replace_placeholders(&args.clone(), &evaluation);
                 print_status_line(cli.status_template.clone(), status, Some(repos.lens), cli.align);
-                if !cli.hide_command {
+                if cli.show_command == BoolChoice::Never {
                     println!("$ {} {}", "git".green(), args.yellow());
                 }
 
                 let mut command = Command::new("git");
                 command.current_dir(status.absolute_path.clone());
                 command.args(args.split(" "));
+                if cli.quiet {
+                    command.stdout(Stdio::null());
+                }
                 command.status().expect("Unable to execute command");
             });
         }
@@ -72,13 +75,16 @@ async fn main() {
                 let args = replace_placeholders(&args.clone(), &evaluation);
 
                 print_status_line(cli.status_template.clone(), status, Some(repos.lens), cli.align);
-                if !cli.hide_command {
+                if cli.show_command == BoolChoice::Never {
                     println!("$ {} {}", command_name.green(), args.yellow());
                 }
 
                 let mut command = Command::new(command_name.clone());
                 command.current_dir(status.absolute_path.clone());
                 command.args(args.split(" "));
+                if cli.quiet {
+                    command.stdout(Stdio::null());
+                }
                 command.status().expect("Unable to execute command");
             });
         }
@@ -95,13 +101,16 @@ async fn main() {
 
             repos.props.iter().for_each(|status| {
                 print_status_line(cli.status_template.clone(), status, Some(repos.lens), cli.align);
-                if !cli.hide_command {
+                if cli.show_command == BoolChoice::Never {
                     println!("$ {} {}", command_name.green(), script.to_string_lossy().yellow());
                 }
 
                 let mut command = Command::new(command_name.clone());
                 command.current_dir(status.absolute_path.clone());
                 command.arg(script.clone());
+                if cli.quiet {
+                    command.stdout(Stdio::null());
+                }
                 command.status().expect("Unable to execute command");
             });
         }
@@ -116,7 +125,7 @@ async fn main() {
                 let args = replace_placeholders(&args.clone(), &evaluation);
 
                 print_status_line(cli.status_template.clone(), status, Some(repos.lens), cli.align);
-                if !cli.hide_command {
+                if cli.show_command == BoolChoice::Never {
                     println!("$ {} -c {}", command_name.green(), args.yellow());
                 }
 
@@ -124,6 +133,9 @@ async fn main() {
                 command.current_dir(status.absolute_path.clone());
                 command.arg("-c");
                 command.arg(args);
+                if cli.quiet {
+                    command.stdout(Stdio::null());
+                }
                 command.status().expect("Unable to eval command");
             });
         }
