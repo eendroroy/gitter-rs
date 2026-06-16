@@ -2,7 +2,9 @@
 
 A fast, concurrent CLI utility for running commands across multiple Git repositories.
 
-`gitter-rs` scans a directory tree, discovers Git repositories, collects repository metadata, and executes commands in each repository context. It is designed for monorepo-adjacent workflows, workspace maintenance, and bulk Git operations.
+`gitter-rs` scans a directory tree, discovers Git repositories, collects repository metadata,
+and executes commands in each repository context.
+It is designed for monorepo-adjacent workflows, workspace maintenance, and bulk Git operations.
 
 ## Features
 
@@ -26,7 +28,7 @@ A fast, concurrent CLI utility for running commands across multiple Git reposito
 cargo install gitter-rs
 ```
 
-### Using homebrew (mac and linux)
+### Using homebrew (Mac and Linux)
 
 ```bash
 brew tap eendroroy/tools               # tap
@@ -76,9 +78,9 @@ Prebuilt binaries available at [GitHub releases](https://github.com/eendroroy/gi
 ## Examples
 
 ```bash
-gitter git pull
-gitter exec cargo test
-gitter git checkout develop
+gitter git -- pull        # $(git pull)
+gitter exec -- cargo test # $(cargo test)
+gitter checkout develop   # $(git checkout development)
 ```
 
 ## License
