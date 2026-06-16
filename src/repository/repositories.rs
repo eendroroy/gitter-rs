@@ -12,7 +12,6 @@ use tokio::task::JoinSet;
 #[derive(Debug, Default, Clone)]
 pub struct ContributionSummary {
     pub author_count: usize,
-    pub commit_count: usize,
     pub top_commit_count: usize,
     pub top_author_name: String,
     pub top_author_email: String,
@@ -83,11 +82,11 @@ pub struct PropertyLengths {
     pub author_email: usize,
     pub relative_time: usize,
     pub absolute_time: usize,
-    pub author_count: usize,
-    pub contribution_count: usize,
-    pub top_commit_count: usize,
-    pub top_author_name: usize,
-    pub top_author_email: usize,
+    pub cs_author_count: usize,
+    pub cs_commit_count: usize,
+    pub cs_top_commit_count: usize,
+    pub cs_top_author_name: usize,
+    pub cs_top_author_email: usize,
 }
 
 #[derive(Debug, Clone)]
@@ -139,16 +138,16 @@ impl Repositories {
             self.lens.author_email = max(self.lens.author_email, s.author_email.len());
             self.lens.relative_time = max(self.lens.relative_time, s.relative_time.len());
             self.lens.absolute_time = max(self.lens.absolute_time, s.absolute_time.len());
-            self.lens.author_count =
-                max(self.lens.author_count, digit_len(s.contribution_summary.author_count));
-            self.lens.contribution_count =
-                max(self.lens.contribution_count, digit_len(s.contribution_summary.commit_count));
-            self.lens.top_commit_count =
-                max(self.lens.top_commit_count, digit_len(s.contribution_summary.top_commit_count));
-            self.lens.top_author_name =
-                max(self.lens.top_author_name, s.contribution_summary.top_author_name.len());
-            self.lens.top_author_email =
-                max(self.lens.top_author_email, s.contribution_summary.top_author_email.len());
+            self.lens.cs_author_count =
+                max(self.lens.cs_author_count, digit_len(s.contribution_summary.author_count));
+            self.lens.cs_top_commit_count = max(
+                self.lens.cs_top_commit_count,
+                digit_len(s.contribution_summary.top_commit_count),
+            );
+            self.lens.cs_top_author_name =
+                max(self.lens.cs_top_author_name, s.contribution_summary.top_author_name.len());
+            self.lens.cs_top_author_email =
+                max(self.lens.cs_top_author_email, s.contribution_summary.top_author_email.len());
         });
     }
 }

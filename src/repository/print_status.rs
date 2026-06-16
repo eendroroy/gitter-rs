@@ -42,6 +42,10 @@ pub fn print_status(
         update_evaluation_padding(&mut evaluation, "{_author:e_}", l.author_email);
         update_evaluation_padding(&mut evaluation, "{_time:r_}", l.relative_time);
         update_evaluation_padding(&mut evaluation, "{_time:d_}", l.absolute_time);
+        update_evaluation_padding(&mut evaluation, "{_contrib:ac_}", l.cs_commit_count);
+        update_evaluation_padding(&mut evaluation, "{_contrib:tan_}", l.cs_top_commit_count);
+        update_evaluation_padding(&mut evaluation, "{_contrib:tae_}", l.cs_top_author_name);
+        update_evaluation_padding(&mut evaluation, "{_contrib:tcc_}", l.cs_top_author_email);
     }
 
     update_evaluation_style(&mut evaluation, "{_path:r_}", STYLE.path.clone());
@@ -52,6 +56,10 @@ pub fn print_status(
     update_evaluation_style(&mut evaluation, "{_author:e_}", STYLE.author_email.clone());
     update_evaluation_style(&mut evaluation, "{_time:r_}", STYLE.relative_time.clone());
     update_evaluation_style(&mut evaluation, "{_time:d_}", STYLE.absolute_time.clone());
+    update_evaluation_style(&mut evaluation, "{_contrib:ac_}", STYLE.cs_commit_count.clone());
+    update_evaluation_style(&mut evaluation, "{_contrib:tan_}", STYLE.cs_top_commit_count.clone());
+    update_evaluation_style(&mut evaluation, "{_contrib:tae_}", STYLE.cs_top_author_name.clone());
+    update_evaluation_style(&mut evaluation, "{_contrib:tcc_}", STYLE.cs_top_author_email.clone());
 
     for (key, val) in evaluation.iter_mut() {
         if key.starts_with("{_commit:") {

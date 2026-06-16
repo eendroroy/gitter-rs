@@ -25,14 +25,12 @@ pub fn get_contributor_summary(repository: &Repository) -> ContributionSummary {
         }
     }
 
-    let contribution_count = contributor_counts.values().sum::<usize>();
     let contributor_count = contributor_counts.len();
 
     match contributor_counts.into_iter().max_by_key(|&(_, count)| count) {
         Some(((top_contributor_name, top_contributor_email), top_contribution_count)) => {
             ContributionSummary {
                 author_count: contributor_count,
-                commit_count: contribution_count,
                 top_commit_count: top_contribution_count,
                 top_author_name: top_contributor_name,
                 top_author_email: top_contributor_email,

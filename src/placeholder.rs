@@ -1,3 +1,4 @@
+use crate::STYLE;
 use crate::repository::repositories::Properties;
 use lazy_static::lazy_static;
 use regex::{Captures, Regex};
@@ -30,8 +31,12 @@ pub fn evaluate_placeholders(base_string: &str, status: &Properties) -> HashMap<
             "author:n" => status.author_name.clone(),
             "time:r" => status.relative_time.clone(),
             "time:d" => status.absolute_time.clone(),
-            "dirty" => (if status.is_dirty { "DIRTY" } else { "CLEAN" }).to_string(),
-            "contrib:cc" => status.contribution_summary.commit_count.to_string(),
+            "dirty" => (if status.is_dirty {
+                STYLE.dirty_style.apply("DIRTY")
+            } else {
+                STYLE.clean_style.apply("CLEAN")
+            })
+            .to_string(),
             "contrib:ac" => status.contribution_summary.author_count.to_string(),
             "contrib:tan" => status.contribution_summary.top_author_name.to_string(),
             "contrib:tae" => status.contribution_summary.top_author_email.to_string(),
@@ -49,7 +54,7 @@ pub fn evaluate_placeholders(base_string: &str, status: &Properties) -> HashMap<
                     continue;
                 }
             }
-            _ => continue, // Ignore unrecognized tags
+            _ => continue,
         };
 
         evaluation.insert(full_tag.to_string(), value);
