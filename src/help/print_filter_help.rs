@@ -25,6 +25,7 @@ macro_rules! help_template {
   - {literal}name{literal:#}     Filters by the name of the repository.
   - {literal}branch{literal:#}   Filters by the current branch name.
   - {literal}active{literal:#}   Filters by the age of the last commit.
+  - {literal}dirty{literal:#}    Filters by uncommitted changes. (Takes no value. ie. - {literal}dirty:{literal:#})
 
 {header}Value Patterns:{header:#}
   - {literal}value{literal:#}    Exact match.

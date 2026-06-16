@@ -42,6 +42,7 @@ enum FilterType {
     Name,
     Branch,
     Active,
+    Dirty,
 }
 
 #[derive(Debug, PartialEq)]
@@ -85,6 +86,7 @@ impl ParsedFilter {
             "name" => FilterType::Name,
             "branch" => FilterType::Branch,
             "active" => FilterType::Active,
+            "dirty" => FilterType::Dirty,
             _ => return None,
         };
 
@@ -168,6 +170,7 @@ impl ParsedFilter {
                     _ => false,
                 }
             }
+            FilterType::Dirty => repo_prop.is_dirty,
         };
 
         if self.negate { !matched } else { matched }

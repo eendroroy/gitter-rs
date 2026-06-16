@@ -1,7 +1,7 @@
 use crate::repository::helper::{
     USER_EMAIL, USER_NAME, extract_config, get_absolute_time, get_branch_count, get_commit_count,
-    get_current_branch, get_current_commit_hash, get_relative_path, get_relative_time,
-    get_repo_name,
+    get_current_branch, get_current_commit_hash, get_is_dirty, get_relative_path,
+    get_relative_time, get_repo_name,
 };
 use git2::Repository;
 use std::cmp::max;
@@ -22,6 +22,7 @@ pub struct Properties {
     pub author_email: String,
     pub relative_time: String,
     pub absolute_time: String,
+    pub is_dirty: bool,
 }
 
 impl Properties {
@@ -40,6 +41,7 @@ impl Properties {
         let author_email = extract_config(&config, USER_EMAIL);
         let relative_time = get_relative_time(&repository);
         let absolute_time = get_absolute_time(&repository);
+        let is_dirty = get_is_dirty(&repository);
 
         Some(Self {
             absolute_path,
@@ -53,6 +55,7 @@ impl Properties {
             author_email,
             relative_time,
             absolute_time,
+            is_dirty,
         })
     }
 }

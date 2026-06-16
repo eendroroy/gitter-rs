@@ -39,6 +39,12 @@ pub fn evaluate_placeholders(base_string: String, status: &Properties) -> HashMa
     if base_string.contains("{_time:d_}") {
         evaluation.insert("{_time:d_}".to_string(), status.absolute_time.clone());
     }
+    if base_string.contains("{_dirty_}") {
+        evaluation.insert(
+            "{_dirty_}".to_string(),
+            if status.is_dirty { "DIRTY" } else { "CLEAN" }.to_string(),
+        );
+    }
 
     lazy_static! {
         static ref RE: Regex = Regex::new(r"\{_commit:(\d+)_\}").unwrap();

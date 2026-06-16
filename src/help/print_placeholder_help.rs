@@ -23,6 +23,7 @@ macro_rules! placeholder_template {
   {literal}{{_author:e_}}{literal:#}         The email marker boundary of the commit author.
   {literal}{{_time:r_}}{literal:#}           The human-readable relative time interval (e.g., '2 hours ago').
   {literal}{{_time:d_}}{literal:#}           The precise absolute date stamp signature format.
+  {literal}{{_dirty_}}{literal:#}            Marker for uncommitted changes. 
 "
     };
 }
