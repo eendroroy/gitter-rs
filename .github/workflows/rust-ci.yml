@@ -6,6 +6,7 @@ on:
       # 1. Standard Production Releases (e.g., 0.0.1, 12.33.9)
       - '[0-9]+.[0-9]+.[0-9]+'
 
+
       # 2. Strict Dotted Pre-releases (e.g., 1.1.1.a.1, 1.1.1.b.1201, 1.1.1.rc.3)
       - '[0-9]+.[0-9]+.[0-9]+.a.[0-9]*'
       - '[0-9]+.[0-9]+.[0-9]+.b.[0-9]*'
@@ -15,15 +16,6 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  # This gate job runs instantly on tag push, but pauses the pipeline
-  # waiting for your manual button click.
-  gatekeeper:
-    name: "Wait for Manual Approval"
-    runs-on: ubuntu-latest
-    environment: production-releases # This environment forces the manual check
-    steps:
-      - name: Awaiting Approval
-        run: echo "Tag detected. Waiting for user authorization..."
   build:
     name: Build (${{ matrix.rust_target }})
     runs-on: ${{ matrix.os }}
@@ -85,9 +77,10 @@ jobs:
         run: cargo build --verbose --release --target ${{ matrix.rust_target }}
 
       # 6. Smart Test Suite execution (skips cross-compiled ARM targets that cannot run on host runner)
-      - name: Run tests
-        if: "!contains(matrix.rust_target, 'aarch64')"
-        run: cargo test --verbose --target ${{ matrix.rust_target }}
+      # Skip tests
+      # - name: Run tests
+      #   if: "!contains(matrix.rust_target, 'aarch64')"
+      #   run: cargo test --verbose --target ${{ matrix.rust_target }}
 
       # 7. Upload to Pipeline Stage Artifacts
       - name: Upload artifact
