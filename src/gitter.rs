@@ -53,6 +53,9 @@ pub struct Gitter {
     #[arg(short, long, action = clap::ArgAction::SetTrue, global = true)]
     pub align: bool,
 
+    #[arg(short = 'H', long, action = clap::ArgAction::SetTrue, global = true)]
+    pub hide_command: bool,
+
     /// Raw arguments passed after '--' or if no subcommand is specified.
     #[arg(trailing_var_arg = true, allow_hyphen_values = true, num_args = 0.., global = true)]
     pub raw_args: Vec<String>,

@@ -44,9 +44,10 @@ async fn main() {
             repos.props.iter().for_each(|status| {
                 let evaluation = evaluate_placeholders(&args.clone(), status);
                 let args = replace_placeholders(&args.clone(), &evaluation);
-
                 print_status_line(cli.template.clone(), status, Some(repos.lens), cli.align);
-                println!("$ {} {}", "git".green(), args.yellow());
+                if !cli.hide_command {
+                    println!("$ {} {}", "git".green(), args.yellow());
+                }
 
                 let mut command = Command::new("git");
                 command.current_dir(status.absolute_path.clone());
@@ -71,7 +72,9 @@ async fn main() {
                 let args = replace_placeholders(&args.clone(), &evaluation);
 
                 print_status_line(cli.template.clone(), status, Some(repos.lens), cli.align);
-                println!("$ {} {}", command_name.green(), args.yellow());
+                if !cli.hide_command {
+                    println!("$ {} {}", command_name.green(), args.yellow());
+                }
 
                 let mut command = Command::new(command_name.clone());
                 command.current_dir(status.absolute_path.clone());
@@ -92,7 +95,9 @@ async fn main() {
 
             repos.props.iter().for_each(|status| {
                 print_status_line(cli.template.clone(), status, Some(repos.lens), cli.align);
-                println!("$ {} {}", command_name.green(), script.to_string_lossy().yellow());
+                if !cli.hide_command {
+                    println!("$ {} {}", command_name.green(), script.to_string_lossy().yellow());
+                }
 
                 let mut command = Command::new(command_name.clone());
                 command.current_dir(status.absolute_path.clone());
@@ -111,7 +116,9 @@ async fn main() {
                 let args = replace_placeholders(&args.clone(), &evaluation);
 
                 print_status_line(cli.template.clone(), status, Some(repos.lens), cli.align);
-                println!("$ {} -c {}", command_name.green(), args.yellow());
+                if !cli.hide_command {
+                    println!("$ {} -c {}", command_name.green(), args.yellow());
+                }
 
                 let mut command = Command::new(command_name.clone());
                 command.current_dir(status.absolute_path.clone());
