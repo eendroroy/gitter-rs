@@ -45,7 +45,7 @@ async fn main() {
                 let evaluation = evaluate_placeholders(&args.clone(), status);
                 let args = replace_placeholders(&args.clone(), &evaluation);
                 print_status_line(cli.status_template.clone(), status, Some(repos.lens), cli.align);
-                if cli.show_command == BoolChoice::Never {
+                if cli.show_command == BoolChoice::Always {
                     println!("$ {} {}", "git".green(), args.yellow());
                 }
 
@@ -75,7 +75,7 @@ async fn main() {
                 let args = replace_placeholders(&args.clone(), &evaluation);
 
                 print_status_line(cli.status_template.clone(), status, Some(repos.lens), cli.align);
-                if cli.show_command == BoolChoice::Never {
+                if cli.show_command == BoolChoice::Always {
                     println!("$ {} {}", command_name.green(), args.yellow());
                 }
 
@@ -101,7 +101,7 @@ async fn main() {
 
             repos.props.iter().for_each(|status| {
                 print_status_line(cli.status_template.clone(), status, Some(repos.lens), cli.align);
-                if cli.show_command == BoolChoice::Never {
+                if cli.show_command == BoolChoice::Always {
                     println!("$ {} {}", command_name.green(), script.to_string_lossy().yellow());
                 }
 
@@ -125,7 +125,7 @@ async fn main() {
                 let args = replace_placeholders(&args.clone(), &evaluation);
 
                 print_status_line(cli.status_template.clone(), status, Some(repos.lens), cli.align);
-                if cli.show_command == BoolChoice::Never {
+                if cli.show_command == BoolChoice::Always {
                     println!("$ {} -c {}", command_name.green(), args.yellow());
                 }
 
