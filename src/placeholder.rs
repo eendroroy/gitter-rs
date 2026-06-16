@@ -30,7 +30,7 @@ pub fn evaluate_placeholders(base_string: &str, status: &Properties) -> HashMap<
             "author:e" => status.author_email.clone(),
             "author:n" => status.author_name.clone(),
             "time:r" => status.relative_time.clone(),
-            "time:d" => status.absolute_time.clone(),
+            "time:a" => status.absolute_time.clone(),
             "dirty" => (if status.is_dirty {
                 STYLE.dirty_style.apply("DIRTY")
             } else {
