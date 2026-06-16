@@ -15,10 +15,12 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         rust_target:
-          - x86_64-unknown-linux-gnu  # Linux
+          - x86_64-unknown-linux-gnu  # Linux Intel
+          - aarch64-unknown-linux-gnu # Linux ARM
           - x86_64-apple-darwin       # macOS Intel
           - aarch64-apple-darwin      # macOS Apple Silicon
-          - x86_64-pc-windows-msvc    # Windows
+          - x86_64-pc-windows-msvc    # Windows Intel
+          - aarch64-pc-windows-msvc   # Windows ARM
 
         # Filter out invalid combinations
         exclude:
@@ -28,16 +30,27 @@ jobs:
             rust_target: aarch64-apple-darwin
           - os: ubuntu-latest
             rust_target: x86_64-pc-windows-msvc
+          - os: ubuntu-latest
+            rust_target: aarch64-pc-windows-msvc
+
           - os: macos-latest
             rust_target: x86_64-unknown-linux-gnu
+          - os: macos-latest
+            rust_target: aarch64-unknown-linux-gnu
           - os: macos-latest
             rust_target: x86_64-pc-windows-msvc
+          - os: macos-latest
+            rust_target: aarch64-pc-windows-msvc
+
           - os: windows-latest
             rust_target: x86_64-unknown-linux-gnu
+          - os: windows-latest
+            rust_target: aarch64-unknown-linux-gnu
           - os: windows-latest
             rust_target: x86_64-apple-darwin
           - os: windows-latest
             rust_target: aarch64-apple-darwin
+
 
     steps:
     - uses: actions/checkout@v4
