@@ -3,91 +3,98 @@ name: Rust CI
 on:
   push:
     tags:
+      # 1. Standard Production Releases (e.g., 0.0.1, 12.33.9)
       - '[0-9]+.[0-9]+.[0-9]+'
+
+      # 2. Strict Dotted Pre-releases (e.g., 1.1.1.a.1, 1.1.1.b.1201, 1.1.1.rc.3)
+      - '[0-9]+.[0-9]+.[0-9]+.a.[0-9]*'
+      - '[0-9]+.[0-9]+.[0-9]+.b.[0-9]*'
+      - '[0-9]+.[0-9]+.[0-9]+.rc.[0-9]*'
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  # This gate job runs instantly on tag push, but pauses the pipeline
+  # waiting for your manual button click.
+  gatekeeper:
+    name: "Wait for Manual Approval"
+    runs-on: ubuntu-latest
+    environment: production-releases # This environment forces the manual check
+    steps:
+      - name: Awaiting Approval
+        run: echo "Tag detected. Waiting for user authorization..."
   build:
+    name: Build (${{ matrix.rust_target }})
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        rust_target:
-          - x86_64-unknown-linux-gnu  # Linux Intel
-          - aarch64-unknown-linux-gnu # Linux ARM
-          - x86_64-apple-darwin       # macOS Intel
-          - aarch64-apple-darwin      # macOS Apple Silicon
-          - x86_64-pc-windows-msvc    # Windows Intel
-          - aarch64-pc-windows-msvc   # Windows ARM
-
-        # Filter out invalid combinations
-        exclude:
+        include:
+          # Linux Targets
           - os: ubuntu-latest
-            rust_target: x86_64-apple-darwin
+            rust_target: x86_64-unknown-linux-gnu  # Linux Intel
           - os: ubuntu-latest
-            rust_target: aarch64-apple-darwin
-          - os: ubuntu-latest
-            rust_target: x86_64-pc-windows-msvc
-          - os: ubuntu-latest
-            rust_target: aarch64-pc-windows-msvc
+            rust_target: aarch64-unknown-linux-gnu # Linux ARM
 
+          # macOS Targets
           - os: macos-latest
-            rust_target: x86_64-unknown-linux-gnu
+            rust_target: x86_64-apple-darwin       # Mac Intel
           - os: macos-latest
-            rust_target: aarch64-unknown-linux-gnu
-          - os: macos-latest
-            rust_target: x86_64-pc-windows-msvc
-          - os: macos-latest
-            rust_target: aarch64-pc-windows-msvc
+            rust_target: aarch64-apple-darwin      # Mac Silicon
 
+          # Windows Targets
           - os: windows-latest
-            rust_target: x86_64-unknown-linux-gnu
+            rust_target: x86_64-pc-windows-msvc    # Windows Intel
           - os: windows-latest
-            rust_target: aarch64-unknown-linux-gnu
-          - os: windows-latest
-            rust_target: x86_64-apple-darwin
-          - os: windows-latest
-            rust_target: aarch64-apple-darwin
-
+            rust_target: aarch64-pc-windows-msvc   # Windows ARM
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Install Rust toolchain
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        target: ${{ matrix.rust_target }}
-        override: true
+      # 1. Host Setup: Install Linux ARM Cross-Linker
+      - name: Install ARM GCC for Linux
+        if: matrix.rust_target == 'aarch64-unknown-linux-gnu'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu
 
-    - name: Cache Cargo dependencies
-      uses: actions/cache@v3
-      with:
-        path: |
-          ~/.cargo/registry
-          ~/.cargo/git
-          target
-        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-cargo-
+      # 2. Host Setup: Install Windows ARM Build Tools
+      - name: Install Windows ARM64 Build Tools
+        if: matrix.rust_target == 'aarch64-pc-windows-msvc'
+        shell: powershell
+        run: |
+          Start-Process "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vs_installer.exe" -ArgumentList "modify --installPath ""C:\Program Files\Microsoft Visual Studio\2022\Enterprise"" --add Microsoft.VisualStudio.Component.VC.Tools.ARM64 --passive --norestart" -Wait
 
-    - name: Build
-      run: cargo build --verbose --release --target ${{ matrix.rust_target }}
+      # 3. Setup Rust Toolchain
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.rust_target }}
 
-    - name: Run tests
-      run: cargo test --verbose --target ${{ matrix.rust_target }}
-      # Some targets might not support running tests directly on the runner,
-      # or might require specific setup. Adjust as needed.
-      # For example, cross-compiling for embedded systems might not run tests.
-      continue-on-error: true # Allow build to pass even if tests fail on some platforms
+      # 4. Smart Cache Configuration
+      - name: Cache Cargo dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.rust_target }}
 
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: gitter-${{ matrix.rust_target }}
-        path: target/${{ matrix.rust_target }}/release/gitter${{ contains(matrix.rust_target, 'windows') && '.exe' || '' }}
+      # 5. Build Binary (with target-specific environment linkers)
+      - name: Build
+        env:
+          CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
+        run: cargo build --verbose --release --target ${{ matrix.rust_target }}
+
+      # 6. Smart Test Suite execution (skips cross-compiled ARM targets that cannot run on host runner)
+      - name: Run tests
+        if: "!contains(matrix.rust_target, 'aarch64')"
+        run: cargo test --verbose --target ${{ matrix.rust_target }}
+
+      # 7. Upload to Pipeline Stage Artifacts
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gitter-${{ matrix.rust_target }}
+          path: target/${{ matrix.rust_target }}/release/gitter${{ contains(matrix.rust_target, 'windows') && '.exe' || '' }}
 
   release:
     name: Create GitHub Release
@@ -110,19 +117,15 @@ jobs:
           mkdir release_assets
           for dir in artifacts/*; do
             target_name=$(basename "$dir")
-            # Assuming the executable is directly inside the artifact directory
-            # and named 'gitter' or 'gitter.exe'
             if [ -f "$dir/gitter" ]; then
-              zip -j release_assets/${target_name}.zip "$dir/gitter"
+              zip -j "release_assets/${target_name}.zip" "$dir/gitter"
             elif [ -f "$dir/gitter.exe" ]; then
-              zip -j release_assets/${target_name}.zip "$dir/gitter.exe"
-            else
-              echo "Warning: No executable found in $dir"
+              zip -j "release_assets/${target_name}.zip" "$dir/gitter.exe"
             fi
           done
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: release_assets/*.zip
           generate_release_notes: true
