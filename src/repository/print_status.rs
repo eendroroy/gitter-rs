@@ -35,11 +35,8 @@ pub fn get_status_line(
     lengths: Option<PropertyLengths>,
     align: bool,
 ) -> String {
-    let mut evaluation = if let Some(template) = template {
-        evaluate_placeholders(&template, status)
-    } else {
-        evaluate_placeholders(STATUS, status)
-    };
+    let status_template = if let Some(template) = template { template } else { STATUS.to_string() };
+    let mut evaluation = evaluate_placeholders(&status_template, status);
 
     if align && let Some(l) = lengths {
         update_evaluation_padding(&mut evaluation, "{_path:r_}", l.path);
@@ -76,5 +73,5 @@ pub fn get_status_line(
         }
     }
 
-    replace_placeholders(STATUS, &evaluation)
+    replace_placeholders(&status_template, &evaluation)
 }
