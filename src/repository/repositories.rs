@@ -1,7 +1,7 @@
 use crate::repository::helper::{
-    USER_EMAIL, USER_NAME, extract_config, get_absolute_time, get_bare, get_branch_count,
-    get_commit_count, get_contributor_summary, get_current_branch, get_current_commit_hash,
-    get_dirty, get_relative_path, get_relative_time, get_repo_name,
+    extract_config, get_absolute_time, get_bare, get_branch_count, get_commit_count, get_contributor_summary,
+    get_current_branch, get_current_commit_hash, get_dirty, get_relative_path,
+    get_relative_time, get_repo_name, USER_EMAIL, USER_NAME,
 };
 use git2::Repository;
 use std::cmp::max;
@@ -34,7 +34,7 @@ pub struct Properties {
     pub is_dirty: bool,
     pub bare: String,
     pub is_bare: bool,
-    pub contribution_summary: ContributionSummary,
+    pub cs: ContributionSummary,
 }
 
 impl Properties {
@@ -55,7 +55,7 @@ impl Properties {
         let absolute_time = get_absolute_time(&repository);
         let (dirty, is_dirty) = get_dirty(&repository);
         let (bare, is_bare) = get_bare(&repository);
-        let contribution_summary = get_contributor_summary(&repository);
+        let cs = get_contributor_summary(&repository);
 
         Some(Self {
             absolute_path,
@@ -73,14 +73,15 @@ impl Properties {
             is_dirty,
             bare,
             is_bare,
-            contribution_summary,
+            cs,
         })
     }
 }
 
 #[derive(Debug, Default, Clone, Copy)]
 pub struct PropertyLengths {
-    pub path: usize,
+    pub absolute_path: usize,
+    pub relative_path: usize,
     pub name: usize,
     pub branch: usize,
     pub branch_count: usize,
@@ -91,7 +92,6 @@ pub struct PropertyLengths {
     pub absolute_time: usize,
     pub bare: usize,
     pub cs_author_count: usize,
-    pub cs_commit_count: usize,
     pub cs_top_commit_count: usize,
     pub cs_top_author_name: usize,
     pub cs_top_author_email: usize,
@@ -137,7 +137,8 @@ impl Repositories {
         let digit_len = |n: usize| if n == 0 { 1 } else { (n as f64).log10().floor() as usize + 1 };
 
         self.props.iter().for_each(|s| {
-            self.lens.path = max(self.lens.path, s.relative_path.len());
+            self.lens.absolute_path = max(self.lens.absolute_path, s.absolute_path.len());
+            self.lens.relative_path = max(self.lens.relative_path, s.relative_path.len());
             self.lens.name = max(self.lens.name, s.name.len());
             self.lens.branch = max(self.lens.branch, s.branch.len());
             self.lens.branch_count = max(self.lens.branch_count, digit_len(s.branch_count));
@@ -148,15 +149,13 @@ impl Repositories {
             self.lens.absolute_time = max(self.lens.absolute_time, s.absolute_time.len());
             self.lens.bare = max(self.lens.bare, s.bare.len());
             self.lens.cs_author_count =
-                max(self.lens.cs_author_count, digit_len(s.contribution_summary.author_count));
-            self.lens.cs_top_commit_count = max(
-                self.lens.cs_top_commit_count,
-                digit_len(s.contribution_summary.top_commit_count),
-            );
+                max(self.lens.cs_author_count, digit_len(s.cs.author_count));
+            self.lens.cs_top_commit_count =
+                max(self.lens.cs_top_commit_count, digit_len(s.cs.top_commit_count));
             self.lens.cs_top_author_name =
-                max(self.lens.cs_top_author_name, s.contribution_summary.top_author_name.len());
+                max(self.lens.cs_top_author_name, s.cs.top_author_name.len());
             self.lens.cs_top_author_email =
-                max(self.lens.cs_top_author_email, s.contribution_summary.top_author_email.len());
+                max(self.lens.cs_top_author_email, s.cs.top_author_email.len());
         });
     }
 }

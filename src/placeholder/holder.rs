@@ -46,8 +46,8 @@ macro_rules! create_holder {
 lazy_static! {
     pub static ref HOLDERS: Vec<Holder> = vec![
         create_holder!("name",     |s, _c| s.name.clone(),             |s, _c, l|  update_padding_style(&s.name, l.map(|i| i.name), Some(&STYLE.name))),
-        create_holder!("path:r",   |s, _c| s.relative_path.clone(),    |s, _c, l|  update_padding_style(&s.relative_path, l.map(|i| i.path), Some(&STYLE.relative_time))),
-        create_holder!("path:a",   |s, _c| s.absolute_path.clone(),    |s, _c, l|  update_padding_style(&s.absolute_path, l.map(|i| i.path), Some(&STYLE.path))),
+        create_holder!("path:r",   |s, _c| s.relative_path.clone(),    |s, _c, l|  update_padding_style(&s.relative_path, l.map(|i| i.relative_path), Some(&STYLE.path))),
+        create_holder!("path:a",   |s, _c| s.absolute_path.clone(),    |s, _c, l|  update_padding_style(&s.absolute_path, l.map(|i| i.absolute_path), Some(&STYLE.path))),
         create_holder!("branch:n", |s, _c| s.branch.clone(),           |s, _c, l|  update_padding_style(&s.branch, l.map(|i| i.branch), Some(&STYLE.branch))),
         create_holder!("branch:c", |s, _c| s.branch_count.to_string(), |s, _c, l|  update_padding_style(&s.branch_count.to_string(), l.map(|i| i.branch_count), Some(&STYLE.branch))),
         create_holder!("hash:f",   |s, _c| s.commit_hash.clone(),      |s, _c, _l| update_padding_style(&s.commit_hash, None, Some(&STYLE.commit_hash))),
@@ -62,10 +62,10 @@ lazy_static! {
         create_holder!("bare",     |s, _c| s.bare.clone(),             |s, _c, l|  update_padding_style(&s.bare, l.map(|i| i.bare), Some(&STYLE.bare_style))),
 
         // Contribution Summaries
-        create_holder!("contrib:ac",  |s, _c| s.contribution_summary.author_count.to_string(),      |s, _c, l| update_padding_style(&s.contribution_summary.author_count.to_string(), l.map(|i| i.cs_commit_count), Some(&STYLE.cs_commit_count))),
-        create_holder!("contrib:tan", |s, _c| s.contribution_summary.top_author_name.to_string(),   |s, _c, l| update_padding_style(&s.contribution_summary.top_author_name.to_string(), l.map(|i| i.cs_top_author_name), Some(&STYLE.cs_top_author_name))),
-        create_holder!("contrib:tae", |s, _c| s.contribution_summary.top_author_email.to_string(),  |s, _c, l| update_padding_style(&s.contribution_summary.top_author_email.to_string(), l.map(|i| i.cs_top_author_email), Some(&STYLE.cs_top_author_email))),
-        create_holder!("contrib:tcc", |s, _c| s.contribution_summary.top_commit_count.to_string(),  |s, _c, l| update_padding_style(&s.contribution_summary.top_commit_count.to_string(), l.map(|i| i.cs_top_commit_count), Some(&STYLE.cs_top_commit_count))),
+        create_holder!("contrib:ac",  |s, _c| s.cs.author_count.to_string(),      |s, _c, l| update_padding_style(&s.cs.author_count.to_string(), l.map(|i| i.cs_author_count), Some(&STYLE.cs_author_count))),
+        create_holder!("contrib:tan", |s, _c| s.cs.top_author_name.to_string(),   |s, _c, l| update_padding_style(&s.cs.top_author_name.to_string(), l.map(|i| i.cs_top_author_name), Some(&STYLE.cs_top_author_name))),
+        create_holder!("contrib:tae", |s, _c| s.cs.top_author_email.to_string(),  |s, _c, l| update_padding_style(&s.cs.top_author_email.to_string(), l.map(|i| i.cs_top_author_email), Some(&STYLE.cs_top_author_email))),
+        create_holder!("contrib:tcc", |s, _c| s.cs.top_commit_count.to_string(),  |s, _c, l| update_padding_style(&s.cs.top_commit_count.to_string(), l.map(|i| i.cs_top_commit_count), Some(&STYLE.cs_top_commit_count))),
 
         // Dynamic "hash" tag handler supporting variable lengths (e.g. hash:7)
         create_holder!(
