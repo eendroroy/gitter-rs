@@ -22,7 +22,7 @@ dependencies = ["preflight-check", "build-matrix", "deploy"]
 
 [tasks.build-matrix]
 description = "Runs compilation matrix concurrently based on Host OS."
-run_task = { name = ["linux", "win", "mac"], parallel = true }
+run_task = { name = ["linux", "win", "mac"], parallel = false }
 
 [tasks.linux]
 dependencies = ["linux-x86", "linux-arm"]
