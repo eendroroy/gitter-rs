@@ -11,7 +11,7 @@ use crate::help::{
     print_completion_help, print_filter_help, print_gitterignore_help, print_placeholder_help,
 };
 use crate::palette::Palette;
-use crate::placeholder::{evaluate_placeholders, replace_placeholders};
+use crate::placeholder::processor::{evaluate_placeholders, replace_placeholders};
 use crate::repository::filter_repositories::filter_repositories;
 use crate::repository::print_status::print_status_line;
 use crate::repository::repositories::Repositories;
