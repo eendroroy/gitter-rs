@@ -1,9 +1,10 @@
 use crate::directory::ignore::{IgnoreRule, ignore_patterns, is_ignored};
+use std::fs;
 use std::path::{Path, PathBuf};
 use walkdir::WalkDir;
 
 pub fn find_repo_dirs<P: AsRef<Path>>(target_dir: P, depth: usize) -> Vec<PathBuf> {
-    let target_path = target_dir.as_ref();
+    let target_path = fs::canonicalize(target_dir).unwrap();
     let mut repositories: Vec<PathBuf> = vec![];
     let mut active_ignore_rules_stack: Vec<(usize, Vec<IgnoreRule>)> = Vec::new();
 

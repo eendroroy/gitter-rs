@@ -1,11 +1,11 @@
 use crate::repository::helper::{
-    extract_config, get_absolute_time, get_bare, get_branch_count, get_commit_count, get_contributor_summary,
-    get_current_branch, get_current_commit_hash, get_dirty, get_relative_path,
-    get_relative_time, get_repo_name, USER_EMAIL, USER_NAME,
+    USER_EMAIL, USER_NAME, extract_config, get_absolute_path, get_absolute_time, get_bare,
+    get_branch_count, get_commit_count, get_contributor_summary, get_current_branch,
+    get_current_commit_hash, get_dirty, get_relative_path, get_relative_time, get_repo_name,
 };
 use git2::Repository;
 use std::cmp::max;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use tokio::task::JoinSet;
 
@@ -38,11 +38,11 @@ pub struct Properties {
 }
 
 impl Properties {
-    pub fn new(path: &str, base_path: &str) -> Option<Self> {
+    pub fn new(path: &Path, base_path: &Path) -> Option<Self> {
         let repository = Repository::open(path).ok()?;
         let config = repository.config().ok();
 
-        let absolute_path = path.to_string();
+        let absolute_path = get_absolute_path(path);
         let relative_path = get_relative_path(path, base_path);
         let name = get_repo_name(path);
         let branch = get_current_branch(&repository);
@@ -104,16 +104,14 @@ pub struct Repositories {
 }
 
 impl Repositories {
-    pub async fn new(repositories: Vec<PathBuf>, path: &str) -> Self {
+    pub async fn new(repositories: Vec<PathBuf>, path: &Path) -> Self {
         let base_path = Arc::new(path.to_owned());
 
         let mut tasks = JoinSet::new();
 
         for repo in repositories {
             let base_path = Arc::clone(&base_path);
-            tasks.spawn_blocking(move || {
-                Properties::new(repo.to_str().expect("Invalid UTF-8 path"), &base_path)
-            });
+            tasks.spawn_blocking(move || Properties::new(&repo, &base_path));
         }
 
         let mut statuses: Vec<Properties> = Vec::new();

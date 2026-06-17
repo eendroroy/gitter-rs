@@ -5,6 +5,7 @@ use clap::builder::styling::Style;
 use clap::{Args, Parser, Subcommand, ValueEnum};
 use std::fmt;
 use std::fmt::{Display, Formatter};
+use std::path::PathBuf;
 
 pub const CLAP_STYLE: Styles = Styles::styled()
     .header(Style::new().bold().fg_color(Some(Ansi(Green))))
@@ -36,7 +37,7 @@ pub struct Gitter {
 
     /// Working directory, if not provided current directory will be used
     #[arg(short = 'C', long = "pwd", default_value = ".", global = true)]
-    pub directory: String,
+    pub directory: PathBuf,
 
     /// Max depth to traverse subdirectories
     #[arg(short = 'd', long = "max-depth", default_value = "2", global = true)]

@@ -32,7 +32,7 @@ pub fn evaluate_placeholders(base_string: &str, status: &Properties) -> HashMap<
 pub fn evaluate_placeholders_styled(
     base_string: &str,
     status: &Properties,
-    lengths: Option<&PropertyLengths>, // Added parameter to forward to HOLDERS
+    lengths: Option<&PropertyLengths>,
 ) -> HashMap<String, String> {
     let mut evaluation = HashMap::new();
 
@@ -45,7 +45,6 @@ pub fn evaluate_placeholders_styled(
         let key = caps.get(1).unwrap().as_str();
 
         if let Some(holder) = HOLDERS.iter().find(|h| h.tag == key) {
-            // Passes status, captures, and lengths context down to your holders
             let value = (holder.status)(status, Some(&caps), lengths);
             evaluation.insert(full_tag.to_string(), value);
         }

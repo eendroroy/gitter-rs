@@ -1,4 +1,5 @@
 mod extract_config;
+mod get_absolute_path;
 mod get_absolute_time;
 mod get_bare;
 mod get_branch_count;
@@ -12,6 +13,7 @@ mod get_relative_time;
 mod get_repo_name;
 
 pub use extract_config::extract_config;
+pub use get_absolute_path::get_absolute_path;
 pub use get_absolute_time::get_absolute_time;
 pub use get_bare::get_bare;
 pub use get_branch_count::get_branch_count;
