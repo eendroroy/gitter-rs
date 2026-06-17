@@ -1,9 +1,10 @@
+#[macro_use]
+mod placeholder;
 mod directory;
 mod gitter;
 mod gitter_command;
 mod help;
 mod palette;
-mod placeholder;
 mod repository;
 
 use crate::gitter::{Gitter, GitterCommand, RawArgsBlock};

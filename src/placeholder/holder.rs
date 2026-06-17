@@ -27,6 +27,8 @@ fn apply_style(value: &str, width: Option<usize>, style: Option<&ComponentStyle>
 macro_rules! create_holder {
     (
         $tag:expr,
+        $full_tag:expr,
+        $desc:expr,
 
         |$props_v:ident, $idx_v:ident| $value_body:expr,
         |$props_s:ident, $idx_s:ident, $lens_s:ident| $status_body:expr $(,)?
@@ -39,120 +41,211 @@ macro_rules! create_holder {
     };
 }
 
-lazy_static! {
-    pub static ref HOLDERS: Vec<Holder> = vec![
-        create_holder!("name", |s, _c| s.name.clone(), |s, _c, l| apply_style(
-            &s.name,
-            l.map(|i| i.name),
-            Some(&STYLE.name)
-        )),
-        create_holder!("path:r", |s, _c| s.relative_path.clone(), |s, _c, l| apply_style(
-            &s.relative_path,
-            l.map(|i| i.relative_path),
-            Some(&STYLE.path)
-        )),
-        create_holder!("path:a", |s, _c| s.absolute_path.clone(), |s, _c, l| apply_style(
-            &s.absolute_path,
-            l.map(|i| i.absolute_path),
-            Some(&STYLE.path)
-        )),
-        create_holder!("branch:n", |s, _c| s.branch.clone(), |s, _c, l| apply_style(
-            &s.branch,
-            l.map(|i| i.branch),
-            Some(&STYLE.branch)
-        )),
-        create_holder!("branch:c", |s, _c| s.branch_count.to_string(), |s, _c, l| apply_style(
-            &s.branch_count.to_string(),
-            l.map(|i| i.branch_count),
-            Some(&STYLE.branch)
-        )),
-        create_holder!("hash:f", |s, _c| s.commit_hash.clone(), |s, _c, _l| apply_style(
-            &s.commit_hash,
-            None,
-            Some(&STYLE.commit_hash)
-        )),
-        create_holder!("commit:c", |s, _c| s.commit_count.to_string(), |s, _c, l| apply_style(
-            &s.commit_count.to_string(),
-            l.map(|i| i.commit_count),
-            Some(&STYLE.commit_hash),
-        )),
-        create_holder!("author:e", |s, _c| s.author_email.clone(), |s, _c, l| apply_style(
-            &s.author_email,
-            l.map(|i| i.author_email),
-            Some(&STYLE.author_email)
-        )),
-        create_holder!("author:n", |s, _c| s.author_name.clone(), |s, _c, l| apply_style(
-            &s.author_name,
-            l.map(|i| i.author_name),
-            Some(&STYLE.author_name)
-        )),
-        create_holder!("time:r", |s, _c| s.relative_time.clone(), |s, _c, l| apply_style(
-            &s.relative_time,
-            l.map(|i| i.relative_time),
-            Some(&STYLE.relative_time)
-        )),
-        create_holder!("time:a", |s, _c| s.absolute_time.clone(), |s, _c, l| apply_style(
-            &s.absolute_time,
-            l.map(|i| i.absolute_time),
-            Some(&STYLE.absolute_time)
-        )),
-        create_holder!("dirty", |s, _c| s.dirty.clone(), |s, _c, _l| apply_style(
-            &s.dirty, None, None
-        )),
-        create_holder!("bare", |s, _c| s.bare.clone(), |s, _c, l| apply_style(
-            &s.bare,
-            l.map(|i| i.bare),
-            Some(&STYLE.bare_style)
-        )),
-        create_holder!("contrib:ac", |s, _c| s.cs.author_count.to_string(), |s, _c, l| {
-            apply_style(
-                &s.cs.author_count.to_string(),
-                l.map(|i| i.cs_author_count),
-                Some(&STYLE.cs_author_count),
-            )
-        }),
-        create_holder!("contrib:tan", |s, _c| s.cs.top_author_name.to_string(), |s, _c, l| {
-            apply_style(
-                &s.cs.top_author_name.to_string(),
-                l.map(|i| i.cs_top_author_name),
-                Some(&STYLE.cs_top_author_name),
-            )
-        }),
-        create_holder!("contrib:tae", |s, _c| s.cs.top_author_email.to_string(), |s, _c, l| {
-            apply_style(
-                &s.cs.top_author_email.to_string(),
-                l.map(|i| i.cs_top_author_email),
-                Some(&STYLE.cs_top_author_email),
-            )
-        }),
-        create_holder!("contrib:tcc", |s, _c| s.cs.top_commit_count.to_string(), |s, _c, l| {
-            apply_style(
-                &s.cs.top_commit_count.to_string(),
-                l.map(|i| i.cs_top_commit_count),
-                Some(&STYLE.cs_top_commit_count),
-            )
-        }),
-        create_holder!(
-            "hash",
-            |s, caps| {
-                if let Some(c) = caps
-                    && let Some(len_match) = c.get(2)
-                    && let Ok(req_len) = len_match.as_str().parse::<usize>()
-                {
-                    let target_len = std::cmp::min(req_len, s.commit_hash.len());
-                    return s.commit_hash[..target_len].to_string();
-                }
-                s.commit_hash.clone()
-            },
-            |s, caps, _l| {
-                let target_len = caps
-                    .and_then(|c| c.get(2))
-                    .and_then(|m| m.as_str().parse::<usize>().ok())
-                    .map(|len| std::cmp::min(len, s.commit_hash.len()))
-                    .unwrap_or(s.commit_hash.len());
+macro_rules! define_holders {
+    (
+        $(
+            {
+                $tag:literal, $full_tag:literal, $desc:literal,
 
-                apply_style(&s.commit_hash[..target_len], None, Some(&STYLE.commit_hash))
+                |$props_v:ident, $idx_v:ident| $value_body:expr,
+                |$props_s:ident, $idx_s:ident, $lens_s:ident| $status_body:expr $(,)?
             }
-        ),
-    ];
+        )*
+    ) => {
+        lazy_static! {
+            pub static ref HOLDERS: Vec<Holder> = vec![
+                $(
+                    create_holder!(
+                        $tag,
+                        $full_tag,
+                        $desc,
+
+                        |$props_v, $idx_v| $value_body,
+                        |$props_s, $idx_s, $lens_s| $status_body
+                    ),
+                )*
+            ];
+        }
+
+        #[macro_export]
+        macro_rules! placeholder_template {
+            // Accept the custom style arguments and the target padding width variable
+            ($header:expr, $usage:expr, $literal:expr, $placeholder:expr, $tag_width:expr) => {{
+                // Print the invariant header block first
+                print!(
+                    concat!(
+                        "{header}Gitter Template Placeholders{header:#}\n\n",
+                        "{usage}Usage:{usage:#}\n",
+                        "  Pass these tags within string sequences to dynamically extract local repository data.\n",
+                        "  Example: {literal}gitter bash{literal:#} {placeholder}-- echo \"Current branch name is: {{_branch:n_}}\"{placeholder:#}\n\n",
+                        "{header}Available Placeholders:{header:#}\n"
+                    ),
+                    header = $header,
+                    usage = $usage,
+                    literal = $literal,
+                    placeholder = $placeholder
+                );
+
+                // Use macro repetition to print each entry using the runtime tag_width variable
+                $(
+                    let formatted_desc = $desc
+                        .replace("{literal}", &$literal.to_string())
+                        .replace("{literal:#}", "\x1b[0m"); // Resets terminal style sequence back to normal
+
+                    println!(
+                        "  {literal}{tag_val:<width$}{literal:#} {desc}",
+                        literal = $literal,
+                        tag_val = $full_tag,
+                        width = $tag_width,
+                        desc = formatted_desc
+                    );
+                )*
+            }};
+        }
+    };
+}
+
+define_holders! {
+    {
+        "name", "{_name_}", "The simple name of the repository directory.",
+
+        |s, _c| s.name.clone(),
+        |s, _c, l| apply_style(&s.name, l.map(|i| i.name), Some(&STYLE.name))
+    }
+
+    {
+        "path:r", "{_path:r_}", "The relative path from your execution context.",
+
+        |s, _c| s.relative_path.clone(),
+        |s, _c, l| apply_style(&s.relative_path, l.map(|i| i.relative_path), Some(&STYLE.path))
+    }
+
+    {
+        "path:a", "{_path:a_}", "The complete absolute file path on the system filesystem.",
+
+        |s, _c| s.absolute_path.clone(),
+        |s, _c, l| apply_style(&s.absolute_path, l.map(|i| i.absolute_path), Some(&STYLE.path))
+    }
+
+    {
+        "branch:n", "{_branch:n_}", "The active checked-out Git branch head.",
+
+        |s, _c| s.branch.clone(),
+        |s, _c, l| apply_style(&s.branch, l.map(|i| i.branch), Some(&STYLE.branch))
+    }
+
+    {
+        "branch:c", "{_branch:c_}", "Total number of branches.",
+
+        |s, _c| s.branch_count.to_string(),
+        |s, _c, l| apply_style(&s.branch_count.to_string(), l.map(|i| i.branch_count), Some(&STYLE.branch))
+    }
+
+    {
+        "hash:f", "{_hash:f_}", "The full 40-character Git commit hash string.",
+
+        |s, _c| s.commit_hash.clone(),
+        |s, _c, _l| apply_style(&s.commit_hash, None, Some(&STYLE.commit_hash))
+    }
+
+    {
+        "commit:c", "{_commit:c_}", "Total number of commits in current branch.",
+
+        |s, _c| s.commit_count.to_string(),
+        |s, _c, l| apply_style(&s.commit_count.to_string(), l.map(|i| i.commit_count), Some(&STYLE.commit_hash))
+    }
+
+    {
+        "author:e", "{_author:e_}", "The email marker boundary of the commit author.",
+
+        |s, _c| s.author_email.clone(),
+        |s, _c, l| apply_style(&s.author_email, l.map(|i| i.author_email), Some(&STYLE.author_email))
+    }
+
+    {
+        "author:n", "{_author:n_}", "The name signature of the individual behind the latest commit.",
+
+        |s, _c| s.author_name.clone(),
+        |s, _c, l| apply_style(&s.author_name, l.map(|i| i.author_name), Some(&STYLE.author_name))
+    }
+
+    {
+        "time:r", "{_time:r_}", "The human-readable relative time interval (e.g., '2 hours ago').",
+
+        |s, _c| s.relative_time.clone(),
+        |s, _c, l| apply_style(&s.relative_time, l.map(|i| i.relative_time), Some(&STYLE.relative_time))
+    }
+
+    {
+        "time:a", "{_time:a_}", "The precise absolute date stamp signature format.",
+
+        |s, _c| s.absolute_time.clone(),
+        |s, _c, l| apply_style(&s.absolute_time, l.map(|i| i.absolute_time), Some(&STYLE.absolute_time))
+    }
+
+    {
+        "dirty", "{_dirty_}", "Marker for uncommitted changes.",
+
+        |s, _c| s.dirty.clone(),
+        |s, _c, _l| apply_style(&s.dirty, None, None)
+    }
+
+    {
+        "bare", "{_bare_}", "Marker for bare status.",
+
+        |s, _c| s.bare.clone(),
+        |s, _c, l| apply_style(&s.bare, l.map(|i| i.bare), Some(&STYLE.bare_style))
+    }
+
+    {
+        "contrib:ac", "{_contrib:ac_}", "Total number of authors in current branch.",
+
+        |s, _c| s.cs.author_count.to_string(),
+        |s, _c, l| apply_style(&s.cs.author_count.to_string(), l.map(|i| i.cs_author_count), Some(&STYLE.cs_author_count))
+    }
+
+    {
+        "contrib:tan", "{_contrib:tan_}", "Top author name in current branch.",
+
+        |s, _c| s.cs.top_author_name.to_string(),
+        |s, _c, l| apply_style(&s.cs.top_author_name.to_string(), l.map(|i| i.cs_top_author_name), Some(&STYLE.cs_top_author_name))
+    }
+
+    {
+        "contrib:tae", "{_contrib:tae_}", "Top author email in current branch.",
+
+        |s, _c| s.cs.top_author_email.to_string(),
+        |s, _c, l| apply_style(&s.cs.top_author_email.to_string(), l.map(|i| i.cs_top_author_email), Some(&STYLE.cs_top_author_email))
+    }
+
+    {
+        "contrib:tcc", "{_contrib:tcc_}", "Total number of commits by top author in current branch.",
+
+        |s, _c| s.cs.top_commit_count.to_string(),
+        |s, _c, l| apply_style(&s.cs.top_commit_count.to_string(), l.map(|i| i.cs_top_commit_count), Some(&STYLE.cs_top_commit_count))
+    }
+
+    {
+        "hash", "{_hash:<n>_}", "A variable length commit SHA slice where 'n' is any integer. Ex: {literal}{_hash:12_}{literal:#} = 12-character)",
+
+        |s, caps| {
+            if let Some(c) = caps
+                && let Some(len_match) = c.get(2)
+                && let Ok(req_len) = len_match.as_str().parse::<usize>()
+            {
+                let target_len = std::cmp::min(req_len, s.commit_hash.len());
+                return s.commit_hash[..target_len].to_string();
+            }
+            s.commit_hash.clone()
+        },
+
+        |s, caps, _l| {
+            let target_len = caps
+                .and_then(|c| c.get(2))
+                .and_then(|m| m.as_str().parse::<usize>().ok())
+                .map(|len| std::cmp::min(len, s.commit_hash.len()))
+                .unwrap_or(s.commit_hash.len());
+            apply_style(&s.commit_hash[..target_len], None, Some(&STYLE.commit_hash))
+        }
+    }
 }
