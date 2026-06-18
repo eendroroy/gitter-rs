@@ -29,6 +29,7 @@ pub struct Palette {
     pub path: ComponentStyle,
     pub name: ComponentStyle,
     pub branch: ComponentStyle,
+    pub detached: ComponentStyle,
     pub commit_hash: ComponentStyle,
     pub author_name: ComponentStyle,
     pub author_email: ComponentStyle,
@@ -46,9 +47,10 @@ pub struct Palette {
 impl Default for Palette {
     fn default() -> Self {
         Self {
-            path: new_style!(Color::BrightBlue, Styles::Dimmed, Styles::Bold, Styles::Italic),
-            name: new_style!(Color::BrightWhite, Styles::Bold),
+            path: new_style!(Color::BrightBlue, Styles::Dimmed, Styles::Bold),
+            name: new_style!(Color::White, Styles::Bold),
             branch: new_style!(Color::Green, Styles::Clear),
+            detached: new_style!(Color::Red, Styles::Italic),
             commit_hash: new_style!(Color::Cyan, Styles::Italic),
             author_name: new_style!(Color::BrightCyan, Styles::Clear),
             author_email: new_style!(Color::BrightBlack, Styles::Clear),

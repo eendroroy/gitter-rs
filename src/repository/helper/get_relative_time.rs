@@ -47,5 +47,5 @@ pub fn get_relative_time(repository: &Repository) -> String {
         .and_then(|head| head.peel_to_commit())
         .map(|commit| commit.time().seconds())
         .map(format_relative_time)
-        .unwrap_or_else(|_| "NO_COMMIT".to_string())
+        .unwrap_or_else(|_| "".to_string())
 }

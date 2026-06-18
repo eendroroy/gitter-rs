@@ -1,8 +1,10 @@
 use crate::STYLE;
 use crate::palette::ComponentStyle;
+use crate::repository::helper::DETACHED;
 use crate::repository::repositories::{Properties, PropertyLengths};
 use lazy_static::lazy_static;
 use regex::Captures;
+use std::cmp::min;
 
 type ValueFn = Box<dyn Fn(&Properties, Option<&Captures>) -> String + Send + Sync>;
 type StatusFn =
@@ -131,7 +133,13 @@ define_holders! {
         "branch:n", "{_branch:n_}", "The active checked-out Git branch head.",
 
         |s, _c| s.branch.clone(),
-        |s, _c, l| apply_style(&s.branch, l.map(|i| i.branch), Some(&STYLE.branch))
+        |s, _c, l| {
+            if &s.branch == DETACHED {
+                apply_style(&s.branch, l.map(|i| i.branch), Some(&STYLE.detached))
+            } else {
+                apply_style(&s.branch, l.map(|i| i.branch), Some(&STYLE.branch))
+            }
+        }
     }
 
     {
@@ -233,19 +241,23 @@ define_holders! {
                 && let Some(len_match) = c.get(2)
                 && let Ok(req_len) = len_match.as_str().parse::<usize>()
             {
-                let target_len = std::cmp::min(req_len, s.commit_hash.len());
+                let target_len = min(req_len, s.commit_hash.len());
                 return s.commit_hash[..target_len].to_string();
             }
             s.commit_hash.clone()
         },
 
-        |s, caps, _l| {
-            let target_len = caps
-                .and_then(|c| c.get(2))
-                .and_then(|m| m.as_str().parse::<usize>().ok())
-                .map(|len| std::cmp::min(len, s.commit_hash.len()))
-                .unwrap_or(s.commit_hash.len());
-            apply_style(&s.commit_hash[..target_len], None, Some(&STYLE.commit_hash))
+        |s, caps, l| {
+            if let Some(c) = caps
+                && let Some(len_match) = c.get(2)
+                && let Ok(req_len) = len_match.as_str().parse::<usize>()
+            {
+                let commit_len = min(req_len, s.commit_hash.len());
+                let target_len = min(req_len, l.map(|i| i.commit_hash).unwrap_or(0));
+                apply_style(&s.commit_hash[..commit_len], Some(target_len), Some(&STYLE.commit_hash))
+            } else {
+                apply_style(&s.commit_hash, None, Some(&STYLE.commit_hash))
+            }
         }
     }
 }

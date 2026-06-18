@@ -1,16 +1,14 @@
+use crate::repository::helper::DETACHED;
 use git2::Repository;
 
 pub fn get_current_branch(repository: &Repository) -> String {
+    if repository.head_detached().unwrap_or(true) {
+        return DETACHED.to_string();
+    }
+
     repository
         .head()
         .ok()
-        .map(|h| {
-            h.shorthand().map(|s| s.to_string()).or_else(|_| {
-                h.symbolic_target()
-                    .map(|s| s.expect("REASON").strip_prefix("refs/heads/"))
-                    .map(|s| s.expect("REASON").to_string())
-            })
-        })
-        .unwrap_or_else(|| Ok("DETACHED_HEAD".to_string()))
-        .expect("REASON")
+        .and_then(|h| h.shorthand().map(String::from).ok())
+        .unwrap_or_else(|| DETACHED.to_string())
 }

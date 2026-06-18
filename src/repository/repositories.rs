@@ -1,7 +1,7 @@
 use crate::repository::helper::{
-    USER_EMAIL, USER_NAME, extract_config, get_absolute_path, get_absolute_time, get_bare,
-    get_branch_count, get_commit_count, get_contributor_summary, get_current_branch,
-    get_current_commit_hash, get_dirty, get_relative_path, get_relative_time, get_repo_name,
+    get_absolute_path, get_absolute_time, get_bare, get_branch_count, get_commit_count,
+    get_contributor_summary, get_current_branch, get_current_commit_info, get_dirty,
+    get_relative_path, get_relative_time, get_repo_name,
 };
 use git2::Repository;
 use std::cmp::max;
@@ -40,17 +40,13 @@ pub struct Properties {
 impl Properties {
     pub fn new(path: &Path, base_path: &Path) -> Option<Self> {
         let repository = Repository::open(path).ok()?;
-        let config = repository.config().ok();
-
         let absolute_path = get_absolute_path(path);
         let relative_path = get_relative_path(path, base_path);
         let name = get_repo_name(path);
         let branch = get_current_branch(&repository);
         let branch_count = get_branch_count(&repository);
-        let commit_hash = get_current_commit_hash(&repository);
+        let (commit_hash, author_name, author_email) = get_current_commit_info(&repository);
         let commit_count = get_commit_count(&repository);
-        let author_name = extract_config(&config, USER_NAME);
-        let author_email = extract_config(&config, USER_EMAIL);
         let relative_time = get_relative_time(&repository);
         let absolute_time = get_absolute_time(&repository);
         let (dirty, is_dirty) = get_dirty(&repository);
@@ -85,6 +81,7 @@ pub struct PropertyLengths {
     pub name: usize,
     pub branch: usize,
     pub branch_count: usize,
+    pub commit_hash: usize,
     pub commit_count: usize,
     pub author_name: usize,
     pub author_email: usize,
@@ -140,6 +137,7 @@ impl Repositories {
             self.lens.name = max(self.lens.name, s.name.len());
             self.lens.branch = max(self.lens.branch, s.branch.len());
             self.lens.branch_count = max(self.lens.branch_count, digit_len(s.branch_count));
+            self.lens.commit_hash = max(self.lens.commit_hash, s.commit_hash.len());
             self.lens.commit_count = max(self.lens.commit_count, digit_len(s.commit_count));
             self.lens.author_name = max(self.lens.author_name, s.author_name.len());
             self.lens.author_email = max(self.lens.author_email, s.author_email.len());
