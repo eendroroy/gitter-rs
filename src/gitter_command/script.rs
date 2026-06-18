@@ -1,6 +1,6 @@
 use crate::gitter::{BoolChoice, CompShell, Gitter};
 use crate::gitter_command::helper::{find_repos, get_default_shell};
-use crate::repository::print_status::print_status_line;
+use crate::repository::print_info::print_info_line;
 use colored::Colorize;
 use std::path;
 use std::path::Path;
@@ -18,7 +18,7 @@ pub async fn script(cli: &Gitter, shell: &Option<CompShell>, path: &&String) {
     let script = path::absolute(Path::new(path)).expect("Unable to find script");
 
     repos.props.iter().for_each(|status| {
-        print_status_line(cli.status_template.clone(), status, Some(repos.lens), cli.align);
+        print_info_line(cli.status_template.clone(), status, Some(repos.lens), cli.align);
         if cli.show_command == BoolChoice::Always {
             println!("$ {} {}", command_name.green(), script.to_string_lossy().yellow());
         }

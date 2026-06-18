@@ -1,7 +1,7 @@
 use crate::gitter::{BoolChoice, Gitter};
 use crate::gitter_command::helper::find_repos;
 use crate::placeholder::processor::{evaluate_placeholders, replace_placeholders};
-use crate::repository::print_status::print_status_line;
+use crate::repository::print_info::print_info_line;
 use colored::Colorize;
 use std::process::{Command, Stdio};
 
@@ -12,7 +12,7 @@ pub async fn git(cli: &Gitter, raw_args: &[String]) {
     repos.props.iter().for_each(|status| {
         let evaluation = evaluate_placeholders(&args.clone(), status);
         let args = replace_placeholders(&args.clone(), &evaluation);
-        print_status_line(cli.status_template.clone(), status, Some(repos.lens), cli.align);
+        print_info_line(cli.status_template.clone(), status, Some(repos.lens), cli.align);
         if cli.show_command == BoolChoice::Always {
             println!("$ {} {}", "git".green(), args.yellow());
         }
