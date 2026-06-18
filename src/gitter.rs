@@ -63,6 +63,15 @@ pub struct Gitter {
     #[arg(short, long, action = clap::ArgAction::SetTrue, global = true)]
     pub quiet: bool,
 
+    /// Sort the repo list by provided template using placeholders.
+    /// Ex: gitter ls --sort "{_name_}"
+    #[arg(short, long, default_value = "{_path:r_}/{_name_}", global = true)]
+    pub sort: String,
+
+    /// Reverse sort. Only allowed with --sort arg.
+    #[arg(short, long, action = clap::ArgAction::SetTrue, global = true)]
+    pub reverse: bool,
+
     /// Raw arguments passed after '--' or if no subcommand is specified.
     #[arg(trailing_var_arg = true, allow_hyphen_values = true, num_args = 0.., global = true)]
     pub raw_args: Vec<String>,

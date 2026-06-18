@@ -12,6 +12,7 @@ pub async fn find_repos(cli: &Gitter) -> Repositories {
         repos = filter_repositories(&mut repos, filter);
     }
 
+    repos.sort(cli);
     repos.compute_lengths();
     repos
 }

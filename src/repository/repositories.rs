@@ -1,3 +1,5 @@
+use crate::gitter::Gitter;
+use crate::placeholder::processor::{evaluate_placeholders, replace_placeholders};
 use crate::repository::helper::{
     get_absolute_path, get_absolute_time, get_bare, get_branch_count, get_commit_count,
     get_contributor_summary, get_current_branch, get_current_commit_info, get_dirty,
@@ -125,10 +127,20 @@ impl Repositories {
             }
         }
 
-        statuses.sort_by(|a, b| a.name.cmp(&b.name));
         Self {
             props: statuses,
             lens: PropertyLengths::default(),
+        }
+    }
+
+    pub fn sort(&mut self, cli: &Gitter) {
+        self.props.sort_by(|a, b| {
+            replace_placeholders(&cli.sort, &evaluate_placeholders(&cli.sort, a))
+                .cmp(&replace_placeholders(&cli.sort, &evaluate_placeholders(&cli.sort, b)))
+        });
+
+        if cli.reverse {
+            self.props.reverse();
         }
     }
 
