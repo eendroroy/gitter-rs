@@ -41,9 +41,10 @@ enum FilterType {
     Path,
     Name,
     Branch,
-    Active,
     Dirty,
     Bare,
+    Language,
+    Active,
 }
 
 #[derive(Debug, PartialEq)]
@@ -89,6 +90,7 @@ impl ParsedFilter {
             "active" => FilterType::Active,
             "dirty" => FilterType::Dirty,
             "bare" => FilterType::Bare,
+            "language" => FilterType::Language,
             _ => return None,
         };
 
@@ -124,36 +126,12 @@ impl ParsedFilter {
 
     fn matches(&self, repo_prop: &Properties) -> bool {
         let matched = match &self.filter_type {
-            FilterType::Path => {
-                let target_string = &repo_prop.relative_path;
-                match &self.condition {
-                    FilterCondition::Exact(s) => target_string == s,
-                    FilterCondition::StartsWith(s) => target_string.starts_with(s),
-                    FilterCondition::EndsWith(s) => target_string.ends_with(s),
-                    FilterCondition::Contains(s) => target_string.contains(s),
-                    _ => false,
-                }
-            }
-            FilterType::Name => {
-                let target_string = &repo_prop.name;
-                match &self.condition {
-                    FilterCondition::Exact(s) => target_string == s,
-                    FilterCondition::StartsWith(s) => target_string.starts_with(s),
-                    FilterCondition::EndsWith(s) => target_string.ends_with(s),
-                    FilterCondition::Contains(s) => target_string.contains(s),
-                    _ => false,
-                }
-            }
-            FilterType::Branch => {
-                let target_string = &repo_prop.branch;
-                match &self.condition {
-                    FilterCondition::Exact(s) => target_string == s,
-                    FilterCondition::StartsWith(s) => target_string.starts_with(s),
-                    FilterCondition::EndsWith(s) => target_string.ends_with(s),
-                    FilterCondition::Contains(s) => target_string.contains(s),
-                    _ => false,
-                }
-            }
+            FilterType::Path => self.evaluate_condition(&repo_prop.relative_path),
+            FilterType::Name => self.evaluate_condition(&repo_prop.name),
+            FilterType::Branch => self.evaluate_condition(&repo_prop.branch),
+            FilterType::Dirty => repo_prop.is_dirty,
+            FilterType::Bare => repo_prop.is_bare,
+            FilterType::Language => self.evaluate_condition(&repo_prop.top_lang),
             FilterType::Active => {
                 let commit_time = match DateTime::parse_from_rfc3339(&repo_prop.absolute_time) {
                     Ok(dt) => dt.with_timezone(&Utc),
@@ -172,11 +150,19 @@ impl ParsedFilter {
                     _ => false,
                 }
             }
-            FilterType::Dirty => repo_prop.is_dirty,
-            FilterType::Bare => repo_prop.is_bare,
         };
 
         if self.negate { !matched } else { matched }
+    }
+
+    fn evaluate_condition(&self, target_string: &String) -> bool {
+        match &self.condition {
+            FilterCondition::Exact(s) => target_string == s,
+            FilterCondition::StartsWith(s) => target_string.starts_with(s),
+            FilterCondition::EndsWith(s) => target_string.ends_with(s),
+            FilterCondition::Contains(s) => target_string.contains(s),
+            _ => false,
+        }
     }
 }
 

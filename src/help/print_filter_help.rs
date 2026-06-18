@@ -24,9 +24,10 @@ macro_rules! help_template {
   - {literal}path{literal:#}     Filters by the relative path of the repository.
   - {literal}name{literal:#}     Filters by the name of the repository.
   - {literal}branch{literal:#}   Filters by the current branch name.
-  - {literal}active{literal:#}   Filters by the age of the last commit.
   - {literal}dirty{literal:#}    Filters by uncommitted changes. (Takes no value. ie. - {literal}dirty:{literal:#})
   - {literal}bare{literal:#}     Filters by bare status. (Takes no value. ie. - {literal}bare:{literal:#})
+  - {literal}language{literal:#} Filters by top language used.
+  - {literal}active{literal:#}   Filters by the age of the last commit.(See: {usage}Active Filter Value Patterns{usage:#})
 
 {header}Value Patterns:{header:#}
   - {literal}value{literal:#}    Exact match.
@@ -44,18 +45,18 @@ macro_rules! help_template {
   - {literal}duration{literal:#}   Last commit was approximately the specified duration ago. Ex: {literal}active:2w{literal:#} (last commit around 2 weeks ago).
 
 {header}Examples:{header:#}
-  - {literal}name:my-repo{literal:#}                 Matches repositories with the exact name \"my-repo\".
-  - {literal}path:src/projects+{literal:#}           Matches repositories whose relative path starts with \"src/projects\".
-  - {literal}branch:+main{literal:#}                 Matches repositories whose current branch ends with \"main\".
-  - {literal}name:+feature+{literal:#}               Matches repositories whose name contains \"feature\".
+  - {literal}name:my-repo{literal:#}                 Matches repositories with the exact name {literal}my-repo{literal:#}.
+  - {literal}path:src/projects+{literal:#}           Matches repositories whose relative path starts with {literal}src/projects{literal:#}.
+  - {literal}branch:+main{literal:#}                 Matches repositories whose current branch ends with {literal}main{literal:#}.
+  - {literal}name:+feature+{literal:#}               Matches repositories whose name contains {literal}feature{literal:#}.
   - {literal}active:<7d{literal:#}                   Matches repositories with a last commit within the last 7 days.
   - {literal}active:>1y3M{literal:#}                 Matches repositories with a last commit older than 1 year and 3 months.
-  - {literal}name:repo1 || name:repo2{literal:#}     Matches repositories named \"repo1\" OR \"repo2\".
-  - {literal}name:project+ && branch:main{literal:#} Matches repositories whose name starts with \"project\" AND are on the \"main\" branch.
-  - {literal}!branch:main{literal:#}                 Matches repositories that are NOT on the \"main\" branch.
-  - {literal}!(name:test+ || name:temp+){literal:#}  Matches repositories whose name does NOT start with \"test\" OR \"temp\".
+  - {literal}name:repo1 || name:repo2{literal:#}     Matches repositories named {literal}repo1{literal:#} OR {literal}repo2{literal:#}.
+  - {literal}name:project+ && branch:main{literal:#} Matches repositories whose name starts with {literal}project{literal:#} AND are on the {literal}main{literal:#} branch.
+  - {literal}!branch:main{literal:#}                 Matches repositories that are NOT on the {literal}main{literal:#} branch.
+  - {literal}!(name:test+ || name:temp+){literal:#}  Matches repositories whose name does NOT start with {literal}test{literal:#} OR {literal}temp{literal:#}.
   - {literal}path:backend+ && (branch:dev || branch:feature+){literal:#}
-                                 Matches backend repositories that are on the \"dev\" branch OR a branch starting with \"feature\".
+                                 Matches backend repositories that are on the {literal}dev{literal:#} branch OR a branch starting with {literal}feature{literal:#}.
 "
     };
 }
