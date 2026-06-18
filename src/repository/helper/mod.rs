@@ -10,6 +10,7 @@ mod get_dirty;
 mod get_relative_path;
 mod get_relative_time;
 mod get_repo_name;
+mod get_repo_size;
 
 pub use get_absolute_path::get_absolute_path;
 pub use get_absolute_time::get_absolute_time;
@@ -23,6 +24,7 @@ pub use get_dirty::get_dirty;
 pub use get_relative_path::get_relative_path;
 pub use get_relative_time::get_relative_time;
 pub use get_repo_name::get_repo_name;
+pub use get_repo_size::get_repo_size;
 
 pub const DETACHED: &str = "detached";
 pub const BARE: &str = "bare";

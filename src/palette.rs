@@ -27,6 +27,7 @@ impl ComponentStyle {
 #[derive(Debug, Clone)]
 pub struct Palette {
     pub path: ComponentStyle,
+    pub repo_size: ComponentStyle,
     pub name: ComponentStyle,
     pub branch: ComponentStyle,
     pub detached: ComponentStyle,
@@ -48,6 +49,7 @@ impl Default for Palette {
     fn default() -> Self {
         Self {
             path: new_style!(Color::BrightBlue, Styles::Dimmed, Styles::Bold),
+            repo_size: new_style!(Color::BrightMagenta, Styles::Dimmed),
             name: new_style!(Color::White, Styles::Bold),
             branch: new_style!(Color::Green, Styles::Clear),
             detached: new_style!(Color::Red, Styles::Italic),

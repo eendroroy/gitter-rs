@@ -71,9 +71,7 @@ macro_rules! define_holders {
 
         #[macro_export]
         macro_rules! placeholder_template {
-            // Accept the custom style arguments and the target padding width variable
             ($header:expr, $usage:expr, $literal:expr, $placeholder:expr, $tag_width:expr) => {{
-                // Print the invariant header block first
                 print!(
                     concat!(
                         "{header}Gitter Template Placeholders{header:#}\n\n",
@@ -88,11 +86,10 @@ macro_rules! define_holders {
                     placeholder = $placeholder
                 );
 
-                // Use macro repetition to print each entry using the runtime tag_width variable
                 $(
                     let formatted_desc = $desc
                         .replace("{literal}", &$literal.to_string())
-                        .replace("{literal:#}", "\x1b[0m"); // Resets terminal style sequence back to normal
+                        .replace("{literal:#}", "\x1b[0m");
 
                     println!(
                         "  {literal}{tag_val:<width$}{literal:#} {desc}",
@@ -231,6 +228,13 @@ define_holders! {
 
         |s, _c| s.cs.top_commit_count.to_string(),
         |s, _c, l| apply_style(&s.cs.top_commit_count.to_string(), l.map(|i| i.cs_top_commit_count), Some(&STYLE.cs_top_commit_count))
+    }
+
+    {
+        "size", "{_size_}", "Size of the repository",
+
+        |s, _c| s.repo_size.to_string(),
+        |s, _c, l| apply_style(&s.repo_size.to_string(), l.map(|i| i.repo_size), Some(&STYLE.repo_size))
     }
 
     {

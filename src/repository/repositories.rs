@@ -1,7 +1,7 @@
 use crate::repository::helper::{
     get_absolute_path, get_absolute_time, get_bare, get_branch_count, get_commit_count,
     get_contributor_summary, get_current_branch, get_current_commit_info, get_dirty,
-    get_relative_path, get_relative_time, get_repo_name,
+    get_relative_path, get_relative_time, get_repo_name, get_repo_size,
 };
 use git2::Repository;
 use std::cmp::max;
@@ -21,6 +21,7 @@ pub struct ContributionSummary {
 pub struct Properties {
     pub absolute_path: String,
     pub relative_path: String,
+    pub repo_size: String,
     pub name: String,
     pub branch: String,
     pub branch_count: usize,
@@ -42,6 +43,7 @@ impl Properties {
         let repository = Repository::open(path).ok()?;
         let absolute_path = get_absolute_path(path);
         let relative_path = get_relative_path(path, base_path);
+        let repo_size = get_repo_size(&repository);
         let name = get_repo_name(path);
         let branch = get_current_branch(&repository);
         let branch_count = get_branch_count(&repository);
@@ -56,6 +58,7 @@ impl Properties {
         Some(Self {
             absolute_path,
             relative_path,
+            repo_size,
             name,
             branch,
             branch_count,
@@ -78,6 +81,7 @@ impl Properties {
 pub struct PropertyLengths {
     pub absolute_path: usize,
     pub relative_path: usize,
+    pub repo_size: usize,
     pub name: usize,
     pub branch: usize,
     pub branch_count: usize,
@@ -134,6 +138,7 @@ impl Repositories {
         self.props.iter().for_each(|s| {
             self.lens.absolute_path = max(self.lens.absolute_path, s.absolute_path.len());
             self.lens.relative_path = max(self.lens.relative_path, s.relative_path.len());
+            self.lens.repo_size = max(self.lens.repo_size, s.repo_size.len());
             self.lens.name = max(self.lens.name, s.name.len());
             self.lens.branch = max(self.lens.branch, s.branch.len());
             self.lens.branch_count = max(self.lens.branch_count, digit_len(s.branch_count));
