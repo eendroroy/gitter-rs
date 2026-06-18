@@ -43,9 +43,9 @@ pub struct Gitter {
     #[arg(short = 'd', long = "max-depth", default_value = "2", global = true)]
     pub max_depth: usize,
 
-    /// Repo status-line template
+    /// Repo info-line template
     #[arg(short, long, global = true)]
-    pub status_template: Option<String>,
+    pub info_template: Option<String>,
 
     /// Filter string
     #[arg(short, long, global = true)]

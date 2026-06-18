@@ -6,6 +6,6 @@ pub async fn list(cli: &Gitter) {
     let repos = find_repos(cli).await;
 
     repos.props.iter().for_each(|status| {
-        print_info_line(cli.status_template.clone(), status, Some(repos.lens), cli.align);
+        print_info_line(cli.info_template.clone(), status, Some(repos.lens), cli.align);
     });
 }

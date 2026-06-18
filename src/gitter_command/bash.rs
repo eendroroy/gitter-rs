@@ -15,7 +15,7 @@ pub async fn bash(cli: &Gitter, raw_args: &[String]) {
         let evaluation = evaluate_placeholders(&args.clone(), status);
         let args = replace_placeholders(&args.clone(), &evaluation);
 
-        print_info_line(cli.status_template.clone(), status, Some(repos.lens), cli.align);
+        print_info_line(cli.info_template.clone(), status, Some(repos.lens), cli.align);
         if cli.show_command == BoolChoice::Always {
             println!("$ {} -c {}", command_name.green(), args.yellow());
         }
