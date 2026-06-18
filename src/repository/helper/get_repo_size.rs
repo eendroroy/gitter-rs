@@ -1,8 +1,10 @@
 use git2::Repository;
 use std::fs;
+#[cfg(unix)]
 use std::os::unix::prelude::MetadataExt;
 use std::path::Path;
 
+#[cfg(unix)]
 const BLOCK_SIZE: u64 = 512;
 
 pub fn get_repo_size(repository: &Repository) -> String {
@@ -11,7 +13,18 @@ pub fn get_repo_size(repository: &Repository) -> String {
     if let Ok(metadata) = fs::metadata(path)
         && !metadata.is_dir()
     {
-        let file_size = (metadata.blocks() * BLOCK_SIZE) as usize;
+        let file_size = {
+            #[cfg(unix)]
+            {
+                // On Unix, use actual allocated blocks (counts sparse files accurately)
+                (metadata.blocks() * BLOCK_SIZE) as usize
+            }
+            #[cfg(not(unix))]
+            {
+                // On Windows/other platforms, fallback to standard file length
+                metadata.len() as usize
+            }
+        };
 
         let common_path = repository.commondir();
         let total_size = file_size + walk_dir_disk_size(common_path);
@@ -30,7 +43,18 @@ fn walk_dir_disk_size(path: &Path) -> usize {
                 if metadata.is_dir() {
                     total_size += walk_dir_disk_size(&entry.path());
                 } else {
-                    total_size += (metadata.blocks() * BLOCK_SIZE) as usize;
+                    total_size += {
+                        #[cfg(unix)]
+                        {
+                            // On Unix, use actual allocated blocks (counts sparse files accurately)
+                            (metadata.blocks() * BLOCK_SIZE) as usize
+                        }
+                        #[cfg(not(unix))]
+                        {
+                            // On Windows/other platforms, fallback to standard file length
+                            metadata.len() as usize
+                        }
+                    };
                 }
             }
         }
