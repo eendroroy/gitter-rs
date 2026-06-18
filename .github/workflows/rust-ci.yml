@@ -111,9 +111,9 @@ jobs:
           for dir in artifacts/*; do
             target_name=$(basename "$dir")
             if [ -f "$dir/gitter" ]; then
-              zip -j "release_assets/${target_name}.zip" "$dir/gitter"
+              zip -9 -j "release_assets/${target_name}.zip" "$dir/gitter"
             elif [ -f "$dir/gitter.exe" ]; then
-              zip -j "release_assets/${target_name}.zip" "$dir/gitter.exe"
+              zip -9 -j "release_assets/${target_name}.zip" "$dir/gitter.exe"
             fi
           done
 
