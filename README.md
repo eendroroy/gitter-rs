@@ -8,17 +8,17 @@ It is designed for monorepo-adjacent workflows, workspace maintenance, and bulk 
 
 ## Features
 
-- 🔍 Automatically discovers Git repositories recursively
-- ⚡ Concurrent repository scanning and status collection using Tokio
-- 🧩 Placeholder system for dynamic command templating
-- 🎨 Colored and aligned repository status output
-- 🛠 Run:
+- Automatically discovers Git repositories recursively
+- Concurrent repository scanning and status collection using Tokio
+- Placeholder system for dynamic command templating
+- Colored and aligned repository status output
+- Run:
     - Git commands
     - Arbitrary shell commands
     - Script files
     - Bash expressions
-- 🐚 Shell completion generation
-- 📏 Configurable output templates
+- Shell completion generation
+- Configurable output templates
 
 ## Installation
 
