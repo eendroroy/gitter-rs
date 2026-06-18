@@ -18,7 +18,7 @@ pub async fn git(cli: &Gitter, raw_args: &[String]) {
         }
 
         let mut command = Command::new("git");
-        command.current_dir(status.absolute_path.clone());
+        command.current_dir(status.repo_path.clone());
         command.args(args.split(" "));
         if cli.quiet {
             command.stdout(Stdio::null());

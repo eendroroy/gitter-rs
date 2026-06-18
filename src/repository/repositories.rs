@@ -21,6 +21,7 @@ pub struct ContributionSummary {
 
 #[derive(Debug, Default, Clone)]
 pub struct Properties {
+    pub repo_path: String, // to use as repo working directory, not a placeholder
     pub absolute_path: String,
     pub relative_path: String,
     pub repo_size: String,
@@ -113,6 +114,7 @@ impl Properties {
         let top_lang = language.ok()??;
 
         Some(Self {
+            repo_path: path.display().to_string(),
             absolute_path,
             relative_path,
             repo_size,

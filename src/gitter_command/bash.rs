@@ -21,7 +21,7 @@ pub async fn bash(cli: &Gitter, raw_args: &[String]) {
         }
 
         let mut command = Command::new(command_name.clone());
-        command.current_dir(status.absolute_path.clone());
+        command.current_dir(status.repo_path.clone());
         command.arg("-c");
         command.arg(args);
         if cli.quiet {

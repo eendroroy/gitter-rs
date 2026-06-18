@@ -24,7 +24,7 @@ pub async fn script(cli: &Gitter, shell: &Option<CompShell>, path: &&String) {
         }
 
         let mut command = Command::new(command_name.clone());
-        command.current_dir(status.absolute_path.clone());
+        command.current_dir(status.repo_path.clone());
         command.arg(script.clone());
         if cli.quiet {
             command.stdout(Stdio::null());
