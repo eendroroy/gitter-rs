@@ -1,10 +1,19 @@
 use chrono::{DateTime, Utc};
 use git2::Repository;
 
+const UNKNOWN_TIME: &str = "unknown time";
+const FUTURE: &str = "in the future";
+const SECONDS: &str = "seconds ago";
+const MINUTES: &str = "minutes ago";
+const HOURS: &str = "hours ago";
+const DAYS: &str = "days ago";
+const MONTHS: &str = "months ago";
+const YEARS: &str = "years ago";
+
 fn format_relative_time(commit_time_epoch: i64) -> String {
     let commit_time = match DateTime::from_timestamp(commit_time_epoch, 0) {
         Some(dt) => dt,
-        None => return "unknown time".to_string(),
+        None => return UNKNOWN_TIME.to_string(),
     };
 
     let now = Utc::now();
@@ -12,33 +21,32 @@ fn format_relative_time(commit_time_epoch: i64) -> String {
 
     let seconds = duration.num_seconds();
     if seconds < 0 {
-        return "in the future".to_string();
+        return FUTURE.to_string();
     }
     if seconds < 60 {
-        return format!("{} seconds ago", seconds);
+        return format!("{} {}", seconds, SECONDS);
     }
 
     let minutes = duration.num_minutes();
     if minutes < 60 {
-        return format!("{} minutes ago", minutes);
+        return format!("{} {}", minutes, MINUTES);
     }
 
     let hours = duration.num_hours();
     if hours < 24 {
-        return format!("{} hours ago", hours);
+        return format!("{} {}", hours, HOURS);
     }
 
     let days = duration.num_days();
     if days < 30 {
-        return format!("{} days ago", days);
+        return format!("{} {}", days, DAYS);
     }
 
     let months = days / 30;
     if months < 12 {
-        return format!("{} months ago", months);
+        return format!("{} {}", months, MONTHS);
     }
-
-    format!("{} years ago", months / 12)
+    format!("{} {}", YEARS, months / 12)
 }
 
 pub fn get_relative_time(repository: &Repository) -> String {

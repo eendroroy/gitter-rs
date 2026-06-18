@@ -13,5 +13,5 @@ pub fn get_absolute_time(repository: &Repository) -> String {
                 .map(|dt| dt.format("%Y-%m-%d %H:%M:%S").to_string())
                 .unwrap_or_else(|| "invalid timestamp".to_string())
         })
-        .unwrap_or_else(|_| "NO_COMMIT".to_string())
+        .unwrap_or_else(|_| "".to_string())
 }

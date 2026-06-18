@@ -134,7 +134,7 @@ define_holders! {
 
         |s, _c| s.branch.clone(),
         |s, _c, l| {
-            if &s.branch == DETACHED {
+            if s.branch == DETACHED {
                 apply_style(&s.branch, l.map(|i| i.branch), Some(&STYLE.detached))
             } else {
                 apply_style(&s.branch, l.map(|i| i.branch), Some(&STYLE.branch))
