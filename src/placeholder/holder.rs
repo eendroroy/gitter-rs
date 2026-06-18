@@ -106,6 +106,24 @@ macro_rules! define_holders {
 
 define_holders! {
     {
+        "remote:n", "{_remote:n_}", "Name of the remote",
+
+        |s, _c| s.remote_name.clone(),
+        |s, _c, l| apply_style(&s.remote_name, l.map(|i| i.remote_name), Some(&STYLE.remote_name))
+    }
+    {
+        "remote:f", "{_remote:f_}", "Remote url (fetch url)",
+
+        |s, _c| s.remote_fetch.clone(),
+        |s, _c, l| apply_style(&s.remote_fetch, l.map(|i| i.remote_fetch), Some(&STYLE.remote_fetch))
+    }
+    {
+        "remote:p", "{_remote:p_}", "Remote push url",
+
+        |s, _c| s.remote_push.clone(),
+        |s, _c, l| apply_style(&s.remote_push, l.map(|i| i.remote_push), Some(&STYLE.remote_push))
+    }
+    {
         "name", "{_name_}", "The simple name of the repository directory.",
 
         |s, _c| s.name.clone(),

@@ -3,7 +3,8 @@ use crate::placeholder::processor::{evaluate_placeholders, replace_placeholders}
 use crate::repository::helper::{
     get_absolute_path, get_absolute_time, get_bare, get_branch_count, get_commit_count,
     get_contributor_summary, get_current_branch, get_current_commit_info, get_dirty,
-    get_relative_path, get_relative_time, get_repo_name, get_repo_size, get_top_language,
+    get_relative_path, get_relative_time, get_remote, get_repo_name, get_repo_size,
+    get_top_language,
 };
 use std::cmp::max;
 use std::path::{Path, PathBuf};
@@ -25,6 +26,9 @@ pub struct Properties {
     pub absolute_path: String,
     pub relative_path: String,
     pub repo_size: String,
+    pub remote_name: String,
+    pub remote_fetch: String,
+    pub remote_push: String,
     pub name: String,
     pub branch: String,
     pub branch_count: usize,
@@ -54,7 +58,16 @@ impl Properties {
             let relative_path = get_relative_path(&path_clone, &base_path);
             let name = get_repo_name(&path_clone);
             let repo_size = get_repo_size(&repository);
-            Some((absolute_path, relative_path, name, repo_size))
+            let (remote_name, remote_fetch, remote_push) = get_remote(&repository);
+            Some((
+                absolute_path,
+                relative_path,
+                name,
+                repo_size,
+                remote_name,
+                remote_fetch,
+                remote_push,
+            ))
         });
 
         let path_clone = path.clone();
@@ -106,7 +119,8 @@ impl Properties {
             task_language_info
         );
 
-        let (absolute_path, relative_path, name, repo_size) = basic.ok()??;
+        let (absolute_path, relative_path, name, repo_size, remote_name, remote_fetch, remote_push) =
+            basic.ok()??;
         let (branch, branch_count) = branch.ok()??;
         let (commit_hash, author_name, author_email, commit_count, relative_time, absolute_time) =
             commit.ok()??;
@@ -118,6 +132,9 @@ impl Properties {
             absolute_path,
             relative_path,
             repo_size,
+            remote_name,
+            remote_fetch,
+            remote_push,
             name,
             branch,
             branch_count,
@@ -142,6 +159,9 @@ pub struct PropertyLengths {
     pub absolute_path: usize,
     pub relative_path: usize,
     pub repo_size: usize,
+    pub remote_name: usize,
+    pub remote_fetch: usize,
+    pub remote_push: usize,
     pub name: usize,
     pub branch: usize,
     pub branch_count: usize,
@@ -209,6 +229,9 @@ impl Repositories {
             self.lens.absolute_path = max(self.lens.absolute_path, s.absolute_path.len());
             self.lens.relative_path = max(self.lens.relative_path, s.relative_path.len());
             self.lens.repo_size = max(self.lens.repo_size, s.repo_size.len());
+            self.lens.remote_name = max(self.lens.remote_name, s.remote_name.len());
+            self.lens.remote_fetch = max(self.lens.remote_fetch, s.remote_fetch.len());
+            self.lens.remote_push = max(self.lens.remote_push, s.remote_push.len());
             self.lens.name = max(self.lens.name, s.name.len());
             self.lens.branch = max(self.lens.branch, s.branch.len());
             self.lens.branch_count = max(self.lens.branch_count, digit_len(s.branch_count));
