@@ -6,6 +6,7 @@ mod help;
 mod helper;
 mod list;
 mod script;
+mod state;
 
 pub use bash::bash;
 pub use completion::completion;
@@ -14,3 +15,4 @@ pub use git::git;
 pub use help::help;
 pub use list::list;
 pub use script::script;
+pub use state::state;

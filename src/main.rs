@@ -8,13 +8,15 @@ mod palette;
 mod repository;
 
 use crate::gitter::{Gitter, GitterCommand, RawArgsBlock};
-use crate::gitter_command::{bash, completion, exec, git, help, list, script};
+use crate::gitter_command::{bash, completion, exec, git, help, list, script, state};
 use crate::palette::Palette;
 use clap::Parser;
 use std::sync::LazyLock;
 
 pub static STYLE: LazyLock<Palette> = LazyLock::new(Palette::default);
 pub static REPO_INFO: &str = "{_path:r_}{_name_} {_language_} {_bare_} on {_branch:n_} [{_hash:8_}] by {_author:n_} {_time:r_}";
+pub static IGNORE_FILE: &str = ".gitterignore";
+pub static STATE_FILE: &str = ".gitterstate";
 
 #[tokio::main]
 async fn main() {
@@ -34,5 +36,6 @@ async fn main() {
         GitterCommand::Bash(RawArgsBlock { raw_args }) => bash(&cli, raw_args).await,
         GitterCommand::Completion { shell } => completion(shell),
         GitterCommand::Help { topic } => help(topic),
+        GitterCommand::State { action: topic } => state(topic, &cli).await,
     }
 }

@@ -123,6 +123,11 @@ pub enum GitterCommand {
         #[command(subcommand)]
         topic: Option<HelpTopic>,
     },
+    /// Create/Dump/Load gitter workspace state
+    State {
+        #[command(subcommand)]
+        action: StateAction,
+    },
 }
 
 #[derive(Subcommand, Debug)]
@@ -155,6 +160,33 @@ pub enum HelpTopic {
     Gitterignore,
     Filter,
     Completion,
+}
+
+#[derive(Subcommand, Debug)]
+pub enum StateAction {
+    /// Add a repository to state
+    #[clap(visible_alias = "a")]
+    Add {
+        /// Repository remote url
+        url: String,
+
+        /// Name of the repository (Required if path is provided)
+        #[arg(requires = "path")]
+        name: Option<String>,
+
+        /// Parent directory to clone the project
+        #[arg(default_value = ".")]
+        path: String,
+    },
+    /// Create state from current workdir
+    #[clap(visible_alias = "d")]
+    Dump,
+    /// Load (clone) repositories from state
+    #[clap(visible_alias = "l")]
+    Load,
+    /// Show state information
+    #[clap(visible_alias = "i")]
+    Info,
 }
 
 #[derive(Debug, Clone, ValueEnum, PartialEq)]

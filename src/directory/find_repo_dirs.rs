@@ -1,3 +1,4 @@
+use crate::IGNORE_FILE;
 use crate::directory::ignore::{IgnoreRule, ignore_patterns, is_ignored};
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -8,7 +9,7 @@ pub fn find_repo_dirs<P: AsRef<Path>>(target_dir: P, depth: usize) -> Vec<PathBu
     let mut repositories: Vec<PathBuf> = vec![];
     let mut active_ignore_rules_stack: Vec<(usize, Vec<IgnoreRule>)> = Vec::new();
 
-    let initial_gitterignore_path = target_path.join(".gitterignore");
+    let initial_gitterignore_path = target_path.join(IGNORE_FILE);
     if initial_gitterignore_path.exists() {
         let path_str = initial_gitterignore_path.to_string_lossy();
         let rules = ignore_patterns(&path_str);
@@ -37,7 +38,7 @@ pub fn find_repo_dirs<P: AsRef<Path>>(target_dir: P, depth: usize) -> Vec<PathBu
         }
 
         if entry.file_type().is_dir() {
-            let gitterignore_path = current_entry_path.join(".gitterignore");
+            let gitterignore_path = current_entry_path.join(IGNORE_FILE);
             if gitterignore_path.exists() {
                 let path_str = gitterignore_path.to_string_lossy();
                 let rules = ignore_patterns(&path_str);
