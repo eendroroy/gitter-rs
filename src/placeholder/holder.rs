@@ -238,6 +238,13 @@ define_holders! {
     }
 
     {
+        "language", "{_language_}", "Top language used by the repository",
+
+        |s, _c| s.top_lang.to_string(),
+        |s, _c, l| apply_style(&s.top_lang.to_string(), l.map(|i| i.top_lang), Some(&STYLE.top_lang))
+    }
+
+    {
         "hash", "{_hash:<n>_}", "A variable length commit SHA slice where 'n' is any integer. Ex: {literal}{_hash:12_}{literal:#} = 12-character)",
 
         |s, caps| {

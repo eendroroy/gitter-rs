@@ -25,6 +25,7 @@ regex = "1.12.4"
 tokio = { version = "1.52.3", features = ["full"] }
 walkdir = "2.5.0"
 pathdiff = "0.2.3"
+tokei = "14.0.0"
 
 [[bin]]
 name = "gitter"

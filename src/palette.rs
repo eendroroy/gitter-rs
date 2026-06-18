@@ -43,6 +43,7 @@ pub struct Palette {
     pub cs_top_commit_count: ComponentStyle,
     pub cs_top_author_name: ComponentStyle,
     pub cs_top_author_email: ComponentStyle,
+    pub top_lang: ComponentStyle,
 }
 
 impl Default for Palette {
@@ -65,6 +66,7 @@ impl Default for Palette {
             cs_top_commit_count: new_style!(Color::Yellow, Styles::Bold),
             cs_top_author_name: new_style!(Color::BrightCyan, Styles::Bold),
             cs_top_author_email: new_style!(Color::BrightWhite, Styles::Dimmed),
+            top_lang: new_style!(Color::BrightYellow, Styles::Dimmed, Styles::Bold),
         }
     }
 }

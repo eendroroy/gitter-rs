@@ -14,7 +14,7 @@ use clap::Parser;
 use std::sync::LazyLock;
 
 pub static STYLE: LazyLock<Palette> = LazyLock::new(Palette::default);
-pub static REPO_INFO: &str = "{_path:r_}{_name_} {_bare_} on {_branch:n_} [{_hash:8_}] by {_author:n_}<{_author:e_}> {_time:r_}";
+pub static REPO_INFO: &str = "{_path:r_}{_name_} {_language_} {_bare_} on {_branch:n_} [{_hash:8_}] by {_author:n_} {_time:r_}";
 
 #[tokio::main]
 async fn main() {
