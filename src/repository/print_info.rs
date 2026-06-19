@@ -20,5 +20,11 @@ pub fn get_info_line(
     let status_template = template.unwrap_or_else(|| REPO_INFO.to_string());
     let lengths_context = if align { lengths.as_ref() } else { None };
     let evaluation = evaluate_placeholders_styled(&status_template, status, lengths_context);
-    replace_placeholders(&status_template, &evaluation)
+    status_template
+        .split(' ')
+        .map(|x| replace_placeholders(x, &evaluation))
+        .filter(|s| !s.is_empty())
+        .collect::<Vec<String>>()
+        .join(" ")
+        .replace("\\s", " ")
 }

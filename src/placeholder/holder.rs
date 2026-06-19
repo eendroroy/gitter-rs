@@ -17,13 +17,19 @@ pub struct Holder {
 }
 
 fn apply_style(value: &str, width: Option<usize>, style: Option<&ComponentStyle>) -> String {
-    let val = if let Some(width) = width {
-        format!("{:<width$}", value, width = width)
-    } else {
-        value.to_string()
+    let val = match width {
+        Some(width) => format!("{:<width$}", value, width = width),
+        None => value.to_string(),
     };
 
-    if let Some(style) = style { style.apply(val.as_str()) } else { val }
+    if val.trim().is_empty() {
+        return val.to_string();
+    }
+
+    match style {
+        Some(style) => style.apply(val.as_str()),
+        None => val,
+    }
 }
 
 macro_rules! create_holder {
