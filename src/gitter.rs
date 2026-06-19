@@ -187,7 +187,11 @@ pub enum MetaAction {
     },
     /// Create metafile from current workdir
     #[clap(visible_alias = "d")]
-    Dump,
+    Dump {
+        /// Parent directory to clone the project
+        #[arg(short = 'n', long, action = clap::ArgAction::SetTrue)]
+        dry_run: bool,
+    },
     /// Load (clone) repositories from metafile
     #[clap(visible_alias = "l")]
     Load,

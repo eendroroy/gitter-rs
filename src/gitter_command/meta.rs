@@ -9,7 +9,7 @@ use std::process::Command;
 pub async fn meta(action: &MetaAction, cli: &Gitter) {
     match action {
         MetaAction::Add { url, name, path } => add(cli, &url, name, path),
-        MetaAction::Dump => dump(cli).await,
+        MetaAction::Dump { dry_run } => dump(cli, dry_run).await,
         MetaAction::Load => load(cli),
         MetaAction::Info => info(cli),
     }
@@ -42,16 +42,21 @@ fn add(cli: &Gitter, url: &&String, name: &Option<String>, path: &String) {
         .expect("Unable to add");
 }
 
-async fn dump(cli: &Gitter) {
+async fn dump(cli: &Gitter, dry_run: &bool) {
     let repos = find_repos(cli).await;
 
     let meta_file = cli.directory.join(META_FILE);
-    let mut file = OpenOptions::new()
-        .write(true)
-        .truncate(true)
-        .create(true)
-        .open(meta_file)
-        .unwrap();
+    let mut file = match dry_run {
+        true => None,
+        false => Some(
+            OpenOptions::new()
+                .write(true)
+                .create(true)
+                .truncate(true)
+                .open(meta_file)
+                .unwrap(),
+        ),
+    };
 
     repos.props.iter().for_each(|status| {
         if !status.remote_fetch.is_empty() && status.relative_path != "../" {
@@ -61,11 +66,13 @@ async fn dump(cli: &Gitter) {
                 STYLE.path.apply(&status.relative_path),
                 STYLE.name.apply(&status.name)
             );
-            file.write_all(
-                format!("{} {}{}\n", status.remote_fetch, status.relative_path, status.name)
-                    .as_ref(),
-            )
-            .expect("Unable to add");
+            if let Some(file) = file.as_mut() {
+                file.write_all(
+                    format!("{} {}{}\n", status.remote_fetch, status.relative_path, status.name)
+                        .as_ref(),
+                )
+                .expect("Unable to add");
+            }
         }
     });
 }
