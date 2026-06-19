@@ -130,10 +130,10 @@ pub enum GitterCommand {
         #[command(subcommand)]
         topic: Option<HelpTopic>,
     },
-    /// Create/Dump/Load gitter workspace state
-    State {
+    /// Create/Dump/Load gitter workspace metadata
+    Meta {
         #[command(subcommand)]
-        action: StateAction,
+        action: MetaAction,
     },
 }
 
@@ -170,8 +170,8 @@ pub enum HelpTopic {
 }
 
 #[derive(Subcommand, Debug)]
-pub enum StateAction {
-    /// Add a repository to state
+pub enum MetaAction {
+    /// Add a repository to metafile
     #[clap(visible_alias = "a")]
     Add {
         /// Repository remote url
@@ -185,13 +185,13 @@ pub enum StateAction {
         #[arg(default_value = ".")]
         path: String,
     },
-    /// Create state from current workdir
+    /// Create metafile from current workdir
     #[clap(visible_alias = "d")]
     Dump,
-    /// Load (clone) repositories from state
+    /// Load (clone) repositories from metafile
     #[clap(visible_alias = "l")]
     Load,
-    /// Show state information
+    /// Show meta information
     #[clap(visible_alias = "i")]
     Info,
 }

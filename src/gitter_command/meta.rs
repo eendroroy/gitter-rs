@@ -1,17 +1,17 @@
-use crate::gitter::{Gitter, StateAction};
+use crate::gitter::{Gitter, MetaAction};
 use crate::gitter_command::helper::find_repos;
-use crate::{STATE_FILE, STYLE};
+use crate::{META_FILE, STYLE};
 use colored::Colorize;
 use std::fs::OpenOptions;
 use std::io::{BufRead, BufReader, Write};
 use std::process::Command;
 
-pub async fn state(action: &StateAction, cli: &Gitter) {
+pub async fn meta(action: &MetaAction, cli: &Gitter) {
     match action {
-        StateAction::Add { url, name, path } => add(cli, &url, name, path),
-        StateAction::Dump => dump(cli).await,
-        StateAction::Load => load(cli),
-        StateAction::Info => info(cli),
+        MetaAction::Add { url, name, path } => add(cli, &url, name, path),
+        MetaAction::Dump => dump(cli).await,
+        MetaAction::Load => load(cli),
+        MetaAction::Info => info(cli),
     }
 }
 
@@ -35,8 +35,8 @@ fn add(cli: &Gitter, url: &&String, name: &Option<String>, path: &String) {
         STYLE.name.apply(name)
     );
 
-    let state_file = cli.directory.join(STATE_FILE);
-    let mut file = OpenOptions::new().append(true).create(true).open(state_file).unwrap();
+    let meta_file = cli.directory.join(META_FILE);
+    let mut file = OpenOptions::new().append(true).create(true).open(meta_file).unwrap();
 
     file.write_all(format!("{} {}/{}\n", url, path, name).as_ref())
         .expect("Unable to add");
@@ -45,12 +45,12 @@ fn add(cli: &Gitter, url: &&String, name: &Option<String>, path: &String) {
 async fn dump(cli: &Gitter) {
     let repos = find_repos(cli).await;
 
-    let state_file = cli.directory.join(STATE_FILE);
+    let meta_file = cli.directory.join(META_FILE);
     let mut file = OpenOptions::new()
         .write(true)
         .truncate(true)
         .create(true)
-        .open(state_file)
+        .open(meta_file)
         .unwrap();
 
     repos.props.iter().for_each(|status| {
@@ -71,11 +71,11 @@ async fn dump(cli: &Gitter) {
 }
 
 fn load(cli: &Gitter) {
-    let state_file = cli.directory.join(STATE_FILE);
-    if !state_file.exists() {
-        println!("No state file found at {}", state_file.display().to_string().red());
+    let meta_file = cli.directory.join(META_FILE);
+    if !meta_file.exists() {
+        println!("No metafile found at {}", meta_file.display().to_string().red());
     }
-    let file = OpenOptions::new().read(true).open(state_file).unwrap();
+    let file = OpenOptions::new().read(true).open(meta_file).unwrap();
     let reader = BufReader::new(file);
 
     let mut lines = reader.lines();
@@ -107,11 +107,11 @@ fn load(cli: &Gitter) {
 }
 
 fn info(cli: &Gitter) {
-    let state_file = cli.directory.join(STATE_FILE);
-    if !state_file.exists() {
-        return println!("No state file found at {}", state_file.display().to_string().red());
+    let meta_file = cli.directory.join(META_FILE);
+    if !meta_file.exists() {
+        return println!("No metafile found at {}", meta_file.display().to_string().red());
     }
-    let file = OpenOptions::new().read(true).open(state_file).unwrap();
+    let file = OpenOptions::new().read(true).open(meta_file).unwrap();
     let reader = BufReader::new(file);
 
     let mut lines = reader.lines();
