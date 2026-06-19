@@ -43,9 +43,16 @@ pub struct Gitter {
     #[arg(short = 'd', long = "max-depth", default_value = "2", global = true)]
     pub max_depth: usize,
 
-    /// Repo info-line template
-    #[arg(short, long, global = true)]
-    pub info_template: Option<String>,
+    /// Repo info-line template.
+    /// Use placeholders as components.
+    /// Use '\\s' or '\s' as forced space.
+    #[arg(
+        short,
+        long,
+        default_value = "{_path:r_}{_name_} {_language_} {_bare_} on {_branch:n_} [{_hash:8_}] by {_author:n_} {_time:r_}",
+        global = true
+    )]
+    pub info_template: String,
 
     /// Filter string
     #[arg(short, long, global = true)]
