@@ -60,7 +60,10 @@ pub fn find_repo_dirs<P: AsRef<Path>>(target_dir: P, depth: usize) -> Vec<PathBu
                         repositories.push(repo_path.to_path_buf());
                     }
                 }
-            } else if entry.file_name().to_string_lossy().ends_with(".git") {
+            } else if entry.path().join("HEAD").is_file()
+                && entry.path().join("config").is_file()
+                && entry.path().join("objects").is_dir()
+            {
                 let all_active_rules: Vec<&IgnoreRule> =
                     active_ignore_rules_stack.iter().flat_map(|(_, rules)| rules.iter()).collect();
 
