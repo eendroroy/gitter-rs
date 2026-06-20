@@ -2,14 +2,13 @@
 mod placeholder;
 mod directory;
 mod gitter;
-mod gitter_command;
 mod help;
-mod palette;
 mod repository;
+mod style;
 
-use crate::gitter::{Gitter, GitterCommand, RawArgsBlock};
-use crate::gitter_command::{bash, completion, exec, git, help, list, meta, script};
-use crate::palette::Palette;
+use crate::gitter::cli::{Gitter, GitterCommand, RawArgsBlock};
+use crate::gitter::processor::{bash, completion, exec, git, help, list, meta, script};
+use crate::style::Palette;
 use clap::Parser;
 use std::sync::LazyLock;
 

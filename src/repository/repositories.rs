@@ -1,4 +1,4 @@
-use crate::gitter::Gitter;
+use crate::gitter::cli::Gitter;
 use crate::placeholder::processor::{evaluate_placeholders, replace_placeholders};
 use crate::repository::helper::{
     get_absolute_path, get_absolute_time, get_bare, get_branch_count, get_commit_count,

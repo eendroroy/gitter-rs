@@ -1,5 +1,5 @@
-use crate::gitter::{CompShell, Gitter};
-use crate::gitter_command::helper::get_default_shell;
+use crate::gitter::cli::{CompShell, Gitter};
+use crate::gitter::processor::helper::get_default_shell;
 use clap::CommandFactory;
 
 pub fn completion(shell: &Option<CompShell>) {

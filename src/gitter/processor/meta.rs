@@ -1,5 +1,5 @@
-use crate::gitter::{Gitter, MetaAction};
-use crate::gitter_command::helper::find_repos;
+use crate::gitter::cli::{Gitter, MetaAction};
+use crate::gitter::processor::helper::find_repos;
 use crate::{META_FILE, STYLE};
 use colored::Colorize;
 use std::fs::OpenOptions;

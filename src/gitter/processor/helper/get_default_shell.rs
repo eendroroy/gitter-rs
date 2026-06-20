@@ -1,4 +1,4 @@
-use crate::gitter::CompShell;
+use crate::gitter::cli::CompShell;
 use std::env;
 use std::path::Path;
 

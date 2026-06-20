@@ -1,7 +1,7 @@
 use crate::STYLE;
-use crate::palette::ComponentStyle;
 use crate::repository::helper::DETACHED;
 use crate::repository::repositories::{Properties, PropertyLengths};
+use crate::style::ComponentStyle;
 use lazy_static::lazy_static;
 use regex::Captures;
 use std::cmp::min;

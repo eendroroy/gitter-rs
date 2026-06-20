@@ -1,4 +1,4 @@
-use crate::gitter::CLAP_STYLE;
+use crate::gitter::cli::CLAP_STYLE;
 
 macro_rules! completion_template {
     () => {
