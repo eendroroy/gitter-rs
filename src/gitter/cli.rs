@@ -131,6 +131,7 @@ pub enum GitterCommand {
         topic: Option<HelpTopic>,
     },
     /// Create/Dump/Load gitter workspace metadata
+    #[clap(visible_alias = "m")]
     Meta {
         #[command(subcommand)]
         action: MetaAction,
@@ -139,11 +140,21 @@ pub enum GitterCommand {
 
 #[derive(Subcommand, Debug)]
 pub enum CompShell {
+    /// Generate completion for bash
+    #[clap(visible_alias = "b")]
     Bash,
+    /// Generate completion for elvish
+    #[clap(visible_alias = "e")]
     Elvish,
+    /// Generate completion for fish
+    #[clap(visible_alias = "f")]
     Fish,
+    /// Generate completion for PowerShell
     #[allow(clippy::enum_variant_names)]
+    #[clap(visible_alias = "p")]
     PowerShell,
+    /// Generate completion for zsh
+    #[clap(visible_alias = "z")]
     Zsh,
 }
 
@@ -163,9 +174,13 @@ impl Display for CompShell {
 
 #[derive(Subcommand, Debug)]
 pub enum HelpTopic {
+    #[clap(visible_alias = "p")]
     Placeholder,
+    #[clap(visible_alias = "g")]
     Gitterignore,
+    #[clap(visible_alias = "f")]
     Filter,
+    #[clap(visible_alias = "c")]
     Completion,
 }
 
