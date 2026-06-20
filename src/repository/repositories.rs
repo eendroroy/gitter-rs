@@ -9,7 +9,6 @@ use crate::repository::helper::{
 use std::cmp::max;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
-use tokio::task;
 use tokio::task::JoinSet;
 
 #[derive(Debug, Default, Clone)]
@@ -47,85 +46,28 @@ pub struct Properties {
 }
 
 impl Properties {
-    pub async fn new(path: &Path, base_path: &Path) -> Option<Self> {
-        let path = path.to_path_buf();
-        let base_path = base_path.to_path_buf();
+    pub fn new(path: &Path, base_path: &Path) -> Option<Self> {
+        let repository = git2::Repository::open(path).ok()?;
 
-        let path_clone = path.clone();
-        let task_basic_info = task::spawn_blocking(move || {
-            let repository = git2::Repository::open(&path_clone).ok()?;
-            let absolute_path = get_absolute_path(&path_clone);
-            let relative_path = get_relative_path(&path_clone, &base_path);
-            let name = get_repo_name(&path_clone);
-            let repo_size = get_repo_size(&repository);
-            let (remote_name, remote_fetch, remote_push) = get_remote(&repository);
-            Some((
-                absolute_path,
-                relative_path,
-                name,
-                repo_size,
-                remote_name,
-                remote_fetch,
-                remote_push,
-            ))
-        });
+        let absolute_path = get_absolute_path(path);
+        let relative_path = get_relative_path(path, base_path);
+        let name = get_repo_name(path);
+        let repo_size = get_repo_size(&repository);
+        let (remote_name, remote_fetch, remote_push) = get_remote(&repository);
 
-        let path_clone = path.clone();
-        let task_branch_info = task::spawn_blocking(move || {
-            let repository = git2::Repository::open(&path_clone).ok()?;
-            let branch = get_current_branch(&repository);
-            let branch_count = get_branch_count(&repository);
-            Some((branch, branch_count))
-        });
+        let branch = get_current_branch(&repository);
+        let branch_count = get_branch_count(&repository);
 
-        let path_clone = path.clone();
-        let task_commit_info = task::spawn_blocking(move || {
-            let repository = git2::Repository::open(&path_clone).ok()?;
-            let (commit_hash, author_name, author_email) = get_current_commit_info(&repository);
-            let commit_count = get_commit_count(&repository);
-            let relative_time = get_relative_time(&repository);
-            let absolute_time = get_absolute_time(&repository);
-            Some((
-                commit_hash,
-                author_name,
-                author_email,
-                commit_count,
-                relative_time,
-                absolute_time,
-            ))
-        });
+        let (commit_hash, author_name, author_email) = get_current_commit_info(&repository);
+        let commit_count = get_commit_count(&repository);
+        let relative_time = get_relative_time(&repository);
+        let absolute_time = get_absolute_time(&repository);
 
-        let path_clone = path.clone();
-        let task_status_info = task::spawn_blocking(move || {
-            let repository = git2::Repository::open(&path_clone).ok()?;
-            let (dirty, is_dirty) = get_dirty(&repository);
-            let (bare, is_bare) = get_bare(&repository);
-            let cs = get_contributor_summary(&repository);
-            Some((dirty, is_dirty, bare, is_bare, cs))
-        });
+        let (dirty, is_dirty) = get_dirty(&repository);
+        let (bare, is_bare) = get_bare(&repository);
+        let cs = get_contributor_summary(&repository);
 
-        let path_clone = path.clone();
-        let task_language_info = task::spawn_blocking(move || {
-            let repository = git2::Repository::open(&path_clone).ok()?;
-            let top_lang = get_top_language(&repository);
-            Some(top_lang)
-        });
-
-        let (basic, branch, commit, status, language) = tokio::join!(
-            task_basic_info,
-            task_branch_info,
-            task_commit_info,
-            task_status_info,
-            task_language_info
-        );
-
-        let (absolute_path, relative_path, name, repo_size, remote_name, remote_fetch, remote_push) =
-            basic.ok()??;
-        let (branch, branch_count) = branch.ok()??;
-        let (commit_hash, author_name, author_email, commit_count, relative_time, absolute_time) =
-            commit.ok()??;
-        let (dirty, is_dirty, bare, is_bare, cs) = status.ok()??;
-        let top_lang = language.ok()??;
+        let top_lang = get_top_language(&repository);
 
         Some(Self {
             repo_path: path.display().to_string(),
@@ -192,7 +134,7 @@ impl Repositories {
 
         for repo in repositories {
             let base_path = Arc::clone(&base_path);
-            tasks.spawn(async move { Properties::new(&repo, &base_path).await });
+            tasks.spawn(async move { Properties::new(&repo, &base_path) });
         }
 
         let mut statuses: Vec<Properties> = Vec::new();
