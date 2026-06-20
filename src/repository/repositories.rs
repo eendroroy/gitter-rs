@@ -9,7 +9,10 @@ use crate::repository::helper::{
 use std::cmp::max;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
+use tokio::sync::Semaphore;
 use tokio::task::JoinSet;
+
+const MAX_CONCURRENT_TASKS: usize = 20;
 
 #[derive(Debug, Default, Clone)]
 pub struct ContributionSummary {
@@ -132,18 +135,31 @@ impl Repositories {
         let base_path = Arc::new(path.to_owned());
         let mut tasks = JoinSet::new();
 
+        let semaphore = Arc::new(Semaphore::new(MAX_CONCURRENT_TASKS));
+
+        let repo_count = repositories.len();
+
         for repo in repositories {
             let base_path = Arc::clone(&base_path);
-            tasks.spawn(async move { Properties::new(&repo, &base_path) });
+            let sem = Arc::clone(&semaphore);
+
+            tasks.spawn(async move {
+                let _permit = sem.acquire_owned().await.ok()?;
+
+                tokio::task::spawn_blocking(move || Properties::new(&repo, &base_path))
+                    .await
+                    .ok()
+                    .flatten()
+            });
         }
 
-        let mut statuses: Vec<Properties> = Vec::new();
+        let mut statuses: Vec<Properties> = Vec::with_capacity(repo_count);
 
         while let Some(result) = tasks.join_next().await {
             match result {
                 Ok(Some(status)) => statuses.push(status),
                 Ok(None) => {}
-                Err(e) => eprintln!("Task paniced or was canceled: {e}"),
+                Err(e) => eprintln!("Task panicked or was canceled: {e}"),
             }
         }
 
