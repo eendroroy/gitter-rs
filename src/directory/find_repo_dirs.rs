@@ -5,22 +5,17 @@ use std::path::{Path, PathBuf};
 use walkdir::WalkDir;
 
 pub fn find_repo_dirs<P: AsRef<Path>>(target_dir: P, depth: usize) -> Vec<PathBuf> {
-    let target_path = fs::canonicalize(target_dir).unwrap();
+    let target_path = match fs::canonicalize(target_dir) {
+        Ok(path) => path,
+        Err(_) => return vec![],
+    };
+
     let mut repositories: Vec<PathBuf> = vec![];
     let mut active_ignore_rules_stack: Vec<(usize, Vec<IgnoreRule>)> = Vec::new();
 
-    let initial_gitterignore_path = target_path.join(IGNORE_FILE);
-    if initial_gitterignore_path.exists() {
-        let path_str = initial_gitterignore_path.to_string_lossy();
-        let rules = ignore_patterns(&path_str);
-        if !rules.is_empty() {
-            active_ignore_rules_stack.push((0, rules));
-        }
-    }
+    let mut it = WalkDir::new(target_path).max_depth(depth + 1).into_iter();
 
-    let walkdir_iterator = WalkDir::new(target_path).max_depth(depth + 1).into_iter();
-
-    for entry_result in walkdir_iterator {
+    while let Some(entry_result) = it.next() {
         let entry = match entry_result {
             Ok(e) => e,
             Err(_) => continue,
@@ -40,36 +35,36 @@ pub fn find_repo_dirs<P: AsRef<Path>>(target_dir: P, depth: usize) -> Vec<PathBu
         if entry.file_type().is_dir() {
             let gitterignore_path = current_entry_path.join(IGNORE_FILE);
             if gitterignore_path.exists() {
-                let path_str = gitterignore_path.to_string_lossy();
-                let rules = ignore_patterns(&path_str);
+                let rules = ignore_patterns(&gitterignore_path.to_string_lossy());
                 if !rules.is_empty() {
                     active_ignore_rules_stack.push((current_entry_depth, rules));
                 }
             }
         }
 
+        let all_active_rules: Vec<&IgnoreRule> =
+            active_ignore_rules_stack.iter().flat_map(|(_, rules)| rules.iter()).collect();
+
+        if entry.file_type().is_dir() && is_ignored(current_entry_path, &all_active_rules) {
+            it.skip_current_dir();
+            continue;
+        }
+
         if entry.file_type().is_dir() {
-            if entry.file_name() == ".git" {
-                if let Some(repo_path) = current_entry_path.parent() {
-                    let all_active_rules: Vec<&IgnoreRule> = active_ignore_rules_stack
-                        .iter()
-                        .flat_map(|(_, rules)| rules.iter())
-                        .collect();
+            let is_git_dir = current_entry_path.join("HEAD").is_file()
+                && current_entry_path.join("config").is_file()
+                && current_entry_path.join("objects").is_dir();
 
-                    if !is_ignored(repo_path, &all_active_rules) {
-                        repositories.push(repo_path.to_path_buf());
-                    }
-                }
-            } else if entry.path().join("HEAD").is_file()
-                && entry.path().join("config").is_file()
-                && entry.path().join("objects").is_dir()
-            {
-                let all_active_rules: Vec<&IgnoreRule> =
-                    active_ignore_rules_stack.iter().flat_map(|(_, rules)| rules.iter()).collect();
+            if is_git_dir {
+                let repo_path = if entry.file_name() == ".git" {
+                    current_entry_path.parent().unwrap_or(current_entry_path)
+                } else {
+                    current_entry_path
+                };
 
-                if !is_ignored(current_entry_path, &all_active_rules) {
-                    repositories.push(current_entry_path.to_path_buf());
-                }
+                repositories.push(repo_path.to_path_buf());
+                it.skip_current_dir();
+                continue;
             }
         }
     }
