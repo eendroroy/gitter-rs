@@ -7,3 +7,4 @@ Cargo.lock
 *.out
 .local
 artifacts
+.gitter.meta.toml

@@ -16,8 +16,8 @@ pub async fn meta(action: &MetaAction, cli: &Gitter) {
             branch,
             dry_run,
         } => add(cli, url, name, path, branch, dry_run),
-        MetaAction::Save { dry_run } => dump(cli, dry_run).await,
-        MetaAction::Restore { dry_run } => load(cli, dry_run),
+        MetaAction::Save { dry_run } => save(cli, dry_run).await,
+        MetaAction::Restore { dry_run } => restore(cli, dry_run),
         MetaAction::Info => info(cli),
     }
 }
@@ -77,7 +77,7 @@ fn add(
     }
 }
 
-async fn dump(cli: &Gitter, dry_run: &bool) {
+async fn save(cli: &Gitter, dry_run: &bool) {
     let repos = find_repos(cli).await;
     let mut new_repos = Vec::new();
 
@@ -100,7 +100,7 @@ async fn dump(cli: &Gitter, dry_run: &bool) {
     }
 }
 
-fn load(cli: &Gitter, dry_run: &bool) {
+fn restore(cli: &Gitter, dry_run: &bool) {
     let data = load_meta_file(cli);
     if data.repos.is_empty() {
         println!("No repositories found to load.");
