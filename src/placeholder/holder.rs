@@ -227,34 +227,6 @@ define_holders! {
     }
 
     {
-        "contrib:ac", "{_contrib:ac_}", "Total number of authors in current branch.",
-
-        |s, _c| s.cs.author_count.to_string(),
-        |s, _c, l| apply_style(&s.cs.author_count.to_string(), l.map(|i| i.cs_author_count), Some(&STYLE.cs_author_count))
-    }
-
-    {
-        "contrib:tan", "{_contrib:tan_}", "Top author name in current branch.",
-
-        |s, _c| s.cs.top_author_name.to_string(),
-        |s, _c, l| apply_style(&s.cs.top_author_name.to_string(), l.map(|i| i.cs_top_author_name), Some(&STYLE.cs_top_author_name))
-    }
-
-    {
-        "contrib:tae", "{_contrib:tae_}", "Top author email in current branch.",
-
-        |s, _c| s.cs.top_author_email.to_string(),
-        |s, _c, l| apply_style(&s.cs.top_author_email.to_string(), l.map(|i| i.cs_top_author_email), Some(&STYLE.cs_top_author_email))
-    }
-
-    {
-        "contrib:tcc", "{_contrib:tcc_}", "Total number of commits by top author in current branch.",
-
-        |s, _c| s.cs.top_commit_count.to_string(),
-        |s, _c, l| apply_style(&s.cs.top_commit_count.to_string(), l.map(|i| i.cs_top_commit_count), Some(&STYLE.cs_top_commit_count))
-    }
-
-    {
         "size", "{_size_}", "Size of the repository",
 
         |s, _c| s.repo_size.to_string(),

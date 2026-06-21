@@ -2,9 +2,8 @@ use crate::gitter::cli::Gitter;
 use crate::placeholder::processor::{evaluate_placeholders, replace_placeholders};
 use crate::repository::helper::{
     get_absolute_path, get_absolute_time, get_bare, get_branch_count, get_commit_count,
-    get_contributor_summary, get_current_branch, get_current_commit_info, get_dirty,
-    get_relative_path, get_relative_time, get_remote, get_repo_name, get_repo_size,
-    get_top_language,
+    get_current_branch, get_current_commit_info, get_dirty, get_relative_path, get_relative_time,
+    get_remote, get_repo_name, get_repo_size, get_top_language,
 };
 use std::cmp::max;
 use std::path::{Path, PathBuf};
@@ -13,14 +12,6 @@ use tokio::sync::Semaphore;
 use tokio::task::JoinSet;
 
 const MAX_CONCURRENT_TASKS: usize = 20;
-
-#[derive(Debug, Default, Clone)]
-pub struct ContributionSummary {
-    pub author_count: usize,
-    pub top_commit_count: usize,
-    pub top_author_name: String,
-    pub top_author_email: String,
-}
 
 #[derive(Debug, Default, Clone)]
 pub struct Properties {
@@ -44,7 +35,6 @@ pub struct Properties {
     pub is_dirty: bool,
     pub bare: String,
     pub is_bare: bool,
-    pub cs: ContributionSummary,
     pub top_lang: String,
 }
 
@@ -68,7 +58,6 @@ impl Properties {
 
         let (dirty, is_dirty) = get_dirty(&repository);
         let (bare, is_bare) = get_bare(&repository);
-        let cs = get_contributor_summary(&repository);
 
         let top_lang = get_top_language(&repository);
 
@@ -93,7 +82,6 @@ impl Properties {
             is_dirty,
             bare,
             is_bare,
-            cs,
             top_lang,
         })
     }
@@ -117,10 +105,6 @@ pub struct PropertyLengths {
     pub relative_time: usize,
     pub absolute_time: usize,
     pub bare: usize,
-    pub cs_author_count: usize,
-    pub cs_top_commit_count: usize,
-    pub cs_top_author_name: usize,
-    pub cs_top_author_email: usize,
     pub top_lang: usize,
 }
 
@@ -200,14 +184,6 @@ impl Repositories {
             self.lens.relative_time = max(self.lens.relative_time, s.relative_time.len());
             self.lens.absolute_time = max(self.lens.absolute_time, s.absolute_time.len());
             self.lens.bare = max(self.lens.bare, s.bare.len());
-            self.lens.cs_author_count =
-                max(self.lens.cs_author_count, digit_len(s.cs.author_count));
-            self.lens.cs_top_commit_count =
-                max(self.lens.cs_top_commit_count, digit_len(s.cs.top_commit_count));
-            self.lens.cs_top_author_name =
-                max(self.lens.cs_top_author_name, s.cs.top_author_name.len());
-            self.lens.cs_top_author_email =
-                max(self.lens.cs_top_author_email, s.cs.top_author_email.len());
             self.lens.top_lang = max(self.lens.top_lang, s.top_lang.len());
         });
     }
