@@ -26,7 +26,7 @@ pub async fn meta(action: &MetaAction, cli: &Gitter) {
 fn load_meta_file(cli: &Gitter) -> MetaFile {
     let meta_file = cli.directory.join(META_FILE);
     if !meta_file.exists() {
-        println!("{} does not exist", META_FILE.bold().yellow());
+        println!("{}{} does not exist", *ERROR, META_FILE.bold().yellow());
         std::process::exit(1);
     }
     let content = fs::read_to_string(meta_file).unwrap_or_default();
@@ -158,7 +158,7 @@ fn load(cli: &Gitter, dry_run: &bool) {
                 command.current_dir(&cli.directory);
 
                 if let Err(e) = command.status() {
-                    println!("Unable to checkout: {}", e);
+                    println!("{}Unable to checkout: {}", *ERROR, e);
                     continue;
                 }
             }
@@ -169,7 +169,7 @@ fn load(cli: &Gitter, dry_run: &bool) {
 fn info(cli: &Gitter) {
     let data = load_meta_file(cli);
     if data.repos.is_empty() {
-        println!("No metadata information found.");
+        println!("{}No metadata information found.", *WARN);
         return;
     }
 
