@@ -1,6 +1,7 @@
 use crate::gitter::cli::{Gitter, MetaAction};
 use crate::gitter::processor::helper::find_repos;
 use crate::meta::{MetaFile, Metadata};
+use crate::style::{ERROR, WARN};
 use crate::{META_FILE, STYLE};
 use colored::Colorize;
 use std::fs;
@@ -46,7 +47,18 @@ fn add(
     branch: &Option<String>,
     dry_run: &bool,
 ) {
-    let fallback_name = url.split('/').next_back().unwrap_or("");
+    let mut data = load_meta_file(cli);
+
+    let exists = data.repos.iter().any(|repo| repo.url == url || repo.path == path);
+    if exists {
+        println!(
+            "{} Repository with URL '{}' or path '{}' already exists in the metafile.",
+            *ERROR, url, path
+        );
+        return;
+    }
+
+    let fallback_name = url.split('/').rfind(|s| !s.is_empty()).unwrap_or("");
     let parsed_name = fallback_name.strip_suffix(".git").unwrap_or(fallback_name).to_string();
 
     let final_name = name.clone().unwrap_or(parsed_name);
@@ -61,7 +73,6 @@ fn add(
     println!("++ {}", meta);
 
     if !dry_run {
-        let mut data = load_meta_file(cli);
         data.repos.push(meta);
         save_meta_file(cli, &data);
     }
@@ -126,10 +137,9 @@ fn load(cli: &Gitter, dry_run: &bool) {
             }
         } else {
             println!(
-                "{} '{}' {}",
-                "Directory".red(),
+                "{} Directory '{}' already exists. Skipping clone.",
+                *WARN,
                 STYLE.path.apply(&repo_dir_name),
-                "already exists. Skipping clone.".red()
             );
         }
 
@@ -155,6 +165,7 @@ fn load(cli: &Gitter, dry_run: &bool) {
         }
     }
 }
+
 fn info(cli: &Gitter) {
     let data = load_meta_file(cli);
     if data.repos.is_empty() {

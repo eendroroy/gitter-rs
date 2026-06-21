@@ -1,5 +1,12 @@
-use colored::{Color, Colorize, Styles};
+use colored::{Color, ColoredString, Colorize, Styles};
+use lazy_static::lazy_static;
+use std::string::ToString;
 use std::vec;
+
+lazy_static! {
+    pub static ref ERROR: ColoredString = "ERR:  ".red().bold();
+    pub static ref WARN: ColoredString = "WARN: ".yellow().bold();
+}
 
 macro_rules! new_style {
     ($color:expr, $($style:expr),*) => {
