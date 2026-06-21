@@ -3,7 +3,6 @@ use crate::gitter::processor::helper::{command, find_repos};
 use crate::placeholder::processor::{evaluate_placeholders, replace_placeholders};
 use crate::repository::print_info::print_info_line;
 use colored::Colorize;
-use std::path::PathBuf;
 use std::process::Stdio;
 
 pub async fn bash(cli: &Gitter, raw_args: &[String]) {
@@ -21,7 +20,7 @@ pub async fn bash(cli: &Gitter, raw_args: &[String]) {
             println!("$ {} -c {}", bin.green(), args.yellow());
         }
 
-        let mut command = command(&bin, &["-c", &args], &PathBuf::from(&status.repo_path));
+        let mut command = command(&bin, &["-c", &args], &status.repo_path);
         if cli.quiet {
             command.stdout(Stdio::null());
         }

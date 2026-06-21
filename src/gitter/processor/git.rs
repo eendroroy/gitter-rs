@@ -18,11 +18,7 @@ pub async fn git(cli: &Gitter, raw_args: &[String]) {
             println!("$ {} {}", "git".green(), args.yellow());
         }
 
-        let mut command = command(
-            "git",
-            &args.split(" ").collect::<Vec<&str>>(),
-            &PathBuf::from(&status.repo_path),
-        );
+        let mut command = command("git", args.split(" "), &status.repo_path);
 
         if cli.quiet {
             command.stdout(Stdio::null());

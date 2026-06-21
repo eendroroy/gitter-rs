@@ -20,11 +20,7 @@ pub async fn exec(cli: &Gitter, raw_args: &[String]) {
             println!("$ {} {}", bin.green(), args.yellow());
         }
 
-        let mut command = command(
-            &bin,
-            &args.split(" ").collect::<Vec<&str>>(),
-            &PathBuf::from(&status.repo_path),
-        );
+        let mut command = command(&bin, args.split(" "), &status.repo_path);
 
         if cli.quiet {
             command.stdout(Stdio::null());
