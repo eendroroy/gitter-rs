@@ -5,13 +5,13 @@ use colored::Colorize;
 use std::path::{Path, absolute};
 use std::process::Stdio;
 
-pub async fn script_raw(cli: &Gitter, shell: &Option<CompShell>, path: &String) {
+pub async fn script_raw(cli: &Gitter, shell: &Option<CompShell>, path: impl AsRef<Path>) {
     let repos = find_repos(cli).await;
 
     let shell = if let Some(shell) = shell { shell } else { &get_default_shell() };
     let bin = shell.get_bin_name();
 
-    let script = absolute(Path::new(path)).expect("Unable to find script");
+    let script = absolute(path).expect("Unable to find script");
 
     repos.props.iter().for_each(|status| {
         print_info_line(

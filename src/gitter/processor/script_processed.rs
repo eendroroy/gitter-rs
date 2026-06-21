@@ -7,13 +7,13 @@ use std::fs;
 use std::path::{Path, absolute};
 use std::process::Stdio;
 
-pub async fn script_processed(cli: &Gitter, shell: &Option<CompShell>, path: &String) {
+pub async fn script_processed(cli: &Gitter, shell: &Option<CompShell>, path: impl AsRef<Path>) {
     let repos = find_repos(cli).await;
 
     let shell = if let Some(shell) = shell { shell } else { &get_default_shell() };
     let bin = shell.get_bin_name();
 
-    let script_path = absolute(Path::new(path)).expect("Unable to find script");
+    let script_path = absolute(path).expect("Unable to find script");
     let original = fs::read_to_string(&script_path).expect("Unable to read script file contents");
 
     repos.props.iter().for_each(|status| {

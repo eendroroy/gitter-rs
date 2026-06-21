@@ -42,13 +42,13 @@ fn add(
     cli: &Gitter,
     url: &str,
     name: &Option<String>,
-    path: &str,
+    path: impl AsRef<Path> + std::fmt::Display,
     branch: &Option<String>,
     dry_run: &bool,
 ) {
     let mut data = load_meta_file(cli);
 
-    let exists = data.repos.iter().any(|repo| repo.url == url || repo.path == path);
+    let exists = data.repos.iter().any(|repo| repo.url == url || repo.path == path.to_string());
     if exists {
         println!(
             "{} Repository with URL '{}' or path '{}' already exists in the metafile.",
@@ -63,7 +63,7 @@ fn add(
     let final_name = name.clone().unwrap_or(parsed_name);
 
     let meta = Metadata {
-        path: path.to_owned(),
+        path: path.to_string(),
         name: final_name,
         url: url.to_owned(),
         branch: branch.clone(),

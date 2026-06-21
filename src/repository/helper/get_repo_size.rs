@@ -34,24 +34,22 @@ pub fn get_repo_size(repository: &Repository) -> String {
     humanize_size(walk_dir_disk_size(path))
 }
 
-fn walk_dir_disk_size(path: &Path) -> usize {
+fn walk_dir_disk_size(path: impl AsRef<Path>) -> usize {
     let mut total_size = 0;
 
     if let Ok(entries) = fs::read_dir(path) {
         for entry in entries.flatten() {
             if let Ok(metadata) = entry.metadata() {
                 if metadata.is_dir() {
-                    total_size += walk_dir_disk_size(&entry.path());
+                    total_size += walk_dir_disk_size(entry.path());
                 } else {
                     total_size += {
                         #[cfg(unix)]
                         {
-                            // On Unix, use actual allocated blocks (counts sparse files accurately)
                             (metadata.blocks() * BLOCK_SIZE) as usize
                         }
                         #[cfg(not(unix))]
                         {
-                            // On Windows/other platforms, fallback to standard file length
                             metadata.len() as usize
                         }
                     };
