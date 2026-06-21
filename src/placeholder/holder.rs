@@ -178,6 +178,34 @@ define_holders! {
     }
 
     {
+        "hash", "{_hash:<n>_}", "A variable length commit SHA slice where 'n' is any integer. Ex: {literal}{_hash:12_}{literal:#} = 12-characters)",
+
+        |s, caps| {
+            if let Some(c) = caps
+                && let Some(len_match) = c.get(2)
+                && let Ok(req_len) = len_match.as_str().parse::<usize>()
+            {
+                let target_len = min(req_len, s.commit_hash.len());
+                return s.commit_hash[..target_len].to_string();
+            }
+            s.commit_hash.clone()
+        },
+
+        |s, caps, l| {
+            if let Some(c) = caps
+                && let Some(len_match) = c.get(2)
+                && let Ok(req_len) = len_match.as_str().parse::<usize>()
+            {
+                let commit_len = min(req_len, s.commit_hash.len());
+                let target_len = min(req_len, l.map(|i| i.commit_hash).unwrap_or(0));
+                apply_style(&s.commit_hash[..commit_len], Some(target_len), Some(&STYLE.commit_hash))
+            } else {
+                apply_style(&s.commit_hash, None, Some(&STYLE.commit_hash))
+            }
+        }
+    }
+
+    {
         "commit:c", "{_commit:c_}", "Total number of commits in current branch.",
 
         |s, _c| s.commit_count.to_string(),
@@ -238,33 +266,5 @@ define_holders! {
 
         |s, _c| s.top_lang.to_string(),
         |s, _c, l| apply_style(&s.top_lang.to_string(), l.map(|i| i.top_lang), Some(&STYLE.top_lang))
-    }
-
-    {
-        "hash", "{_hash:<n>_}", "A variable length commit SHA slice where 'n' is any integer. Ex: {literal}{_hash:12_}{literal:#} = 12-character)",
-
-        |s, caps| {
-            if let Some(c) = caps
-                && let Some(len_match) = c.get(2)
-                && let Ok(req_len) = len_match.as_str().parse::<usize>()
-            {
-                let target_len = min(req_len, s.commit_hash.len());
-                return s.commit_hash[..target_len].to_string();
-            }
-            s.commit_hash.clone()
-        },
-
-        |s, caps, l| {
-            if let Some(c) = caps
-                && let Some(len_match) = c.get(2)
-                && let Ok(req_len) = len_match.as_str().parse::<usize>()
-            {
-                let commit_len = min(req_len, s.commit_hash.len());
-                let target_len = min(req_len, l.map(|i| i.commit_hash).unwrap_or(0));
-                apply_style(&s.commit_hash[..commit_len], Some(target_len), Some(&STYLE.commit_hash))
-            } else {
-                apply_style(&s.commit_hash, None, Some(&STYLE.commit_hash))
-            }
-        }
     }
 }
