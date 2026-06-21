@@ -29,7 +29,7 @@ pub async fn script_processed(cli: &Gitter, shell: &Option<CompShell>, path: imp
         );
         if cli.show_command == BoolChoice::Always {
             println!(
-                "$ {} {} [Modified In-Memory]",
+                "$ {} {} # Modified In-Memory",
                 &bin.green(),
                 script_path.to_string_lossy().yellow()
             );
