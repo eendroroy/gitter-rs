@@ -12,7 +12,13 @@ pub async fn git(cli: &Gitter, raw_args: &[String]) {
     repos.props.iter().for_each(|status| {
         let evaluation = evaluate_placeholders(&args.clone(), status);
         let args = replace_placeholders(&args.clone(), &evaluation);
-        print_info_line(cli.info_template.clone(), status, Some(repos.lens), cli.align);
+        print_info_line(
+            cli.info_template.clone(),
+            status,
+            Some(repos.lens),
+            cli.align,
+            &cli.show_info,
+        );
         if cli.show_command == BoolChoice::Always {
             println!("$ {} {}", "git".green(), args.yellow());
         }

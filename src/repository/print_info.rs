@@ -1,3 +1,4 @@
+use crate::gitter::cli::BoolChoice;
 use crate::placeholder::processor::{evaluate_placeholders_styled, replace_placeholders};
 use crate::repository::repositories::{Properties, PropertyLengths};
 
@@ -6,8 +7,11 @@ pub fn print_info_line(
     status: &Properties,
     lengths: Option<PropertyLengths>,
     align: bool,
+    show_info: &BoolChoice,
 ) {
-    println!("{}", get_info_line(template, status, lengths, align));
+    if show_info == &BoolChoice::Always {
+        println!("{}", get_info_line(template, status, lengths, align));
+    }
 }
 
 pub fn get_info_line(

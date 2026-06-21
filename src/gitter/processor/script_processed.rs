@@ -20,7 +20,13 @@ pub async fn script_processed(cli: &Gitter, shell: &Option<CompShell>, path: &St
         let evaluation = evaluate_placeholders(&original.clone(), status);
         let evaluated = replace_placeholders(&original.clone(), &evaluation);
 
-        print_info_line(cli.info_template.clone(), status, Some(repos.lens), cli.align);
+        print_info_line(
+            cli.info_template.clone(),
+            status,
+            Some(repos.lens),
+            cli.align,
+            &cli.show_info,
+        );
         if cli.show_command == BoolChoice::Always {
             println!(
                 "$ {} {} [Modified In-Memory]",

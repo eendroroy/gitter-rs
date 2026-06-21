@@ -14,7 +14,13 @@ pub async fn script_raw(cli: &Gitter, shell: &Option<CompShell>, path: &String) 
     let script = absolute(Path::new(path)).expect("Unable to find script");
 
     repos.props.iter().for_each(|status| {
-        print_info_line(cli.info_template.clone(), status, Some(repos.lens), cli.align);
+        print_info_line(
+            cli.info_template.clone(),
+            status,
+            Some(repos.lens),
+            cli.align,
+            &cli.show_info,
+        );
         if cli.show_command == BoolChoice::Always {
             println!("$ {} {}", &bin.green(), script.to_string_lossy().yellow());
         }

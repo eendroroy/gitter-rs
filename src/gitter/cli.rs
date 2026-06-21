@@ -47,7 +47,7 @@ pub struct Gitter {
     /// Use placeholders as components.
     /// Use '\\s' or '\s' as forced space.
     #[arg(
-        short,
+        short = 't',
         long,
         default_value = "{_path:r_}{_name_} {_language_} {_bare_} on {_branch:n_} [{_hash:8_}] by {_author:n_} {_time:r_}",
         global = true
@@ -65,6 +65,10 @@ pub struct Gitter {
     /// Hides/Shows the command being executed
     #[arg(short = 'c', long, default_value = "always", global = true)]
     pub show_command: BoolChoice,
+
+    /// Hides/Shows the repository info line
+    #[arg(short = 'i', long, default_value = "always", global = true)]
+    pub show_info: BoolChoice,
 
     /// Hides the stdout
     #[arg(short, long, action = clap::ArgAction::SetTrue, global = true)]
