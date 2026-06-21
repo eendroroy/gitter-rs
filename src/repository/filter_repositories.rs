@@ -1,4 +1,5 @@
 use crate::repository::repositories::{Properties, PropertyLengths, Repositories};
+use crate::style::ERROR;
 use chrono::{DateTime, Duration, Utc};
 use lazy_static::lazy_static;
 use regex::Regex;
@@ -374,8 +375,8 @@ pub fn filter_repositories(repositories: &mut Repositories, filter_str: &str) ->
     let expression = match parser.parse() {
         Ok(expr) => expr,
         Err(e) => {
-            eprintln!("Error parsing filter expression: {}", e);
-            return repositories.clone();
+            eprintln!("{}Error parsing filter expression: {}", *ERROR, e);
+            std::process::exit(1);
         }
     };
 
