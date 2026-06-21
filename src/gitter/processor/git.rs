@@ -1,9 +1,10 @@
 use crate::gitter::cli::{BoolChoice, Gitter};
-use crate::gitter::processor::helper::find_repos;
+use crate::gitter::processor::helper::{command, find_repos};
 use crate::placeholder::processor::{evaluate_placeholders, replace_placeholders};
 use crate::repository::print_info::print_info_line;
 use colored::Colorize;
-use std::process::{Command, Stdio};
+use std::path::PathBuf;
+use std::process::Stdio;
 
 pub async fn git(cli: &Gitter, raw_args: &[String]) {
     let repos = find_repos(cli).await;
@@ -17,9 +18,12 @@ pub async fn git(cli: &Gitter, raw_args: &[String]) {
             println!("$ {} {}", "git".green(), args.yellow());
         }
 
-        let mut command = Command::new("git");
-        command.current_dir(status.repo_path.clone());
-        command.args(args.split(" "));
+        let mut command = command(
+            "git",
+            &args.split(" ").collect::<Vec<&str>>(),
+            &PathBuf::from(&status.repo_path),
+        );
+
         if cli.quiet {
             command.stdout(Stdio::null());
         }

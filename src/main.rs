@@ -35,6 +35,6 @@ async fn main() {
         GitterCommand::Bash(RawArgsBlock { raw_args }) => bash(&cli, raw_args).await,
         GitterCommand::Completion { shell } => completion(shell),
         GitterCommand::Help { topic } => help(topic),
-        GitterCommand::Meta { action: topic } => meta(topic, &cli).await,
+        GitterCommand::Meta { action } => meta(action, &cli).await,
     }
 }

@@ -1,15 +1,16 @@
 use crate::gitter::cli::{BoolChoice, Gitter};
-use crate::gitter::processor::helper::find_repos;
+use crate::gitter::processor::helper::{command, find_repos};
 use crate::placeholder::processor::{evaluate_placeholders, replace_placeholders};
 use crate::repository::print_info::print_info_line;
 use colored::Colorize;
-use std::process::{Command, Stdio};
+use std::path::PathBuf;
+use std::process::Stdio;
 
 pub async fn bash(cli: &Gitter, raw_args: &[String]) {
     let repos = find_repos(cli).await;
     let args = raw_args.join(" ");
 
-    let command_name = "bash".to_string();
+    let bin = "bash".to_string();
 
     repos.props.iter().for_each(|status| {
         let evaluation = evaluate_placeholders(&args.clone(), status);
@@ -17,13 +18,10 @@ pub async fn bash(cli: &Gitter, raw_args: &[String]) {
 
         print_info_line(cli.info_template.clone(), status, Some(repos.lens), cli.align);
         if cli.show_command == BoolChoice::Always {
-            println!("$ {} -c {}", command_name.green(), args.yellow());
+            println!("$ {} -c {}", bin.green(), args.yellow());
         }
 
-        let mut command = Command::new(command_name.clone());
-        command.current_dir(status.repo_path.clone());
-        command.arg("-c");
-        command.arg(args);
+        let mut command = command(&bin, &["-c", &args], &PathBuf::from(&status.repo_path));
         if cli.quiet {
             command.stdout(Stdio::null());
         }

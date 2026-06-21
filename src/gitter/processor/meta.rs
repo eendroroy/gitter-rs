@@ -1,12 +1,11 @@
 use crate::gitter::cli::{Gitter, MetaAction};
-use crate::gitter::processor::helper::find_repos;
+use crate::gitter::processor::helper::{command, find_repos};
 use crate::meta::{MetaFile, Metadata};
 use crate::style::{ERROR, WARN};
 use crate::{META_FILE, STYLE};
 use colored::Colorize;
 use std::fs;
 use std::path::Path;
-use std::process::Command;
 
 pub async fn meta(action: &MetaAction, cli: &Gitter) {
     match action {
@@ -127,9 +126,9 @@ fn load(cli: &Gitter, dry_run: &bool) {
             );
 
             if !dry_run {
-                let mut command = Command::new("git");
-                command.args(["clone", &meta.url, &repo_dir_name]);
-                command.current_dir(&cli.directory);
+                let mut command =
+                    command("git", &["clone", &meta.url, &repo_dir_name], &cli.directory.clone());
+
                 if let Err(e) = command.status() {
                     println!("Clone failed: {}", e);
                     continue;
@@ -153,9 +152,11 @@ fn load(cli: &Gitter, dry_run: &bool) {
                 STYLE.branch.apply(branch),
             );
             if !dry_run {
-                let mut command = Command::new("git");
-                command.args(["-C", &repo_dir_name, "checkout", branch]);
-                command.current_dir(&cli.directory);
+                let mut command = command(
+                    "git",
+                    &["-C", &repo_dir_name, "checkout", branch],
+                    &cli.directory.clone(),
+                );
 
                 if let Err(e) = command.status() {
                     println!("{}Unable to checkout: {}", *ERROR, e);
