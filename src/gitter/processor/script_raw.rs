@@ -2,10 +2,10 @@ use crate::gitter::cli::{BoolChoice, CompShell, Gitter};
 use crate::gitter::processor::helper::{command, find_repos, get_default_shell};
 use crate::repository::print_info::print_info_line;
 use colored::Colorize;
-use std::path::{Path, absolute};
+use std::path::{PathBuf, absolute};
 use std::process::Stdio;
 
-pub async fn script_raw(cli: &Gitter, shell: &Option<CompShell>, path: impl AsRef<Path>) {
+pub async fn script_raw(cli: &Gitter, shell: &Option<CompShell>, path: &PathBuf) {
     let repos = find_repos(cli).await;
 
     let shell = if let Some(shell) = shell { shell } else { &get_default_shell() };

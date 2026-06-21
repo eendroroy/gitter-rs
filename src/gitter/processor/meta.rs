@@ -11,8 +11,8 @@ pub async fn meta(action: &MetaAction, cli: &Gitter) {
     match action {
         MetaAction::Add {
             url,
-            name,
             path,
+            name,
             branch,
             dry_run,
         } => add(cli, url, name, path, branch, dry_run),
@@ -42,28 +42,31 @@ fn add(
     cli: &Gitter,
     url: &str,
     name: &Option<String>,
-    path: impl AsRef<Path> + std::fmt::Display,
+    path: &Path,
     branch: &Option<String>,
     dry_run: &bool,
 ) {
     let mut data = load_meta_file(cli);
-
-    let exists = data.repos.iter().any(|repo| repo.url == url || repo.path == path.to_string());
-    if exists {
-        println!(
-            "{} Repository with URL '{}' or path '{}' already exists in the metafile.",
-            *ERROR, url, path
-        );
-        return;
-    }
+    let path = path.join("");
 
     let fallback_name = url.split('/').rfind(|s| !s.is_empty()).unwrap_or("");
     let parsed_name = fallback_name.strip_suffix(".git").unwrap_or(fallback_name).to_string();
 
     let final_name = name.clone().unwrap_or(parsed_name);
 
+    let exists = data.repos.iter().any(|repo| repo.name == final_name && repo.path == path);
+    if exists {
+        println!(
+            "{} Repository location {}{} already exists in the metafile.",
+            *ERROR,
+            path.to_str().unwrap(),
+            final_name
+        );
+        return;
+    }
+
     let meta = Metadata {
-        path: path.to_string(),
+        path: path.to_string_lossy().to_string(),
         name: final_name,
         url: url.to_owned(),
         branch: branch.clone(),

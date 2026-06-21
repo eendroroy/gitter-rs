@@ -4,10 +4,10 @@ use crate::placeholder::processor::{evaluate_placeholders, replace_placeholders}
 use crate::repository::print_info::print_info_line;
 use colored::Colorize;
 use std::fs;
-use std::path::{Path, absolute};
+use std::path::{PathBuf, absolute};
 use std::process::Stdio;
 
-pub async fn script_processed(cli: &Gitter, shell: &Option<CompShell>, path: impl AsRef<Path>) {
+pub async fn script_processed(cli: &Gitter, shell: &Option<CompShell>, path: &PathBuf) {
     let repos = find_repos(cli).await;
 
     let shell = if let Some(shell) = shell { shell } else { &get_default_shell() };

@@ -2,15 +2,15 @@ use git2::Repository;
 use std::fs;
 #[cfg(unix)]
 use std::os::unix::prelude::MetadataExt;
-use std::path::Path;
+use std::path::PathBuf;
 
 #[cfg(unix)]
 const BLOCK_SIZE: u64 = 512;
 
 pub fn get_repo_size(repository: &Repository) -> String {
-    let path = repository.path();
+    let path: PathBuf = repository.path().into();
 
-    if let Ok(metadata) = fs::metadata(path)
+    if let Ok(metadata) = fs::metadata(&path)
         && !metadata.is_dir()
     {
         let file_size = {
@@ -26,22 +26,22 @@ pub fn get_repo_size(repository: &Repository) -> String {
             }
         };
 
-        let common_path = repository.commondir();
-        let total_size = file_size + walk_dir_disk_size(common_path);
+        let common_path: PathBuf = repository.commondir().into();
+        let total_size = file_size + walk_dir_disk_size(&common_path);
         return humanize_size(total_size);
     }
 
-    humanize_size(walk_dir_disk_size(path))
+    humanize_size(walk_dir_disk_size(&path))
 }
 
-fn walk_dir_disk_size(path: impl AsRef<Path>) -> usize {
+fn walk_dir_disk_size(path: &PathBuf) -> usize {
     let mut total_size = 0;
 
     if let Ok(entries) = fs::read_dir(path) {
         for entry in entries.flatten() {
             if let Ok(metadata) = entry.metadata() {
                 if metadata.is_dir() {
-                    total_size += walk_dir_disk_size(entry.path());
+                    total_size += walk_dir_disk_size(&entry.path());
                 } else {
                     total_size += {
                         #[cfg(unix)]

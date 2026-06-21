@@ -117,7 +117,7 @@ pub enum GitterCommand {
 
         /// Path to the script
         #[arg(short = 'p', long = "path")]
-        path: String,
+        path: PathBuf,
 
         /// Process placeholders inside the script
         #[arg(short = 'P', long, action = clap::ArgAction::SetTrue)]
@@ -218,17 +218,19 @@ pub enum MetaAction {
     #[clap(visible_alias = "a")]
     Add {
         /// Repository remote url
+        #[arg(short, long)]
         url: String,
 
+        /// Parent directory to clone the project
+        #[arg(short, long, default_value = ".")]
+        path: PathBuf,
+
         /// Name of the repository (Required if path is provided)
-        #[arg(requires = "path")]
+        #[arg(short = 'N', long, requires = "path")]
         name: Option<String>,
 
-        /// Parent directory to clone the project
-        #[arg(default_value = ".")]
-        path: String,
-
         /// Branch to check out
+        #[arg(short, long)]
         branch: Option<String>,
 
         /// Display actions to be taken
