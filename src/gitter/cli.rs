@@ -199,17 +199,28 @@ pub enum MetaAction {
         /// Parent directory to clone the project
         #[arg(default_value = ".")]
         path: String,
+
+        /// Branch to check out
+        branch: Option<String>,
+
+        /// Display actions to be taken
+        #[arg(short = 'n', long, action = clap::ArgAction::SetTrue)]
+        dry_run: bool,
     },
     /// Create metafile from current workdir
     #[clap(visible_alias = "d")]
     Dump {
-        /// Parent directory to clone the project
+        /// Display actions to be taken
         #[arg(short = 'n', long, action = clap::ArgAction::SetTrue)]
         dry_run: bool,
     },
     /// Load (clone) repositories from metafile
     #[clap(visible_alias = "l")]
-    Load,
+    Load {
+        /// Display actions to be taken
+        #[arg(short = 'n', long, action = clap::ArgAction::SetTrue)]
+        dry_run: bool,
+    },
     /// Show meta information
     #[clap(visible_alias = "i")]
     Info,

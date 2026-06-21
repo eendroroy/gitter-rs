@@ -3,6 +3,7 @@ mod placeholder;
 mod directory;
 mod gitter;
 mod help;
+mod meta;
 mod repository;
 mod style;
 
@@ -14,7 +15,7 @@ use std::sync::LazyLock;
 
 pub static STYLE: LazyLock<Palette> = LazyLock::new(Palette::default);
 pub static IGNORE_FILE: &str = ".gitterignore";
-pub static META_FILE: &str = ".gitter.meta";
+pub static META_FILE: &str = ".gitter.meta.toml";
 
 #[tokio::main]
 async fn main() {
