@@ -16,8 +16,8 @@ pub async fn meta(action: &MetaAction, cli: &Gitter) {
             branch,
             dry_run,
         } => add(cli, url, name, path, branch, dry_run),
-        MetaAction::Dump { dry_run } => dump(cli, dry_run).await,
-        MetaAction::Load { dry_run } => load(cli, dry_run),
+        MetaAction::Save { dry_run } => dump(cli, dry_run).await,
+        MetaAction::Restore { dry_run } => load(cli, dry_run),
         MetaAction::Info => info(cli),
     }
 }

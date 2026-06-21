@@ -208,15 +208,15 @@ pub enum MetaAction {
         dry_run: bool,
     },
     /// Create metafile from current workdir
-    #[clap(visible_alias = "d")]
-    Dump {
+    #[clap(visible_alias = "s")]
+    Save {
         /// Display actions to be taken
         #[arg(short = 'n', long, action = clap::ArgAction::SetTrue)]
         dry_run: bool,
     },
     /// Load (clone) repositories from metafile
-    #[clap(visible_alias = "l")]
-    Load {
+    #[clap(visible_alias = "r")]
+    Restore {
         /// Display actions to be taken
         #[arg(short = 'n', long, action = clap::ArgAction::SetTrue)]
         dry_run: bool,
