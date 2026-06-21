@@ -110,7 +110,7 @@ pub enum GitterCommand {
         #[command(subcommand)]
         shell: Option<CompShell>,
 
-        #[arg(short = 'p', long = "path", default_value = ".", global = true)]
+        #[arg(short = 'p', long = "path")]
         path: String,
     },
     /// Execute simple bash commands - `bash -c 'command'`
