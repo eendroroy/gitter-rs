@@ -104,6 +104,7 @@ pub struct PropertyLengths {
     pub author_email: usize,
     pub relative_time: usize,
     pub absolute_time: usize,
+    pub dirty: usize,
     pub bare: usize,
     pub top_lang: usize,
 }
@@ -183,6 +184,7 @@ impl Repositories {
             self.lens.author_email = max(self.lens.author_email, s.author_email.len());
             self.lens.relative_time = max(self.lens.relative_time, s.relative_time.len());
             self.lens.absolute_time = max(self.lens.absolute_time, s.absolute_time.len());
+            self.lens.dirty = max(self.lens.dirty, s.dirty.len());
             self.lens.bare = max(self.lens.bare, s.bare.len());
             self.lens.top_lang = max(self.lens.top_lang, s.top_lang.len());
         });

@@ -30,3 +30,4 @@ pub use get_top_language::get_top_language;
 
 pub const DETACHED: &str = "detached";
 pub const BARE: &str = "bare";
+pub const DIRTY: &str = "dirty";

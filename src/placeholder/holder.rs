@@ -244,13 +244,7 @@ define_holders! {
         "dirty", "{_dirty_}", "Marker for uncommitted changes.",
 
         |s, _c| s.dirty.clone(),
-        |s, _c, _l| {
-            match s.dirty.as_str() {
-                "DIRTY" => apply_style("DIRTY", None, Some(&STYLE.dirty_style)),
-                "CLEAN" => apply_style("CLEAN", None, Some(&STYLE.clean_style)),
-                _ => "".to_string()
-            }
-        }
+        |s, _c, l| apply_style(&s.dirty, l.map(|i| i.dirty), Some(&STYLE.dirty_style))
     }
 
     {
