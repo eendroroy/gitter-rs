@@ -164,6 +164,24 @@ pub enum CompShell {
     Zsh,
 }
 
+impl CompShell {
+    pub fn get_bin_name(&self) -> &str {
+        match self {
+            CompShell::Bash => "bash",
+            CompShell::Elvish => "elvish",
+            CompShell::Fish => "fish",
+            CompShell::PowerShell => {
+                if cfg!(windows) {
+                    "powershell"
+                } else {
+                    "pwsh"
+                }
+            }
+            CompShell::Zsh => "zsh",
+        }
+    }
+}
+
 impl Display for CompShell {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let shell_str = match self {

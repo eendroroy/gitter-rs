@@ -8,11 +8,8 @@ use std::process::Stdio;
 pub async fn script_raw(cli: &Gitter, shell: &Option<CompShell>, path: &String) {
     let repos = find_repos(cli).await;
 
-    let bin = if let Some(shell) = shell {
-        shell.to_string()
-    } else {
-        get_default_shell().to_string()
-    };
+    let shell = if let Some(shell) = shell { shell } else { &get_default_shell() };
+    let bin = shell.get_bin_name();
 
     let script = absolute(Path::new(path)).expect("Unable to find script");
 
@@ -22,7 +19,7 @@ pub async fn script_raw(cli: &Gitter, shell: &Option<CompShell>, path: &String) 
             println!("$ {} {}", &bin.green(), script.to_string_lossy().yellow());
         }
 
-        let mut command = command(&bin, [script.to_str().unwrap()], &status.repo_path);
+        let mut command = command(bin, [script.to_str().unwrap()], &status.repo_path);
 
         if cli.quiet {
             command.stdout(Stdio::null());

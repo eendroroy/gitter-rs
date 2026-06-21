@@ -11,6 +11,9 @@ pub fn get_default_shell() -> CompShell {
         Some("zsh") => CompShell::Zsh,
         Some("fish") => CompShell::Fish,
         Some("elvish") => CompShell::Elvish,
+        Some("pwsh") => CompShell::PowerShell, // PowerShell Core on macOS/Linux
+        Some("powershell") => CompShell::PowerShell, // Windows PowerShell
+
         _ => CompShell::Bash,
     }
 }

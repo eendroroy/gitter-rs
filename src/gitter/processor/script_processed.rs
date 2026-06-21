@@ -11,7 +11,7 @@ pub async fn script_processed(cli: &Gitter, shell: &Option<CompShell>, path: &St
     let repos = find_repos(cli).await;
 
     let shell = if let Some(shell) = shell { shell } else { &get_default_shell() };
-    let bin = shell.to_string();
+    let bin = shell.get_bin_name();
 
     let script_path = absolute(Path::new(path)).expect("Unable to find script");
     let original = fs::read_to_string(&script_path).expect("Unable to read script file contents");
@@ -34,13 +34,11 @@ pub async fn script_processed(cli: &Gitter, shell: &Option<CompShell>, path: &St
                 ["-Command", &format!("Invoke-Expression @'\n{}\n'@\n", evaluated)]
             }
             CompShell::Elvish => ["-c", &format!("eval '{}'", evaluated.replace("'", "''"))],
-            CompShell::Fish => {
-                ["-c", &format!("string collect <<'EOF'\n{}\nEOF\n | source", evaluated)]
-            }
+            CompShell::Fish => ["-c", &format!("printf '%s' '{}' | source", evaluated)],
             CompShell::Bash | CompShell::Zsh => ["-c", &evaluated],
         };
 
-        let mut command = command(&bin, args, &status.repo_path);
+        let mut command = command(bin, args, &status.repo_path);
 
         if cli.quiet {
             command.stdout(Stdio::null());
