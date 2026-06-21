@@ -127,7 +127,7 @@ fn load(cli: &Gitter, dry_run: &bool) {
 
             if !dry_run {
                 let mut command =
-                    command("git", &["clone", &meta.url, &repo_dir_name], &cli.directory);
+                    command("git", ["clone", &meta.url, &repo_dir_name], &cli.directory);
 
                 if let Err(e) = command.status() {
                     println!("Clone failed: {}", e);
@@ -153,7 +153,7 @@ fn load(cli: &Gitter, dry_run: &bool) {
             );
             if !dry_run {
                 let mut command =
-                    command("git", &["-C", &repo_dir_name, "checkout", branch], &cli.directory);
+                    command("git", ["-C", &repo_dir_name, "checkout", branch], &cli.directory);
 
                 if let Err(e) = command.status() {
                     println!("{}Unable to checkout: {}", *ERROR, e);

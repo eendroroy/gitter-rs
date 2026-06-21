@@ -7,6 +7,8 @@ mod helper;
 mod list;
 mod meta;
 mod script;
+mod script_processed;
+mod script_raw;
 
 pub use bash::bash;
 pub use completion::completion;
@@ -16,3 +18,5 @@ pub use help::help;
 pub use list::list;
 pub use meta::meta;
 pub use script::script;
+pub use script_processed::script_processed;
+pub use script_raw::script_raw;

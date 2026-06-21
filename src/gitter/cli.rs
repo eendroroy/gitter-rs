@@ -107,11 +107,17 @@ pub enum GitterCommand {
     /// Execute a script file
     #[clap(visible_alias = "s")]
     Script {
+        /// Desired shell to execute the script
         #[command(subcommand)]
         shell: Option<CompShell>,
 
+        /// Path to the script
         #[arg(short = 'p', long = "path")]
         path: String,
+
+        /// Process placeholders inside the script
+        #[arg(short = 'P', long, action = clap::ArgAction::SetTrue)]
+        placeholder: bool,
     },
     /// Execute simple bash commands - `bash -c 'command'`
     /// For complex cases use `script` command

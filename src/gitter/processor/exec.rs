@@ -3,7 +3,6 @@ use crate::gitter::processor::helper::{command, find_repos};
 use crate::placeholder::processor::{evaluate_placeholders, replace_placeholders};
 use crate::repository::print_info::print_info_line;
 use colored::Colorize;
-use std::path::PathBuf;
 use std::process::Stdio;
 
 pub async fn exec(cli: &Gitter, raw_args: &[String]) {

@@ -20,7 +20,7 @@ pub async fn bash(cli: &Gitter, raw_args: &[String]) {
             println!("$ {} -c {}", bin.green(), args.yellow());
         }
 
-        let mut command = command(&bin, &["-c", &args], &status.repo_path);
+        let mut command = command(&bin, ["-c", &args], &status.repo_path);
         if cli.quiet {
             command.stdout(Stdio::null());
         }
