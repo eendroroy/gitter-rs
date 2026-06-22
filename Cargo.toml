@@ -29,6 +29,10 @@ tokei = "14.0.0"
 serde = { version = "1.0.228", features = ["derive"] }
 toml = "1.1.2"
 
+[dev-dependencies]
+assert_cmd = "2.2.2"
+predicates = "3.1.4"
+
 [[bin]]
 name = "gitter"
 path = "src/main.rs"
