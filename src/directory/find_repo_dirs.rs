@@ -1,13 +1,18 @@
 use crate::IGNORE_FILE;
 use crate::directory::ignore::{IgnoreRule, ignore_patterns, is_ignored};
+use crate::style::ERROR;
+use colored::Colorize;
 use std::fs;
 use std::path::{Path, PathBuf};
 use walkdir::WalkDir;
 
 pub fn find_repo_dirs<P: AsRef<Path>>(target_dir: P, depth: usize) -> Vec<PathBuf> {
-    let target_path = match fs::canonicalize(target_dir) {
+    let target_path = match fs::canonicalize(&target_dir) {
         Ok(path) => path,
-        Err(_) => return vec![],
+        Err(e) => {
+            println!("{}({}) {}", *ERROR, &target_dir.as_ref().to_str().unwrap().blue().bold(), e);
+            std::process::exit(1);
+        }
     };
 
     let mut repositories: Vec<PathBuf> = vec![];
