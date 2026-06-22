@@ -1,0 +1,5 @@
+[alias]
+cov = "llvm-cov"
+cov-html = "llvm-cov --html"
+cov-show = "llvm-cov --open"
+cov-summary = "llvm-cov --summary-only"
