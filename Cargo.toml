@@ -32,6 +32,7 @@ toml = "1.1.2"
 [dev-dependencies]
 assert_cmd = "2.2.2"
 predicates = "3.1.4"
+ctor = "1.0.7"
 
 [[bin]]
 name = "gitter"
