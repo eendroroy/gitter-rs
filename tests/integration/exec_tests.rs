@@ -14,7 +14,6 @@ fn test_repo_exec_echo_output() {
 
     let expected_patterns = vec![
         "repo_00 => 1",
-        "repo_01 => 1",
         "repo_02 => 1",
         "repo_03 => 1",
         "repo_04 => 1",
@@ -45,7 +44,6 @@ fn test_repo_exec_basename_output() {
 
     let expected_patterns = vec![
         "repo_00",
-        "repo_01",
         "repo_02",
         "repo_03",
         "repo_04",

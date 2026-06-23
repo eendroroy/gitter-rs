@@ -14,7 +14,6 @@ fn test_filter_branch() {
 
     let expected_patterns = vec![
         r"^\./\.local/repo_00 on master \[[0-9a-f]*\] by indrajit \d+ (minutes|hours|days|months|years) ago\s*$",
-        r"^\./\.local/repo_01 on master \[[0-9a-f]*\] by indrajit \d+ (minutes|hours|days|months|years) ago\s*$",
         r"^\./\.local/repo_02 on master \[[0-9a-f]*\] by indrajit \d+ (minutes|hours|days|months|years) ago\s*$",
         r"^\./\.local/repo_bare_00 bare on master \[[0-9a-f]*\] by indrajit \d+ (minutes|hours|days|months|years) ago\s*$",
     ];
@@ -42,7 +41,6 @@ fn test_filter_active() {
 
     let expected_patterns = vec![
         r"^\./\.local/repo_00 on master \[[0-9a-f]*\] by indrajit \d+ (minute|minutes|hours|days|months|years) ago\s*$",
-        r"^\./\.local/repo_01 on master \[[0-9a-f]*\] by indrajit \d+ (minute|minutes|hours|days|months|years) ago\s*$",
         r"^\./\.local/repo_02 on master \[[0-9a-f]*\] by indrajit \d+ (minute|minutes|hours|days|months|years) ago\s*$",
         r"^\./\.local/repo_03 on feature/feature-3 \[[0-9a-f]*\] by indrajit \d+ (minute|minutes|hours|days|months|years) ago\s*$",
         r"^\./\.local/repo_04 on feature/feature-4 \[[0-9a-f]*\] by indrajit \d+ (minute|minutes|hours|days|months|years) ago\s*$",

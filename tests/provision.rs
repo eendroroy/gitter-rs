@@ -115,4 +115,12 @@ pub fn run_provision() {
             _ => {}
         }
     }
+
+    let ignore_path = base_path.join(".gitterignore");
+
+    if ignore_path.exists() {
+        println!("{} already exists. Deleting....", ignore_path.display());
+        fs::remove_file(&ignore_path).expect("Failed to delete existing .gitterignore file");
+    }
+    fs::write(&ignore_path, "repo_01\n").expect("Failed to create and write to .gitterignore file");
 }
