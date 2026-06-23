@@ -1,7 +1,6 @@
 use crate::gitter::cli::{Gitter, MetaAction};
 use crate::gitter::processor::helper::{command, find_repos};
 use crate::meta::{MetaFile, Metadata};
-use crate::style::{ERROR, WARN};
 use crate::{META_FILE, STYLE, print_error, print_warn};
 use colored::Colorize;
 use std::fs;

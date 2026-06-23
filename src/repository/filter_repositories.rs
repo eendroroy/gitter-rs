@@ -1,7 +1,6 @@
-use crate::print_error;
 use crate::repository::repositories::{Properties, PropertyLengths, Repositories};
-use crate::style::ERROR;
-use chrono::{DateTime, Duration, Utc};
+use crate::{print_error, print_warn};
+use chrono::{DateTime, Duration, Local, NaiveDateTime, Utc};
 use lazy_static::lazy_static;
 use regex::Regex;
 
@@ -135,10 +134,18 @@ impl ParsedFilter {
             FilterType::Bare => repo_prop.is_bare,
             FilterType::Language => self.evaluate_condition(&repo_prop.top_lang),
             FilterType::Active => {
-                let commit_time = match DateTime::parse_from_rfc3339(&repo_prop.absolute_time) {
-                    Ok(dt) => dt.with_timezone(&Utc),
-                    Err(_) => return false,
-                };
+                let commit_time =
+                    match ParsedFilter::parse_with_system_offset(&repo_prop.absolute_time) {
+                        Some(dt) => dt,
+                        _ => {
+                            print_warn!(
+                                "{} => {} Failed to parse timestamp",
+                                repo_prop.name,
+                                repo_prop.absolute_time
+                            );
+                            return false;
+                        }
+                    };
                 let now = Utc::now();
                 let age = now.signed_duration_since(commit_time);
 
@@ -165,6 +172,13 @@ impl ParsedFilter {
             FilterCondition::Contains(s) => target_string.contains(s),
             _ => false,
         }
+    }
+
+    fn parse_with_system_offset(s: &str) -> Option<DateTime<Utc>> {
+        let naive = NaiveDateTime::parse_from_str(s, "%Y-%m-%d %H:%M:%S").ok()?;
+        let local_offset = Local::now().offset().clone();
+        let local_dt = naive.and_local_timezone(local_offset).single()?;
+        Some(local_dt.with_timezone(&Utc))
     }
 }
 

@@ -1,5 +1,4 @@
 use crate::directory::ignore::{IgnoreRule, ignore_patterns, is_ignored};
-use crate::style::ERROR;
 use crate::{IGNORE_FILE, print_error};
 use colored::Colorize;
 use std::fs;
