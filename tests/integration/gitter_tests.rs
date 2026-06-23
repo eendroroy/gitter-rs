@@ -4,7 +4,7 @@ use assert_cmd::Command;
 fn gitter_should_fail_on_invalid_directory() {
     let output = Command::cargo_bin("gitter")
         .unwrap()
-        .args(&["list", "-C", "/non/existent/directory"])
+        .args(&["list", "-d", "3", "-C", "/non/existent/directory"])
         .output()
         .unwrap();
 

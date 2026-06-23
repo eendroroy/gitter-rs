@@ -5,7 +5,17 @@ use regex::Regex;
 fn test_repo_exec_echo_output() {
     let output = Command::cargo_bin("gitter")
         .unwrap()
-        .args(&["exec", "-i", "never", "-c", "never", "echo", "\"{_name_} => {_commit:c_}\""])
+        .args(&[
+            "exec",
+            "-d",
+            "3",
+            "-i",
+            "never",
+            "-c",
+            "never",
+            "echo",
+            "\"{_name_} => {_commit:c_}\"",
+        ])
         .output()
         .unwrap();
 
@@ -22,6 +32,7 @@ fn test_repo_exec_echo_output() {
         "repo_07 => 0",
         "repo_bare_00 => 1",
         "repo_bare_06 => 1",
+        "repo_11 => 1",
     ];
 
     assert_eq!(lines.len(), expected_patterns.len(), "Unexpected number of lines");
@@ -35,7 +46,17 @@ fn test_repo_exec_echo_output() {
 fn test_repo_exec_basename_output() {
     let output = Command::cargo_bin("gitter")
         .unwrap()
-        .args(&["exec", "-i", "never", "-c", "never", "basename", "\"{_path:a_}{_name_}\""])
+        .args(&[
+            "exec",
+            "-d",
+            "3",
+            "-i",
+            "never",
+            "-c",
+            "never",
+            "basename",
+            "\"{_path:a_}{_name_}\"",
+        ])
         .output()
         .unwrap();
 
@@ -52,6 +73,7 @@ fn test_repo_exec_basename_output() {
         "repo_07",
         "repo_bare_00",
         "repo_bare_06",
+        "repo_11",
     ];
 
     assert_eq!(lines.len(), expected_patterns.len(), "Unexpected number of lines");

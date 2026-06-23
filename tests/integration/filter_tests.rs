@@ -5,7 +5,7 @@ use regex::Regex;
 fn test_filter_branch() {
     let output = Command::cargo_bin("gitter")
         .unwrap()
-        .args(&["list", "-f", "branch:master"])
+        .args(&["list", "-d", "3", "-f", "branch:master"])
         .output()
         .unwrap();
 
@@ -16,6 +16,7 @@ fn test_filter_branch() {
         r"^\./\.local/repo_00 on master \[[0-9a-f]*\] by indrajit \d+ (minutes|hours|days|months|years) ago\s*$",
         r"^\./\.local/repo_02 on master \[[0-9a-f]*\] by indrajit \d+ (minutes|hours|days|months|years) ago\s*$",
         r"^\./\.local/repo_bare_00 bare on master \[[0-9a-f]*\] by indrajit \d+ (minutes|hours|days|months|years) ago\s*$",
+        r"^\./\.local/ign_10/repo_11 on master \[[0-9a-f]*\] by indrajit \d+ (minute|minutes|hours|days|months|years) ago\s*$",
     ];
 
     assert_eq!(lines.len(), expected_patterns.len(), "Unexpected number of lines");
@@ -30,7 +31,7 @@ fn test_filter_branch() {
 fn test_filter_active() {
     let output = Command::cargo_bin("gitter")
         .unwrap()
-        .args(&["list", "-f", "active:<1M"])
+        .args(&["list", "-d", "3", "-f", "active:<1M"])
         .output()
         .unwrap();
 
@@ -48,6 +49,7 @@ fn test_filter_active() {
         r"^\./\.local/repo_06 on detached \[[0-9a-f]*\] by indrajit \d+ (minute|minutes|hours|days|months|years) ago\s*$",
         r"^\./\.local/repo_bare_00 bare on master \[[0-9a-f]*\] by indrajit \d+ (minute|minutes|hours|days|months|years) ago\s*$",
         r"^\./\.local/repo_bare_06 bare on detached \[[0-9a-f]*\] by indrajit \d+ (minute|minutes|hours|days|months|years) ago\s*$",
+        r"^\./\.local/ign_10/repo_11 on master \[[0-9a-f]*\] by indrajit \d+ (minute|minutes|hours|days|months|years) ago\s*$",
     ];
 
     assert_eq!(lines.len(), expected_patterns.len(), "Unexpected number of lines");

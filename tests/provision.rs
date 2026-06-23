@@ -1,37 +1,41 @@
 use chrono::{Duration, Utc};
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 
 pub fn run_provision() {
     let local_dir = PathBuf::from(".local");
     fs::create_dir_all(&local_dir).expect("Failed to create .local directory");
-
     let base_path = fs::canonicalize(&local_dir).expect("Failed to get absolute path for .local");
 
-    for i in 0..=7 {
+    for i in 0..=11 {
         let days_ago = (i + 1) as i64;
         let time_stamp =
             (Utc::now() - Duration::days(days_ago)).format("%Y-%m-%dT%H:%M:%S").to_string();
 
-        let repo_dir = base_path.join(format!("repo_0{}", i));
-        let bare_dir = base_path.join(format!("repo_bare_0{}", i));
+        let repo_dir = base_path.join(format!("repo_{:02}", i));
+        let bare_dir = base_path.join(format!("repo_bare_{:02}", i));
 
-        if repo_dir.exists() {
-            println!("{} already exists. Deleting....", repo_dir.display());
-            fs::remove_dir_all(&repo_dir).expect("Failed to delete existing repo_dir");
-        }
+        let create_dir = |repo_dir: &Path| {
+            if repo_dir.exists() {
+                println!("{} already exists. Deleting....", repo_dir.display());
+                fs::remove_dir_all(repo_dir).expect("Failed to delete existing repo_dir");
+            }
+            fs::create_dir_all(repo_dir).expect("Failed to create repo directory");
+        };
 
-        fs::create_dir_all(&repo_dir).expect("Failed to create repo directory");
-        Command::new("git")
-            .args(["-C", repo_dir.to_str().unwrap(), "init", "-b", "master"])
-            .output()
-            .expect("Failed to run git init");
+        let git_init = |repo_dir: &Path| {
+            Command::new("git")
+                .args(["-C", repo_dir.to_str().unwrap(), "init", "-b", "master"])
+                .output()
+                .expect("Failed to run git init");
+        };
 
-        let make_first_commit = || {
+        let make_first_commit = |repo_dir: &Path| {
             let file_path = repo_dir.join("file");
             let file_contents = format!("{}/file-1\n", repo_dir.display());
-            fs::write(&file_path, file_contents).expect("Failed to write file");
+            fs::write(&file_path, file_contents)
+                .expect(&format!("Failed to write file {}", &file_path.display()));
 
             Command::new("git")
                 .args(["-C", repo_dir.to_str().unwrap(), "add", "."])
@@ -46,27 +50,33 @@ pub fn run_provision() {
                 .expect("Failed git commit");
         };
 
-        let clone_bare_repo = || {
-            if bare_dir.exists() {
-                println!("{} already exists. Deleting....", bare_dir.display());
-                fs::remove_dir_all(&bare_dir).expect("Failed to delete existing bare_dir");
+        let clone_bare_repo = |source: &Path, target: &Path| {
+            if target.exists() {
+                println!("{} already exists. Deleting....", target.display());
+                fs::remove_dir_all(target).expect("Failed to delete existing bare_dir");
             }
             Command::new("git")
-                .args(["clone", "--bare", repo_dir.to_str().unwrap(), bare_dir.to_str().unwrap()])
+                .args(["clone", "--bare", source.to_str().unwrap(), target.to_str().unwrap()])
                 .output()
                 .expect("Failed to clone bare repo");
         };
 
         match i {
             0 => {
-                make_first_commit();
-                clone_bare_repo();
+                create_dir(&repo_dir);
+                git_init(&repo_dir);
+                make_first_commit(&repo_dir);
+                clone_bare_repo(&repo_dir, &bare_dir);
             }
             1 | 2 => {
-                make_first_commit();
+                create_dir(&repo_dir);
+                git_init(&repo_dir);
+                make_first_commit(&repo_dir);
             }
             3 | 4 | 5 => {
-                make_first_commit();
+                create_dir(&repo_dir);
+                git_init(&repo_dir);
+                make_first_commit(&repo_dir);
                 Command::new("git")
                     .args([
                         "-C",
@@ -79,7 +89,9 @@ pub fn run_provision() {
                     .expect("Failed to checkout feature branch");
             }
             6 => {
-                make_first_commit();
+                create_dir(&repo_dir);
+                git_init(&repo_dir);
+                make_first_commit(&repo_dir);
 
                 let file2_path = repo_dir.join("file-2");
                 let file2_contents = format!("{}/file-2\n", repo_dir.display());
@@ -109,8 +121,23 @@ pub fn run_provision() {
                     .output()
                     .expect("Failed to checkout root commit");
 
-                clone_bare_repo();
-                clone_bare_repo();
+                clone_bare_repo(&repo_dir, &bare_dir); // Cleaned up the duplicate clone execution
+            }
+            7 => {
+                create_dir(&repo_dir);
+                git_init(&repo_dir);
+            }
+            8 | 9 => {
+                let repo_dir = base_path.join(format!("ign_8_9/repo_{:02}", i));
+                create_dir(&repo_dir);
+                git_init(&repo_dir);
+                make_first_commit(&repo_dir);
+            }
+            10 | 11 => {
+                let repo_dir = base_path.join(format!("ign_10/repo_{:02}", i));
+                create_dir(&repo_dir);
+                git_init(&repo_dir);
+                make_first_commit(&repo_dir);
             }
             _ => {}
         }
@@ -122,5 +149,7 @@ pub fn run_provision() {
         println!("{} already exists. Deleting....", ignore_path.display());
         fs::remove_file(&ignore_path).expect("Failed to delete existing .gitterignore file");
     }
-    fs::write(&ignore_path, "repo_01\n").expect("Failed to create and write to .gitterignore file");
+
+    let ignore_contents = "repo_01\nign_8_9/*\nign_10/repo_10\n";
+    fs::write(&ignore_path, ignore_contents).expect("Failed to write '.gitterignore'");
 }

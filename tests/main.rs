@@ -1,8 +1,8 @@
-mod provision;
-
 use crate::provision::run_provision;
 use ctor::ctor;
 use std::sync::Once;
+
+mod provision;
 
 static GLOBAL_INIT: Once = Once::new();
 
@@ -15,9 +15,9 @@ fn global_test_setup() {
 }
 
 mod integration {
-    mod exec_tests;
-    mod filter_tests;
-    mod gitter_tests;
-    mod help_tests;
-    mod list_tests;
+    pub mod exec_tests;
+    pub mod filter_tests;
+    pub mod gitter_tests;
+    pub mod help_tests;
+    pub mod list_tests;
 }
