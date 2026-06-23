@@ -3,6 +3,7 @@ mod placeholder;
 mod directory;
 mod gitter;
 mod help;
+mod macros;
 mod meta;
 mod repository;
 mod style;

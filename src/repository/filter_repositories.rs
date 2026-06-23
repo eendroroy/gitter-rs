@@ -1,3 +1,4 @@
+use crate::print_error;
 use crate::repository::repositories::{Properties, PropertyLengths, Repositories};
 use crate::style::ERROR;
 use chrono::{DateTime, Duration, Utc};
@@ -367,7 +368,7 @@ pub fn filter_repositories(repositories: &mut Repositories, filter_str: &str) ->
     let mut parser = match FilterParser::new(filter_str) {
         Ok(p) => p,
         Err(e) => {
-            eprintln!("Error initializing parser: {}", e);
+            print_error!("Error initializing parser: {}", e);
             return repositories.clone();
         }
     };
@@ -375,7 +376,7 @@ pub fn filter_repositories(repositories: &mut Repositories, filter_str: &str) ->
     let expression = match parser.parse() {
         Ok(expr) => expr,
         Err(e) => {
-            eprintln!("{}Error parsing filter expression: {}", *ERROR, e);
+            print_error!("Error parsing filter expression: {}", e);
             std::process::exit(1);
         }
     };

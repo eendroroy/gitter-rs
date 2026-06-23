@@ -1,6 +1,6 @@
-use crate::IGNORE_FILE;
 use crate::directory::ignore::{IgnoreRule, ignore_patterns, is_ignored};
 use crate::style::ERROR;
+use crate::{IGNORE_FILE, print_error};
 use colored::Colorize;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -10,7 +10,7 @@ pub fn find_repo_dirs<P: AsRef<Path>>(target_dir: P, depth: usize) -> Vec<PathBu
     let target_path = match fs::canonicalize(&target_dir) {
         Ok(path) => path,
         Err(e) => {
-            println!("{}({}) {}", *ERROR, &target_dir.as_ref().to_str().unwrap().blue().bold(), e);
+            print_error!("({}) {}", &target_dir.as_ref().to_str().unwrap().blue().bold(), e);
             std::process::exit(1);
         }
     };

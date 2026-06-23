@@ -2,7 +2,7 @@ use crate::gitter::cli::{Gitter, MetaAction};
 use crate::gitter::processor::helper::{command, find_repos};
 use crate::meta::{MetaFile, Metadata};
 use crate::style::{ERROR, WARN};
-use crate::{META_FILE, STYLE};
+use crate::{META_FILE, STYLE, print_error, print_warn};
 use colored::Colorize;
 use std::fs;
 use std::path::Path;
@@ -25,7 +25,7 @@ pub async fn meta(action: &MetaAction, cli: &Gitter) {
 fn load_meta_file(cli: &Gitter) -> MetaFile {
     let meta_file = cli.directory.join(META_FILE);
     if !meta_file.exists() {
-        println!("{}{} does not exist", *ERROR, META_FILE.bold().yellow());
+        print_error!("{} does not exist", META_FILE.bold().yellow());
         std::process::exit(1);
     }
     let content = fs::read_to_string(meta_file).unwrap_or_default();
@@ -56,9 +56,8 @@ fn add(
 
     let exists = data.repos.iter().any(|repo| repo.name == final_name && repo.path == path);
     if exists {
-        println!(
-            "{} Repository location {}{} already exists in the metafile.",
-            *ERROR,
+        print_error!(
+            "Repository location {}{} already exists in the metafile.",
             path.to_str().unwrap(),
             final_name
         );
@@ -138,9 +137,8 @@ fn restore(cli: &Gitter, dry_run: &bool) {
                 }
             }
         } else {
-            println!(
-                "{} Directory '{}' already exists. Skipping clone.",
-                *WARN,
+            print_warn!(
+                "Directory '{}' already exists. Skipping clone.",
                 STYLE.path.apply(&repo_dir_name),
             );
         }
@@ -159,7 +157,7 @@ fn restore(cli: &Gitter, dry_run: &bool) {
                     command("git", ["-C", &repo_dir_name, "checkout", branch], &cli.directory);
 
                 if let Err(e) = command.status() {
-                    println!("{}Unable to checkout: {}", *ERROR, e);
+                    print_error!("Unable to checkout: {}", e);
                     continue;
                 }
             }
@@ -170,7 +168,7 @@ fn restore(cli: &Gitter, dry_run: &bool) {
 fn info(cli: &Gitter) {
     let data = load_meta_file(cli);
     if data.repos.is_empty() {
-        println!("{}No metadata information found.", *WARN);
+        print_warn!("No metadata information found.");
         return;
     }
 
