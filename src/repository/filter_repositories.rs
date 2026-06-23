@@ -176,7 +176,7 @@ impl ParsedFilter {
 
     fn parse_with_system_offset(s: &str) -> Option<DateTime<Utc>> {
         let naive = NaiveDateTime::parse_from_str(s, "%Y-%m-%d %H:%M:%S").ok()?;
-        let local_offset = Local::now().offset().clone();
+        let local_offset = *Local::now().offset();
         let local_dt = naive.and_local_timezone(local_offset).single()?;
         Some(local_dt.with_timezone(&Utc))
     }
