@@ -15,13 +15,8 @@ pub async fn bash(repo: &RepoArgs, cmd: &CommandArgs, raw: &RawArgs) {
         let evaluation = evaluate_placeholders(&args.clone(), status);
         let args = replace_placeholders(&args.clone(), &evaluation);
 
-        print_info_line(
-            repo.info_template.clone(),
-            status,
-            Some(repos.lens),
-            repo.align,
-            &cmd.show_info,
-        );
+        print_info_line(&repo.info_template, status, Some(repos.lens), &repo.align, &cmd.show_info);
+
         if cmd.show_command == BoolChoice::Always {
             println!("$ {} -c {}", bin.green(), args.yellow());
         }

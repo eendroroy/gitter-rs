@@ -3,10 +3,10 @@ use crate::placeholder::processor::{evaluate_placeholders_styled, replace_placeh
 use crate::repository::repositories::{Properties, PropertyLengths};
 
 pub fn print_info_line(
-    template: String,
+    template: &str,
     status: &Properties,
     lengths: Option<PropertyLengths>,
-    align: bool,
+    align: &BoolChoice,
     show_info: &BoolChoice,
 ) {
     if show_info == &BoolChoice::Always {
@@ -15,13 +15,13 @@ pub fn print_info_line(
 }
 
 pub fn get_info_line(
-    template: String,
+    template: &str,
     status: &Properties,
     lengths: Option<PropertyLengths>,
-    align: bool,
+    align: &BoolChoice,
 ) -> String {
-    let lengths_context = if align { lengths.as_ref() } else { None };
-    let evaluation = evaluate_placeholders_styled(&template, status, lengths_context);
+    let lengths_context = if align == &BoolChoice::Always { lengths.as_ref() } else { None };
+    let evaluation = evaluate_placeholders_styled(template, status, lengths_context);
     template
         .split(' ')
         .map(|x| replace_placeholders(x, &evaluation))

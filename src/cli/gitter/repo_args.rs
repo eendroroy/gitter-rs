@@ -1,3 +1,4 @@
+use crate::cli::gitter::BoolChoice;
 use clap::Args;
 use std::path::PathBuf;
 
@@ -26,8 +27,8 @@ pub struct RepoArgs {
     pub filter: Option<String>,
 
     /// Align components of each status line
-    #[arg(short, long, action = clap::ArgAction::SetTrue)]
-    pub align: bool,
+    #[arg(short, long, default_value = "always")]
+    pub align: BoolChoice,
 
     /// Sort the repo list by provided template using placeholders.
     /// Ex: gitter ls --sort "{_name_}"
@@ -46,7 +47,7 @@ impl Default for RepoArgs {
             max_depth: 2,
             info_template: "{_path:r_}{_name_} {_language_} {_bare_} on {_branch:n_} [{_hash:8_}] by {_author:n_} {_time:r_}".to_string(),
             filter: None,
-            align: false,
+            align: BoolChoice::Always,
             sort: "{_path:r_}/{_name_}".to_string(),
             reverse: false,
         }

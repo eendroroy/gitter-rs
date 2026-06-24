@@ -116,8 +116,7 @@ pub enum GitterCommand {
         raw_args: RawArgs,
     },
 
-    /// Generate shell completion
-    #[clap(visible_alias = "c", visible_alias = "comp")]
+    /// Generate shell completion (experimental, may not work)
     Completion {
         #[command(flatten)]
         args: CompletionArgs,
@@ -130,7 +129,6 @@ pub enum GitterCommand {
     },
 
     /// Create/Dump/Load gitter workspace metadata
-    #[clap(visible_alias = "m")]
     Meta {
         #[command(flatten)]
         repo_args: RepoArgs,

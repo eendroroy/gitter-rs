@@ -14,13 +14,8 @@ pub async fn script_raw(repo: &RepoArgs, cmd: &CommandArgs, scripting: &ScriptAr
     let script = absolute(&scripting.path).expect("Unable to find script");
 
     repos.props.iter().for_each(|status| {
-        print_info_line(
-            repo.info_template.clone(),
-            status,
-            Some(repos.lens),
-            repo.align,
-            &cmd.show_info,
-        );
+        print_info_line(&repo.info_template, status, Some(repos.lens), &repo.align, &cmd.show_info);
+
         if cmd.show_command == BoolChoice::Always {
             println!("$ {} {}", &bin.green(), script.to_string_lossy().yellow());
         }

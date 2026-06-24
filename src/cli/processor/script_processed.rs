@@ -8,26 +8,20 @@ use std::fs;
 use std::path::absolute;
 use std::process::Stdio;
 
-pub async fn script_processed(cli: &RepoArgs, cmd: &CommandArgs, args: &ScriptArgs) {
-    let repos = find_repos(cli).await;
+pub async fn script_processed(repo: &RepoArgs, cmd: &CommandArgs, scpt: &ScriptArgs) {
+    let repos = find_repos(repo).await;
 
     let default_bin = get_default_shell();
-    let bin = args.get_bin_name(&default_bin);
+    let bin = scpt.get_bin_name(&default_bin);
 
-    let script_path = absolute(&args.path).expect("Unable to find script");
+    let script_path = absolute(&scpt.path).expect("Unable to find script");
     let original = fs::read_to_string(&script_path).expect("Unable to read script file contents");
 
     repos.props.iter().for_each(|status| {
         let evaluation = evaluate_placeholders(&original.clone(), status);
         let evaluated = replace_placeholders(&original.clone(), &evaluation);
 
-        print_info_line(
-            cli.info_template.clone(),
-            status,
-            Some(repos.lens),
-            cli.align,
-            &cmd.show_info,
-        );
+        print_info_line(&repo.info_template, status, Some(repos.lens), &repo.align, &cmd.show_info);
         if cmd.show_command == BoolChoice::Always {
             println!(
                 "$ {} {} # Modified In-Memory",

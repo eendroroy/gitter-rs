@@ -7,10 +7,10 @@ pub async fn list(repo: &RepoArgs) {
 
     repos.props.iter().for_each(|status| {
         print_info_line(
-            repo.info_template.clone(),
+            &repo.info_template,
             status,
             Some(repos.lens),
-            repo.align,
+            &repo.align,
             &BoolChoice::Always,
         );
     });

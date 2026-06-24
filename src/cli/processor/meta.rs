@@ -6,17 +6,17 @@ use colored::Colorize;
 use std::fs;
 use std::path::Path;
 
-pub async fn meta(repo_args: &RepoArgs, meta_args: &MetaArgs) {
-    if meta_args.add
-        && let Some(url) = &meta_args.url
+pub async fn meta(repo: &RepoArgs, args: &MetaArgs) {
+    if args.add
+        && let Some(url) = &args.url
     {
-        add(repo_args, url, &meta_args.name, &meta_args.path, &meta_args.branch, &meta_args.dry_run)
-    } else if meta_args.save {
-        save(repo_args, &meta_args.dry_run).await
-    } else if meta_args.restore {
-        restore(repo_args, &meta_args.dry_run)
-    } else if meta_args.info {
-        info(repo_args)
+        add(repo, url, &args.name, &args.path, &args.branch, &args.dry_run)
+    } else if args.save {
+        save(repo, &args.dry_run).await
+    } else if args.restore {
+        restore(repo, &args.dry_run)
+    } else if args.info {
+        info(repo)
     }
 }
 
