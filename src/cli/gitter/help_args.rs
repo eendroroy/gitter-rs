@@ -1,6 +1,7 @@
 use clap::Args;
+use std::fmt::Debug;
 
-#[derive(Args, Debug)]
+#[derive(Args, Debug, Default, Clone)]
 #[command(
     group(
         clap::ArgGroup::new("HelpArg")

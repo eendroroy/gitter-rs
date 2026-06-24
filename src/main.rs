@@ -8,7 +8,7 @@ mod meta;
 mod repository;
 mod style;
 
-use crate::cli::gitter::{BoolChoice, CommandArgs, Gitter, GitterCommand, RepoArgs};
+use crate::cli::gitter::{CommandArgs, Gitter, GitterCommand, HelpArgs, RepoArgs};
 use crate::cli::processor::{bash, completion, exec, git, help, list, meta, script};
 use crate::style::Palette;
 use clap::Parser;
@@ -25,14 +25,15 @@ async fn main() {
     let command = if let Some(command) = &cli.command {
         command
     } else {
-        &GitterCommand::Git {
-            repo_args: RepoArgs::default(),
-            cmd_args: CommandArgs {
-                show_command: BoolChoice::Always,
-                show_info: BoolChoice::Always,
-                quiet: false,
-            },
-            raw_args: cli.raw_args,
+        if cli.raw_args.raw_args.is_empty() {
+            help(&HelpArgs::default());
+            std::process::exit(0);
+        } else {
+            &GitterCommand::Git {
+                repo_args: RepoArgs::default(),
+                cmd_args: CommandArgs::default(),
+                raw_args: cli.raw_args,
+            }
         }
     };
 
