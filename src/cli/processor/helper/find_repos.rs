@@ -1,6 +1,6 @@
 use crate::directory::find_repo_dirs::find_repo_dirs;
 
-use crate::gitter::cli::Gitter;
+use crate::cli::gitter::Gitter;
 use crate::repository::filter_repositories::filter_repositories;
 use crate::repository::repositories::Repositories;
 use std::fs;

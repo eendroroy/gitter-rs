@@ -1,5 +1,5 @@
-use crate::gitter::cli::{BoolChoice, Gitter};
-use crate::gitter::processor::helper::{command, find_repos};
+use crate::cli::gitter::{BoolChoice, Gitter};
+use crate::cli::processor::helper::{command, find_repos};
 use crate::placeholder::processor::{evaluate_placeholders, replace_placeholders};
 use crate::repository::print_info::print_info_line;
 use colored::Colorize;

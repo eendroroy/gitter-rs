@@ -1,5 +1,5 @@
 use crate::IGNORE_FILE;
-use crate::gitter::cli::CLAP_STYLE;
+use crate::cli::gitter::CLAP_STYLE;
 
 macro_rules! gitterignore_template {
     () => {

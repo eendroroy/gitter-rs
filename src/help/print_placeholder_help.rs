@@ -1,4 +1,4 @@
-use crate::gitter::cli::CLAP_STYLE;
+use crate::cli::gitter::CLAP_STYLE;
 
 pub fn print_placeholder_help() {
     let header = CLAP_STYLE.get_header();

@@ -1,15 +1,15 @@
 #[macro_use]
 mod placeholder;
+mod cli;
 mod directory;
-mod gitter;
 mod help;
 mod macros;
 mod meta;
 mod repository;
 mod style;
 
-use crate::gitter::cli::{Gitter, GitterCommand, RawArgsBlock};
-use crate::gitter::processor::{bash, completion, exec, git, help, list, meta, script};
+use crate::cli::gitter::{Gitter, GitterCommand, RawArgsBlock};
+use crate::cli::processor::{bash, completion, exec, git, help, list, meta, script};
 use crate::style::Palette;
 use clap::Parser;
 use std::sync::LazyLock;

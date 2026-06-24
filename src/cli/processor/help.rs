@@ -1,4 +1,4 @@
-use crate::gitter::cli::{Gitter, HelpTopic};
+use crate::cli::gitter::{Gitter, HelpTopic};
 use crate::help::{
     print_completion_help, print_filter_help, print_gitterignore_help, print_placeholder_help,
 };

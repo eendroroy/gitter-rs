@@ -1,4 +1,4 @@
-use crate::gitter::cli::BoolChoice;
+use crate::cli::gitter::BoolChoice;
 use crate::placeholder::processor::{evaluate_placeholders_styled, replace_placeholders};
 use crate::repository::repositories::{Properties, PropertyLengths};
 

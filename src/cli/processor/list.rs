@@ -1,5 +1,5 @@
-use crate::gitter::cli::{BoolChoice, Gitter};
-use crate::gitter::processor::helper::find_repos;
+use crate::cli::gitter::{BoolChoice, Gitter};
+use crate::cli::processor::helper::find_repos;
 use crate::repository::print_info::print_info_line;
 
 pub async fn list(cli: &Gitter) {

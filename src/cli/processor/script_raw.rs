@@ -1,5 +1,5 @@
-use crate::gitter::cli::{BoolChoice, CompShell, Gitter};
-use crate::gitter::processor::helper::{command, find_repos, get_default_shell};
+use crate::cli::gitter::{BoolChoice, CompShell, Gitter};
+use crate::cli::processor::helper::{command, find_repos, get_default_shell};
 use crate::repository::print_info::print_info_line;
 use colored::Colorize;
 use std::path::{PathBuf, absolute};

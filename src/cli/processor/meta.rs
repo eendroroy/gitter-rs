@@ -1,5 +1,5 @@
-use crate::gitter::cli::{Gitter, MetaAction};
-use crate::gitter::processor::helper::{command, find_repos};
+use crate::cli::gitter::{Gitter, MetaAction};
+use crate::cli::processor::helper::{command, find_repos};
 use crate::meta::{MetaFile, Metadata};
 use crate::{META_FILE, STYLE, print_error, print_warn};
 use colored::Colorize;
