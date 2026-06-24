@@ -1,9 +1,21 @@
+mod bool_choice;
+mod completion_args;
+mod help_args;
+mod meta_args;
+mod script_args;
+
 use clap::builder::Styles;
 use clap::builder::styling::AnsiColor::{Blue, Cyan, Green, Red, Yellow};
 use clap::builder::styling::Color::Ansi;
 use clap::builder::styling::Style;
-use clap::{Args, Parser, Subcommand, ValueEnum};
+use clap::{Args, Parser, Subcommand};
 use std::path::PathBuf;
+
+pub use bool_choice::BoolChoice;
+pub use completion_args::CompletionArgs;
+pub use help_args::HelpArgs;
+pub use meta_args::MetaArgs;
+pub use script_args::ScriptArgs;
 
 pub const CLAP_STYLE: Styles = Styles::styled()
     .header(Style::new().bold().fg_color(Some(Ansi(Green))))
@@ -116,182 +128,11 @@ pub enum GitterCommand {
     /// Generate shell completion
     #[clap(visible_alias = "c")]
     #[clap(visible_alias = "comp")]
-    Completion(ShellArgs),
+    Completion(CompletionArgs),
     /// Help menu
     /// Run: `gitter help --help` for more details
     Help(HelpArgs),
     /// Create/Dump/Load gitter workspace metadata
     #[clap(visible_alias = "m")]
     Meta(MetaArgs),
-}
-
-#[derive(Args, Debug)]
-#[command(
-    group(
-        clap::ArgGroup::new("ScriptArg")
-            .required(false)
-            .multiple(false)
-            .args(["bash", "elvish", "fish", "power_shell", "zsh"])
-    )
-)]
-pub struct ScriptArgs {
-    /// Run script via bash
-    #[arg(long, group = "ScriptArg")]
-    pub bash: bool,
-    /// Run script via elvish
-    #[arg(long, group = "ScriptArg")]
-    pub elvish: bool,
-    /// Run script via fish
-    #[arg(long, group = "ScriptArg")]
-    pub fish: bool,
-    /// Run script via PowerShell
-    #[arg(long, group = "ScriptArg")]
-    pub power_shell: bool,
-    /// Run script via zsh
-    #[arg(long, group = "ScriptArg")]
-    pub zsh: bool,
-
-    /// Path to the script
-    #[arg(short = 'p', long = "path")]
-    pub path: PathBuf,
-
-    /// Process placeholders inside the script
-    #[arg(short = 'p', long, action = clap::ArgAction::SetTrue)]
-    pub placeholder: bool,
-}
-
-impl ScriptArgs {
-    pub fn get_bin_name<'a>(&self, default: &'a str) -> &'a str {
-        if self.bash {
-            "bash"
-        } else if self.elvish {
-            "elvish"
-        } else if self.fish {
-            "fish"
-        } else if self.power_shell {
-            if cfg!(windows) { "powershell" } else { "pwsh" }
-        } else if self.zsh {
-            "zsh"
-        } else {
-            default
-        }
-    }
-}
-
-#[derive(Args, Debug)]
-#[command(
-    group(
-        clap::ArgGroup::new("ShellArg")
-            .required(false)
-            .multiple(false)
-            .args(["bash", "elvish", "fish", "power_shell", "zsh"])
-    )
-)]
-pub struct ShellArgs {
-    /// Generate completion for bash
-    #[arg(long, group = "ShellArg")]
-    pub bash: bool,
-    /// Generate completion for elvish
-    #[arg(long, group = "ShellArg")]
-    pub elvish: bool,
-    /// Generate completion for fish
-    #[arg(long, group = "ShellArg")]
-    pub fish: bool,
-    /// Generate completion for PowerShell
-    #[arg(long, group = "ShellArg")]
-    pub power_shell: bool,
-    /// Generate completion for zsh
-    #[arg(long, group = "ShellArg")]
-    pub zsh: bool,
-}
-
-impl ShellArgs {
-    pub fn get_bin_name<'a>(&self, default: &'a str) -> &'a str {
-        if self.bash {
-            "bash"
-        } else if self.elvish {
-            "elvish"
-        } else if self.fish {
-            "fish"
-        } else if self.power_shell {
-            if cfg!(windows) { "powershell" } else { "pwsh" }
-        } else if self.zsh {
-            "zsh"
-        } else {
-            default
-        }
-    }
-}
-
-#[derive(Args, Debug)]
-#[command(
-    group(
-        clap::ArgGroup::new("HelpArg")
-            .required(false)
-            .multiple(false)
-            .args(["placeholders", "gitterignore", "filters", "completions"])
-    )
-)]
-pub struct HelpArgs {
-    #[arg(long, group = "HelpArg")]
-    pub placeholders: bool,
-    #[arg(long, group = "HelpArg")]
-    pub gitterignore: bool,
-    #[arg(long, group = "HelpArg")]
-    pub filters: bool,
-    #[arg(long, group = "HelpArg")]
-    pub completions: bool,
-}
-
-#[derive(Args, Debug)]
-#[command(
-    group(
-        clap::ArgGroup::new("MetaArg")
-            .required(true)
-            .multiple(false)
-            .args(["add", "save", "restore", "info"])
-    )
-)]
-pub struct MetaArgs {
-    /// Add a repository to metafile
-    #[arg(short = 'A', long, group = "MetaArg")]
-    pub add: bool,
-
-    /// Create metafile from current workdir
-    #[arg(short = 'S', long, group = "MetaArg")]
-    pub save: bool,
-
-    /// Restore (clone) repositories from metafile
-    #[arg(short = 'R', long, group = "MetaArg")]
-    pub restore: bool,
-
-    /// Show meta information
-    #[arg(short = 'I', long, group = "MetaArg")]
-    pub info: bool,
-
-    /// Repository remote url
-    #[arg(short, long, requires = "add", required_if_eq("add", "true"))]
-    pub url: Option<String>,
-
-    /// Parent directory to clone the project
-    #[arg(short, long, default_value = ".", requires = "add")]
-    pub path: PathBuf,
-
-    /// Name of the repository (Required if path is provided)
-    #[arg(short = 'N', long, requires = "path")]
-    pub name: Option<String>,
-
-    /// Branch to check out
-    #[arg(short, long, requires = "add")]
-    pub branch: Option<String>,
-
-    /// Display actions to be taken
-    #[arg(short = 'n', long, action = clap::ArgAction::SetTrue)]
-    pub dry_run: bool,
-}
-
-#[derive(Debug, Clone, ValueEnum, PartialEq)]
-pub enum BoolChoice {
-    Always,
-    Never,
 }

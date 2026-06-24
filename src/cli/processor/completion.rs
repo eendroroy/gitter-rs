@@ -1,8 +1,8 @@
-use crate::cli::gitter::{Gitter, ShellArgs};
+use crate::cli::gitter::{CompletionArgs, Gitter};
 use crate::cli::processor::helper::get_default_shell;
 use clap::CommandFactory;
 
-pub fn completion(args: &ShellArgs) {
+pub fn completion(args: &CompletionArgs) {
     let command = &mut Gitter::command();
 
     let clap_shell = match args.get_bin_name(&get_default_shell()) {
