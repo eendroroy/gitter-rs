@@ -1,17 +1,17 @@
-use crate::cli::gitter::{BoolChoice, CompShell, Gitter};
+use crate::cli::gitter::{BoolChoice, Gitter, ScriptArgs};
 use crate::cli::processor::helper::{command, find_repos, get_default_shell};
 use crate::repository::print_info::print_info_line;
 use colored::Colorize;
-use std::path::{PathBuf, absolute};
+use std::path::absolute;
 use std::process::Stdio;
 
-pub async fn script_raw(cli: &Gitter, shell: &Option<CompShell>, path: &PathBuf) {
+pub async fn script_raw(cli: &Gitter, args: &ScriptArgs) {
     let repos = find_repos(cli).await;
 
-    let shell = if let Some(shell) = shell { shell } else { &get_default_shell() };
-    let bin = shell.get_bin_name();
+    let default_bin = get_default_shell();
+    let bin = args.get_bin_name(&default_bin);
 
-    let script = absolute(path).expect("Unable to find script");
+    let script = absolute(&args.path).expect("Unable to find script");
 
     repos.props.iter().for_each(|status| {
         print_info_line(

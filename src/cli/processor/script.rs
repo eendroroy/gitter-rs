@@ -1,10 +1,9 @@
-use crate::cli::gitter::{CompShell, Gitter};
+use crate::cli::gitter::{Gitter, ScriptArgs};
 use crate::cli::processor::{script_processed, script_raw};
-use std::path::PathBuf;
 
-pub async fn script(cli: &Gitter, shell: &Option<CompShell>, path: &PathBuf, placeholder: &bool) {
-    match placeholder {
-        true => script_processed(cli, shell, path).await,
-        false => script_raw(cli, shell, path).await,
+pub async fn script(cli: &Gitter, args: &ScriptArgs) {
+    match args.placeholder {
+        true => script_processed(cli, args).await,
+        false => script_raw(cli, args).await,
     };
 }

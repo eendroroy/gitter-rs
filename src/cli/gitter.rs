@@ -3,8 +3,6 @@ use clap::builder::styling::AnsiColor::{Blue, Cyan, Green, Red, Yellow};
 use clap::builder::styling::Color::Ansi;
 use clap::builder::styling::Style;
 use clap::{Args, Parser, Subcommand, ValueEnum};
-use std::fmt;
-use std::fmt::{Display, Formatter};
 use std::path::PathBuf;
 
 pub const CLAP_STYLE: Styles = Styles::styled()
@@ -110,19 +108,7 @@ pub enum GitterCommand {
     Exec(RawArgsBlock),
     /// Execute a script file
     #[clap(visible_alias = "s")]
-    Script {
-        /// Desired shell to execute the script
-        #[command(subcommand)]
-        shell: Option<CompShell>,
-
-        /// Path to the script
-        #[arg(short = 'p', long = "path")]
-        path: PathBuf,
-
-        /// Process placeholders inside the script
-        #[arg(short = 'P', long, action = clap::ArgAction::SetTrue)]
-        placeholder: bool,
-    },
+    Script(ScriptArgs),
     /// Execute simple bash commands - `bash -c 'command'`
     /// For complex cases use `script` command
     #[clap(visible_alias = "b")]
@@ -130,130 +116,178 @@ pub enum GitterCommand {
     /// Generate shell completion
     #[clap(visible_alias = "c")]
     #[clap(visible_alias = "comp")]
-    Completion {
-        #[command(subcommand)]
-        shell: Option<CompShell>,
-    },
+    Completion(ShellArgs),
     /// Help menu
     /// Run: `gitter help --help` for more details
-    Help {
-        #[command(subcommand)]
-        topic: Option<HelpTopic>,
-    },
+    Help(HelpArgs),
     /// Create/Dump/Load gitter workspace metadata
     #[clap(visible_alias = "m")]
-    Meta {
-        #[command(subcommand)]
-        action: MetaAction,
-    },
+    Meta(MetaArgs),
 }
 
-#[derive(Subcommand, Debug)]
-pub enum CompShell {
-    /// Generate completion for bash
-    #[clap(visible_alias = "b")]
-    Bash,
-    /// Generate completion for elvish
-    #[clap(visible_alias = "e")]
-    Elvish,
-    /// Generate completion for fish
-    #[clap(visible_alias = "f")]
-    Fish,
-    /// Generate completion for PowerShell
-    #[allow(clippy::enum_variant_names)]
-    #[clap(visible_alias = "p")]
-    PowerShell,
-    /// Generate completion for zsh
-    #[clap(visible_alias = "z")]
-    Zsh,
+#[derive(Args, Debug)]
+#[command(
+    group(
+        clap::ArgGroup::new("ScriptArg")
+            .required(false)
+            .multiple(false)
+            .args(["bash", "elvish", "fish", "power_shell", "zsh"])
+    )
+)]
+pub struct ScriptArgs {
+    /// Run script via bash
+    #[arg(long, group = "ScriptArg")]
+    pub bash: bool,
+    /// Run script via elvish
+    #[arg(long, group = "ScriptArg")]
+    pub elvish: bool,
+    /// Run script via fish
+    #[arg(long, group = "ScriptArg")]
+    pub fish: bool,
+    /// Run script via PowerShell
+    #[arg(long, group = "ScriptArg")]
+    pub power_shell: bool,
+    /// Run script via zsh
+    #[arg(long, group = "ScriptArg")]
+    pub zsh: bool,
+
+    /// Path to the script
+    #[arg(short = 'p', long = "path")]
+    pub path: PathBuf,
+
+    /// Process placeholders inside the script
+    #[arg(short = 'p', long, action = clap::ArgAction::SetTrue)]
+    pub placeholder: bool,
 }
 
-impl CompShell {
-    pub fn get_bin_name(&self) -> &str {
-        match self {
-            CompShell::Bash => "bash",
-            CompShell::Elvish => "elvish",
-            CompShell::Fish => "fish",
-            CompShell::PowerShell => {
-                if cfg!(windows) {
-                    "powershell"
-                } else {
-                    "pwsh"
-                }
-            }
-            CompShell::Zsh => "zsh",
+impl ScriptArgs {
+    pub fn get_bin_name<'a>(&self, default: &'a str) -> &'a str {
+        if self.bash {
+            "bash"
+        } else if self.elvish {
+            "elvish"
+        } else if self.fish {
+            "fish"
+        } else if self.power_shell {
+            if cfg!(windows) { "powershell" } else { "pwsh" }
+        } else if self.zsh {
+            "zsh"
+        } else {
+            default
         }
     }
 }
 
-impl Display for CompShell {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        let shell_str = match self {
-            CompShell::Bash => "bash",
-            CompShell::Elvish => "elvish",
-            CompShell::Fish => "fish",
-            CompShell::PowerShell => "powershell",
-            CompShell::Zsh => "zsh",
-        };
+#[derive(Args, Debug)]
+#[command(
+    group(
+        clap::ArgGroup::new("ShellArg")
+            .required(false)
+            .multiple(false)
+            .args(["bash", "elvish", "fish", "power_shell", "zsh"])
+    )
+)]
+pub struct ShellArgs {
+    /// Generate completion for bash
+    #[arg(long, group = "ShellArg")]
+    pub bash: bool,
+    /// Generate completion for elvish
+    #[arg(long, group = "ShellArg")]
+    pub elvish: bool,
+    /// Generate completion for fish
+    #[arg(long, group = "ShellArg")]
+    pub fish: bool,
+    /// Generate completion for PowerShell
+    #[arg(long, group = "ShellArg")]
+    pub power_shell: bool,
+    /// Generate completion for zsh
+    #[arg(long, group = "ShellArg")]
+    pub zsh: bool,
+}
 
-        write!(f, "{}", shell_str)
+impl ShellArgs {
+    pub fn get_bin_name<'a>(&self, default: &'a str) -> &'a str {
+        if self.bash {
+            "bash"
+        } else if self.elvish {
+            "elvish"
+        } else if self.fish {
+            "fish"
+        } else if self.power_shell {
+            if cfg!(windows) { "powershell" } else { "pwsh" }
+        } else if self.zsh {
+            "zsh"
+        } else {
+            default
+        }
     }
 }
 
-#[derive(Subcommand, Debug)]
-pub enum HelpTopic {
-    #[clap(visible_alias = "p")]
-    Placeholder,
-    #[clap(visible_alias = "g")]
-    Gitterignore,
-    #[clap(visible_alias = "f")]
-    Filter,
-    #[clap(visible_alias = "c")]
-    Completion,
+#[derive(Args, Debug)]
+#[command(
+    group(
+        clap::ArgGroup::new("HelpArg")
+            .required(false)
+            .multiple(false)
+            .args(["placeholders", "gitterignore", "filters", "completions"])
+    )
+)]
+pub struct HelpArgs {
+    #[arg(long, group = "HelpArg")]
+    pub placeholders: bool,
+    #[arg(long, group = "HelpArg")]
+    pub gitterignore: bool,
+    #[arg(long, group = "HelpArg")]
+    pub filters: bool,
+    #[arg(long, group = "HelpArg")]
+    pub completions: bool,
 }
 
-#[derive(Subcommand, Debug)]
-pub enum MetaAction {
+#[derive(Args, Debug)]
+#[command(
+    group(
+        clap::ArgGroup::new("MetaArg")
+            .required(true)
+            .multiple(false)
+            .args(["add", "save", "restore", "info"])
+    )
+)]
+pub struct MetaArgs {
     /// Add a repository to metafile
-    #[clap(visible_alias = "a")]
-    Add {
-        /// Repository remote url
-        #[arg(short, long)]
-        url: String,
+    #[arg(short = 'A', long, group = "MetaArg")]
+    pub add: bool,
 
-        /// Parent directory to clone the project
-        #[arg(short, long, default_value = ".")]
-        path: PathBuf,
-
-        /// Name of the repository (Required if path is provided)
-        #[arg(short = 'N', long, requires = "path")]
-        name: Option<String>,
-
-        /// Branch to check out
-        #[arg(short, long)]
-        branch: Option<String>,
-
-        /// Display actions to be taken
-        #[arg(short = 'n', long, action = clap::ArgAction::SetTrue)]
-        dry_run: bool,
-    },
     /// Create metafile from current workdir
-    #[clap(visible_alias = "s")]
-    Save {
-        /// Display actions to be taken
-        #[arg(short = 'n', long, action = clap::ArgAction::SetTrue)]
-        dry_run: bool,
-    },
-    /// Load (clone) repositories from metafile
-    #[clap(visible_alias = "r")]
-    Restore {
-        /// Display actions to be taken
-        #[arg(short = 'n', long, action = clap::ArgAction::SetTrue)]
-        dry_run: bool,
-    },
+    #[arg(short = 'S', long, group = "MetaArg")]
+    pub save: bool,
+
+    /// Restore (clone) repositories from metafile
+    #[arg(short = 'R', long, group = "MetaArg")]
+    pub restore: bool,
+
     /// Show meta information
-    #[clap(visible_alias = "i")]
-    Info,
+    #[arg(short = 'I', long, group = "MetaArg")]
+    pub info: bool,
+
+    /// Repository remote url
+    #[arg(short, long, requires = "add", required_if_eq("add", "true"))]
+    pub url: Option<String>,
+
+    /// Parent directory to clone the project
+    #[arg(short, long, default_value = ".", requires = "add")]
+    pub path: PathBuf,
+
+    /// Name of the repository (Required if path is provided)
+    #[arg(short = 'N', long, requires = "path")]
+    pub name: Option<String>,
+
+    /// Branch to check out
+    #[arg(short, long, requires = "add")]
+    pub branch: Option<String>,
+
+    /// Display actions to be taken
+    #[arg(short = 'n', long, action = clap::ArgAction::SetTrue)]
+    pub dry_run: bool,
 }
 
 #[derive(Debug, Clone, ValueEnum, PartialEq)]

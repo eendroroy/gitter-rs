@@ -38,7 +38,7 @@ fn test_help() {
 #[test]
 fn test_help_placeholder() {
     let mut cmd = Command::cargo_bin("gitter").unwrap();
-    cmd.args(&["help", "placeholder"])
+    cmd.args(&["help", "--placeholders"])
         .assert()
         .stdout(contains("{_remote:n_}"))
         .stdout(contains("{_remote:f_}"))
@@ -64,7 +64,7 @@ fn test_help_placeholder() {
 #[test]
 fn test_help_gitterignore() {
     let mut cmd = Command::cargo_bin("gitter").unwrap();
-    cmd.args(&["help", "gitterignore"])
+    cmd.args(&["help", "--gitterignore"])
         .assert()
         .stdout(contains("Gitterignore File Format"))
         .stdout(contains("path/to/repo"))
@@ -76,7 +76,7 @@ fn test_help_gitterignore() {
 #[test]
 fn test_help_filter() {
     let mut cmd = Command::cargo_bin("gitter").unwrap();
-    cmd.args(&["help", "filter"])
+    cmd.args(&["help", "--filters"])
         .assert()
         .stdout(contains("Description:"))
         .stdout(contains("General Syntax:"))
@@ -110,7 +110,7 @@ fn test_help_filter() {
 #[test]
 fn test_help_completion() {
     let mut cmd = Command::cargo_bin("gitter").unwrap();
-    cmd.args(&["help", "completion"])
+    cmd.args(&["help", "--completions"])
         .assert()
         .stdout(contains("Quick Setup Commands"))
         .stdout(contains("gitter completion bash"))

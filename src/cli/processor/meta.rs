@@ -1,4 +1,4 @@
-use crate::cli::gitter::{Gitter, MetaAction};
+use crate::cli::gitter::{Gitter, MetaArgs};
 use crate::cli::processor::helper::{command, find_repos};
 use crate::meta::{MetaFile, Metadata};
 use crate::{META_FILE, STYLE, print_error, print_warn};
@@ -6,18 +6,17 @@ use colored::Colorize;
 use std::fs;
 use std::path::Path;
 
-pub async fn meta(action: &MetaAction, cli: &Gitter) {
-    match action {
-        MetaAction::Add {
-            url,
-            path,
-            name,
-            branch,
-            dry_run,
-        } => add(cli, url, name, path, branch, dry_run),
-        MetaAction::Save { dry_run } => save(cli, dry_run).await,
-        MetaAction::Restore { dry_run } => restore(cli, dry_run),
-        MetaAction::Info => info(cli),
+pub async fn meta(args: &MetaArgs, cli: &Gitter) {
+    if args.add
+        && let Some(url) = &args.url
+    {
+        add(cli, url, &args.name, &args.path, &args.branch, &args.dry_run)
+    } else if args.save {
+        save(cli, &args.dry_run).await
+    } else if args.restore {
+        restore(cli, &args.dry_run)
+    } else if args.info {
+        info(cli)
     }
 }
 

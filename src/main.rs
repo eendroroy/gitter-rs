@@ -32,12 +32,10 @@ async fn main() {
         GitterCommand::Git(RawArgsBlock { raw_args }) => git(&cli, raw_args).await,
         GitterCommand::List => list(&cli).await,
         GitterCommand::Exec(RawArgsBlock { raw_args }) => exec(&cli, raw_args).await,
-        GitterCommand::Script { shell, path, placeholder } => {
-            script(&cli, shell, path, placeholder).await
-        }
+        GitterCommand::Script(args) => script(&cli, args).await,
         GitterCommand::Bash(RawArgsBlock { raw_args }) => bash(&cli, raw_args).await,
-        GitterCommand::Completion { shell } => completion(shell),
-        GitterCommand::Help { topic } => help(topic),
-        GitterCommand::Meta { action } => meta(action, &cli).await,
+        GitterCommand::Completion(args) => completion(args),
+        GitterCommand::Help(args) => help(args),
+        GitterCommand::Meta(args) => meta(args, &cli).await,
     }
 }
