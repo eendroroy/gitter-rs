@@ -1,4 +1,4 @@
-use crate::cli::gitter::{Gitter, MetaArgs};
+use crate::cli::gitter::{MetaArgs, RepoArgs};
 use crate::cli::processor::helper::{command, find_repos};
 use crate::meta::{MetaFile, Metadata};
 use crate::{META_FILE, STYLE, print_error, print_warn};
@@ -6,21 +6,21 @@ use colored::Colorize;
 use std::fs;
 use std::path::Path;
 
-pub async fn meta(args: &MetaArgs, cli: &Gitter) {
-    if args.add
-        && let Some(url) = &args.url
+pub async fn meta(repo_args: &RepoArgs, meta_args: &MetaArgs) {
+    if meta_args.add
+        && let Some(url) = &meta_args.url
     {
-        add(cli, url, &args.name, &args.path, &args.branch, &args.dry_run)
-    } else if args.save {
-        save(cli, &args.dry_run).await
-    } else if args.restore {
-        restore(cli, &args.dry_run)
-    } else if args.info {
-        info(cli)
+        add(repo_args, url, &meta_args.name, &meta_args.path, &meta_args.branch, &meta_args.dry_run)
+    } else if meta_args.save {
+        save(repo_args, &meta_args.dry_run).await
+    } else if meta_args.restore {
+        restore(repo_args, &meta_args.dry_run)
+    } else if meta_args.info {
+        info(repo_args)
     }
 }
 
-fn load_meta_file(cli: &Gitter) -> MetaFile {
+fn load_meta_file(cli: &RepoArgs) -> MetaFile {
     let meta_file = cli.directory.join(META_FILE);
     if !meta_file.exists() {
         print_error!("{} does not exist", META_FILE.bold().yellow());
@@ -30,14 +30,14 @@ fn load_meta_file(cli: &Gitter) -> MetaFile {
     toml::from_str(&content).unwrap_or_else(|_| MetaFile { repos: vec![] })
 }
 
-fn save_meta_file(cli: &Gitter, data: &MetaFile) {
+fn save_meta_file(cli: &RepoArgs, data: &MetaFile) {
     let meta_file = cli.directory.join(META_FILE);
     let content = toml::to_string_pretty(data).unwrap();
     fs::write(meta_file, content).expect("Unable to save metafile");
 }
 
 fn add(
-    cli: &Gitter,
+    cli: &RepoArgs,
     url: &str,
     name: &Option<String>,
     path: &Path,
@@ -77,7 +77,7 @@ fn add(
     }
 }
 
-async fn save(cli: &Gitter, dry_run: &bool) {
+async fn save(cli: &RepoArgs, dry_run: &bool) {
     let repos = find_repos(cli).await;
     let mut new_repos = Vec::new();
 
@@ -100,7 +100,7 @@ async fn save(cli: &Gitter, dry_run: &bool) {
     }
 }
 
-fn restore(cli: &Gitter, dry_run: &bool) {
+fn restore(cli: &RepoArgs, dry_run: &bool) {
     let data = load_meta_file(cli);
     if data.repos.is_empty() {
         println!("No repositories found to load.");
@@ -163,7 +163,7 @@ fn restore(cli: &Gitter, dry_run: &bool) {
     }
 }
 
-fn info(cli: &Gitter) {
+fn info(cli: &RepoArgs) {
     let data = load_meta_file(cli);
     if data.repos.is_empty() {
         print_warn!("No metadata information found.");

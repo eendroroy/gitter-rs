@@ -1,4 +1,4 @@
-use crate::cli::gitter::Gitter;
+use crate::cli::gitter::RepoArgs;
 use crate::placeholder::processor::{evaluate_placeholders, replace_placeholders};
 use crate::repository::helper::{
     get_absolute_path, get_absolute_time, get_bare, get_branch_count, get_commit_count,
@@ -154,13 +154,13 @@ impl Repositories {
         }
     }
 
-    pub fn sort(&mut self, cli: &Gitter) {
+    pub fn sort(&mut self, repo: &RepoArgs) {
         self.props.sort_by(|a, b| {
-            replace_placeholders(&cli.sort, &evaluate_placeholders(&cli.sort, a))
-                .cmp(&replace_placeholders(&cli.sort, &evaluate_placeholders(&cli.sort, b)))
+            replace_placeholders(&repo.sort, &evaluate_placeholders(&repo.sort, a))
+                .cmp(&replace_placeholders(&repo.sort, &evaluate_placeholders(&repo.sort, b)))
         });
 
-        if cli.reverse {
+        if repo.reverse {
             self.props.reverse();
         }
     }

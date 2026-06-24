@@ -37,24 +37,24 @@ fn test_repo_listing_output() {
 fn test_repo_listing_output_aligned() {
     let output = Command::cargo_bin("gitter")
         .unwrap()
-        .args(&["list", "-d", "3", "-a"])
+        .args(&["list", "-d", "3", "-a", "-f", "! name:gitter-rs"])
         .output()
         .unwrap();
 
     let stdout = String::from_utf8_lossy(&output.stdout);
-    let lines: Vec<&str> = stdout.lines().filter(|line| !line.contains("gitter-rs")).collect();
+    let lines: Vec<&str> = stdout.lines().collect();
 
     let expected_patterns = vec![
-        r"^\./\.local/       repo_00                on master            \[[0-9a-f]*\] by indrajit \d+ (minute|minutes|hours|days|months|years) ago\s*$",
-        r"^\./\.local/       repo_02                on master            \[[0-9a-f]*\] by indrajit \d+ (minute|minutes|hours|days|months|years) ago\s*$",
-        r"^\./\.local/       repo_03                on feature/feature-3 \[[0-9a-f]*\] by indrajit \d+ (minute|minutes|hours|days|months|years) ago\s*$",
-        r"^\./\.local/       repo_04                on feature/feature-4 \[[0-9a-f]*\] by indrajit \d+ (minute|minutes|hours|days|months|years) ago\s*$",
-        r"^\./\.local/       repo_05                on feature/feature-5 \[[0-9a-f]*\] by indrajit \d+ (minute|minutes|hours|days|months|years) ago\s*$",
-        r"^\./\.local/       repo_06                on detached          \[[0-9a-f]*\] by indrajit \d+ (minute|minutes|hours|days|months|years) ago\s*$",
-        r"^\./\.local/       repo_07                on detached          \[.*\] by.*\s*$",
-        r"^\./\.local/       repo_bare_00      bare on master            \[[0-9a-f]*\] by indrajit \d+ (minute|minutes|hours|days|months|years) ago\s*$",
-        r"^\./\.local/       repo_bare_06      bare on detached          \[[0-9a-f]*\] by indrajit \d+ (minute|minutes|hours|days|months|years) ago\s*$",
-        r"^\./\.local/ign_10/repo_11                on master            \[[0-9a-f]*\] by indrajit \d+ (minute|minutes|hours|days|months|years) ago\s*$",
+        r"^\./\.local/       repo_00           on master            \[[0-9a-f]*\] by indrajit \d+ (minute|minutes|hours|days|months|years) ago\s*$",
+        r"^\./\.local/       repo_02           on master            \[[0-9a-f]*\] by indrajit \d+ (minute|minutes|hours|days|months|years) ago\s*$",
+        r"^\./\.local/       repo_03           on feature/feature-3 \[[0-9a-f]*\] by indrajit \d+ (minute|minutes|hours|days|months|years) ago\s*$",
+        r"^\./\.local/       repo_04           on feature/feature-4 \[[0-9a-f]*\] by indrajit \d+ (minute|minutes|hours|days|months|years) ago\s*$",
+        r"^\./\.local/       repo_05           on feature/feature-5 \[[0-9a-f]*\] by indrajit \d+ (minute|minutes|hours|days|months|years) ago\s*$",
+        r"^\./\.local/       repo_06           on detached          \[[0-9a-f]*\] by indrajit \d+ (minute|minutes|hours|days|months|years) ago\s*$",
+        r"^\./\.local/       repo_07           on detached          \[.*\] by.*\s*$",
+        r"^\./\.local/       repo_bare_00 bare on master            \[[0-9a-f]*\] by indrajit \d+ (minute|minutes|hours|days|months|years) ago\s*$",
+        r"^\./\.local/       repo_bare_06 bare on detached          \[[0-9a-f]*\] by indrajit \d+ (minute|minutes|hours|days|months|years) ago\s*$",
+        r"^\./\.local/ign_10/repo_11           on master            \[[0-9a-f]*\] by indrajit \d+ (minute|minutes|hours|days|months|years) ago\s*$",
     ];
 
     assert_eq!(lines.len(), expected_patterns.len(), "Unexpected number of lines");

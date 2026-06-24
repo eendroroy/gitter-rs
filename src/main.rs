@@ -8,7 +8,7 @@ mod meta;
 mod repository;
 mod style;
 
-use crate::cli::gitter::{Gitter, GitterCommand, RawArgsBlock};
+use crate::cli::gitter::{BoolChoice, CommandArgs, Gitter, GitterCommand, RepoArgs};
 use crate::cli::processor::{bash, completion, exec, git, help, list, meta, script};
 use crate::style::Palette;
 use clap::Parser;
@@ -25,17 +25,33 @@ async fn main() {
     let command = if let Some(command) = &cli.command {
         command
     } else {
-        &GitterCommand::Git(RawArgsBlock { raw_args: cli.raw_args.clone() })
+        &GitterCommand::Git {
+            repo_args: RepoArgs::default(),
+            cmd_args: CommandArgs {
+                show_command: BoolChoice::Always,
+                show_info: BoolChoice::Always,
+                quiet: false,
+            },
+            raw_args: cli.raw_args,
+        }
     };
 
     match command {
-        GitterCommand::Git(RawArgsBlock { raw_args }) => git(&cli, raw_args).await,
-        GitterCommand::List => list(&cli).await,
-        GitterCommand::Exec(RawArgsBlock { raw_args }) => exec(&cli, raw_args).await,
-        GitterCommand::Script(args) => script(&cli, args).await,
-        GitterCommand::Bash(RawArgsBlock { raw_args }) => bash(&cli, raw_args).await,
-        GitterCommand::Completion(args) => completion(args),
-        GitterCommand::Help(args) => help(args),
-        GitterCommand::Meta(args) => meta(args, &cli).await,
+        GitterCommand::Git { repo_args, cmd_args, raw_args } => {
+            git(repo_args, cmd_args, raw_args).await
+        }
+        GitterCommand::List { repo_args } => list(repo_args).await,
+        GitterCommand::Exec { repo_args, cmd_args, raw_args } => {
+            exec(repo_args, cmd_args, raw_args).await
+        }
+        GitterCommand::Script { repo_args, cmd_args, scpt_args } => {
+            script(repo_args, cmd_args, scpt_args).await
+        }
+        GitterCommand::Bash { repo_args, cmd_args, raw_args } => {
+            bash(repo_args, cmd_args, raw_args).await
+        }
+        GitterCommand::Completion { args } => completion(args),
+        GitterCommand::Help { args } => help(args),
+        GitterCommand::Meta { repo_args, meta_args } => meta(repo_args, meta_args).await,
     }
 }

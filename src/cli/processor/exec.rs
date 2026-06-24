@@ -1,33 +1,33 @@
-use crate::cli::gitter::{BoolChoice, Gitter};
+use crate::cli::gitter::{BoolChoice, CommandArgs, RawArgs, RepoArgs};
 use crate::cli::processor::helper::{command, find_repos};
 use crate::placeholder::processor::{evaluate_placeholders, replace_placeholders};
 use crate::repository::print_info::print_info_line;
 use colored::Colorize;
 use std::process::Stdio;
 
-pub async fn exec(cli: &Gitter, raw_args: &[String]) {
-    let repos = find_repos(cli).await;
-    let bin = raw_args[0].clone();
-    let args = raw_args[1..].join(" ");
+pub async fn exec(repo: &RepoArgs, cmd: &CommandArgs, raw: &RawArgs) {
+    let repos = find_repos(repo).await;
+    let bin = raw.raw_args[0].clone();
+    let args = raw.raw_args[1..].join(" ");
 
     repos.props.iter().for_each(|status| {
         let evaluation = evaluate_placeholders(&args.clone(), status);
         let args = replace_placeholders(&args.clone(), &evaluation);
 
         print_info_line(
-            cli.info_template.clone(),
+            repo.info_template.clone(),
             status,
             Some(repos.lens),
-            cli.align,
-            &cli.show_info,
+            repo.align,
+            &cmd.show_info,
         );
-        if cli.show_command == BoolChoice::Always {
+        if cmd.show_command == BoolChoice::Always {
             println!("$ {} {}", bin.green(), args.yellow());
         }
 
         let mut command = command(&bin, args.split(" "), &status.repo_path);
 
-        if cli.quiet {
+        if cmd.quiet {
             command.stdout(Stdio::null());
         }
         command.status().expect("Unable to execute command");

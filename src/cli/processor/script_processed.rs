@@ -1,4 +1,4 @@
-use crate::cli::gitter::{BoolChoice, Gitter, ScriptArgs};
+use crate::cli::gitter::{BoolChoice, CommandArgs, RepoArgs, ScriptArgs};
 use crate::cli::processor::helper::{command, find_repos, get_default_shell};
 use crate::placeholder::processor::{evaluate_placeholders, replace_placeholders};
 use crate::print_error;
@@ -8,7 +8,7 @@ use std::fs;
 use std::path::absolute;
 use std::process::Stdio;
 
-pub async fn script_processed(cli: &Gitter, args: &ScriptArgs) {
+pub async fn script_processed(cli: &RepoArgs, cmd: &CommandArgs, args: &ScriptArgs) {
     let repos = find_repos(cli).await;
 
     let default_bin = get_default_shell();
@@ -26,9 +26,9 @@ pub async fn script_processed(cli: &Gitter, args: &ScriptArgs) {
             status,
             Some(repos.lens),
             cli.align,
-            &cli.show_info,
+            &cmd.show_info,
         );
-        if cli.show_command == BoolChoice::Always {
+        if cmd.show_command == BoolChoice::Always {
             println!(
                 "$ {} {} # Modified In-Memory",
                 &bin.green(),
@@ -51,7 +51,7 @@ pub async fn script_processed(cli: &Gitter, args: &ScriptArgs) {
 
         let mut command = command(bin, bin_args, &status.repo_path);
 
-        if cli.quiet {
+        if cmd.quiet {
             command.stdout(Stdio::null());
         }
 
