@@ -32,7 +32,7 @@ pub struct ScriptArgs {
     pub path: PathBuf,
 
     /// Process placeholders inside the script
-    #[arg(short = 'p', long, action = clap::ArgAction::SetTrue)]
+    #[arg(short = 'P', long, action = clap::ArgAction::SetTrue)]
     pub placeholder: bool,
 }
 

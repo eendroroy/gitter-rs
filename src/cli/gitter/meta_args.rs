@@ -36,7 +36,7 @@ pub struct MetaArgs {
     pub path: PathBuf,
 
     /// Name of the repository (Required if path is provided)
-    #[arg(short = 'N', long, requires = "path")]
+    #[arg(short = 'n', long, requires = "path")]
     pub name: Option<String>,
 
     /// Branch to check out
@@ -44,6 +44,6 @@ pub struct MetaArgs {
     pub branch: Option<String>,
 
     /// Display actions to be taken
-    #[arg(short = 'n', long, action = clap::ArgAction::SetTrue)]
+    #[arg(short = 'N', long, action = clap::ArgAction::SetTrue)]
     pub dry_run: bool,
 }
