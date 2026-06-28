@@ -16,15 +16,15 @@ pub struct MetaArgs {
     pub add: bool,
 
     /// Create metafile from current workdir
-    #[arg(short = 'S', long, group = "MetaArg")]
+    #[arg(short = 'S', long, group = "MetaArg", conflicts_with_all = ["url", "path", "name", "branch"])]
     pub save: bool,
 
     /// Restore (clone) repositories from metafile
-    #[arg(short = 'R', long, group = "MetaArg")]
+    #[arg(short = 'R', long, group = "MetaArg", conflicts_with_all = ["url", "path", "name", "branch"])]
     pub restore: bool,
 
     /// Show meta information
-    #[arg(short = 'I', long, group = "MetaArg")]
+    #[arg(short = 'I', long, group = "MetaArg", conflicts_with_all = ["url", "path", "name", "branch", "dry_run"])]
     pub info: bool,
 
     /// Repository remote url
