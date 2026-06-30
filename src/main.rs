@@ -9,7 +9,7 @@ mod repository;
 mod style;
 
 use crate::cli::gitter::{CommandArgs, Gitter, GitterCommand, HelpArgs, RepoArgs};
-use crate::cli::processor::{bash, completion, exec, git, help, list, meta, script};
+use crate::cli::processor::{bash, completion, exec, git, help, list, meta, report, script};
 use crate::style::Palette;
 use clap::Parser;
 use std::sync::LazyLock;
@@ -54,5 +54,6 @@ async fn main() {
         GitterCommand::Completion { args } => completion(args),
         GitterCommand::Help { args } => help(args),
         GitterCommand::Meta { repo_args, meta_args } => meta(repo_args, meta_args).await,
+        GitterCommand::Report { repo_args, report_args } => report(repo_args, report_args).await,
     }
 }

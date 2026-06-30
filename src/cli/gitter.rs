@@ -5,6 +5,7 @@ mod help_args;
 mod meta_args;
 mod raw_args;
 mod repo_args;
+mod report_args;
 mod script_args;
 
 use clap::builder::Styles;
@@ -20,6 +21,7 @@ pub use help_args::HelpArgs;
 pub use meta_args::MetaArgs;
 pub use raw_args::RawArgs;
 pub use repo_args::RepoArgs;
+pub use report_args::ReportArgs;
 pub use script_args::ScriptArgs;
 
 pub const CLAP_STYLE: Styles = Styles::styled()
@@ -127,7 +129,6 @@ pub enum GitterCommand {
         #[command(flatten)]
         args: HelpArgs,
     },
-
     /// Create/Dump/Load gitter workspace metadata
     Meta {
         #[command(flatten)]
@@ -135,5 +136,13 @@ pub enum GitterCommand {
 
         #[command(flatten)]
         meta_args: MetaArgs,
+    },
+    /// Reports (experimental)
+    Report {
+        #[command(flatten)]
+        repo_args: RepoArgs,
+
+        #[command(flatten)]
+        report_args: ReportArgs,
     },
 }
