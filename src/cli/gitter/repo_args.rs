@@ -32,7 +32,7 @@ pub struct RepoArgs {
 
     /// Sort the repo list by provided template using placeholders.
     /// Ex: gitter ls --sort "{_name_}"
-    #[arg(short, long, default_value = "{_path:r_}/{_name_}")]
+    #[arg(short, long, default_value = "{_nesting_}{_path:r_}{_name_}")]
     pub sort: String,
 
     /// Reverse sort. Only allowed with --sort arg.
