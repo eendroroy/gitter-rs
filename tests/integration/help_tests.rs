@@ -14,15 +14,14 @@ fn test_help() {
         .stdout(contains("exec")).stdout(contains("[aliases: e]"))
         .stdout(contains("script")).stdout(contains("[aliases: s]"))
         .stdout(contains("bash")).stdout(contains("[aliases: b]"))
-        .stdout(contains("completion")).stdout(contains("[aliases: c, comp]"))
+        .stdout(contains("completion"))
         .stdout(contains("help")).stdout(contains("gitter help --help"))
-        .stdout(contains("meta")).stdout(contains("[aliases: m]"))
+        .stdout(contains("meta"))
         .stdout(contains("Arguments:"))
         .stdout(contains("[RAW_ARGS]..."))
         .stdout(contains("Options:"))
         .stdout(contains("-h, --help"))
-        .stdout(contains("-V, --version"))
-        .stdout(contains(""));
+        .stdout(contains("-V, --version"));
 }
 
 #[test]
@@ -103,9 +102,9 @@ fn test_help_completion() {
     cmd.args(&["help", "--completions"])
         .assert()
         .stdout(contains("Quick Setup Commands"))
-        .stdout(contains("gitter completion bash"))
-        .stdout(contains("gitter completion zsh"))
-        .stdout(contains("gitter completion fish"))
-        .stdout(contains("gitter completion elvish"))
-        .stdout(contains("gitter completion powershell"));
+        .stdout(contains("gitter completion --bash"))
+        .stdout(contains("gitter completion --zsh"))
+        .stdout(contains("gitter completion --fish"))
+        .stdout(contains("gitter completion --elvish"))
+        .stdout(contains("gitter completion --powershell"));
 }

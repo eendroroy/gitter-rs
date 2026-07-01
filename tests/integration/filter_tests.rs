@@ -5,7 +5,7 @@ use regex::Regex;
 fn test_filter_branch() {
     let output = Command::cargo_bin("gitter")
         .unwrap()
-        .args(&["list", "-d", "3", "-f", "branch:master"])
+        .args(&["list", "-d", "3", "-a", "never", "-f", "branch:master"])
         .output()
         .unwrap();
 
@@ -31,7 +31,7 @@ fn test_filter_branch() {
 fn test_filter_active() {
     let output = Command::cargo_bin("gitter")
         .unwrap()
-        .args(&["list", "-d", "3", "-f", "active:<1M"])
+        .args(&["list", "-d", "3", "-a", "never", "-f", "active:<1M"])
         .output()
         .unwrap();
 

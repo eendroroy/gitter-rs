@@ -5,7 +5,7 @@ use regex::Regex;
 fn test_repo_listing_output() {
     let output = Command::cargo_bin("gitter")
         .unwrap()
-        .args(&["list", "-d", "3"])
+        .args(&["list", "-d", "3", "-a", "never"])
         .output()
         .unwrap();
 
@@ -37,7 +37,7 @@ fn test_repo_listing_output() {
 fn test_repo_listing_output_aligned() {
     let output = Command::cargo_bin("gitter")
         .unwrap()
-        .args(&["list", "-d", "3", "-a", "-f", "! name:gitter-rs"])
+        .args(&["list", "-d", "3", "-f", "! name:gitter-rs"])
         .output()
         .unwrap();
 
@@ -69,7 +69,7 @@ fn test_repo_listing_output_aligned() {
 fn test_repo_listing_filtered_output() {
     let output = Command::cargo_bin("gitter")
         .unwrap()
-        .args(&["list", "-d", "3", "-f", "branch:master"])
+        .args(&["list", "-d", "3", "-a", "never", "-f", "branch:master"])
         .output()
         .unwrap();
 
@@ -95,7 +95,7 @@ fn test_repo_listing_filtered_output() {
 fn test_repo_listing_sorted_output() {
     let output = Command::cargo_bin("gitter")
         .unwrap()
-        .args(&["list", "-d", "3", "-s", "{_branch:n_}{_name_}"])
+        .args(&["list", "-d", "3", "-a", "never", "-s", "{_branch:n_}{_name_}"])
         .output()
         .unwrap();
 
