@@ -1,14 +1,14 @@
 use chrono::{DateTime, Utc};
 use git2::Repository;
 
-const UNKNOWN_TIME: &str = "unknown time";
-const FUTURE: &str = "in the future";
-const SECONDS: &str = "seconds ago";
-const MINUTES: &str = "minutes ago";
-const HOURS: &str = "hours ago";
-const DAYS: &str = "days ago";
-const MONTHS: &str = "months ago";
-const YEARS: &str = "years ago";
+const UNKNOWN_TIME: &str = "unknown";
+const FUTURE: &str = "future";
+const SECONDS: &str = "s";
+const MINUTES: &str = "mi";
+const HOURS: &str = "h";
+const DAYS: &str = "d";
+const MONTHS: &str = "mo";
+const YEARS: &str = "y";
 
 fn format_relative_time(commit_time_epoch: i64) -> String {
     let commit_time = match DateTime::from_timestamp(commit_time_epoch, 0) {
