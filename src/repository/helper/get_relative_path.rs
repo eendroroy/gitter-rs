@@ -13,11 +13,11 @@ pub fn get_relative_path(path: &Path, base_path: &Path) -> String {
             .to_string()
     };
 
-    if result != "" && !result.starts_with("./") {
+    if !result.is_empty() && !result.starts_with("./") {
         result = format!("./{}", result);
     }
 
-    if result != "" && !result.ends_with('/') {
+    if !result.is_empty() && !result.ends_with('/') {
         result.push('/');
     }
 
