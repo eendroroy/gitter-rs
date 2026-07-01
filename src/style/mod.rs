@@ -9,8 +9,16 @@ lazy_static! {
 }
 
 macro_rules! new_style {
+    (right_align: $right_align:expr, $color:expr, $($style:expr),*) => {
+        ComponentStyle {
+            right_align: $right_align,
+            color: $color,
+            styles: vec![$($style),*],
+        }
+    };
     ($color:expr, $($style:expr),*) => {
         ComponentStyle {
+            right_align: false,
             color: $color,
             styles: vec![$($style),*],
         }
@@ -19,6 +27,7 @@ macro_rules! new_style {
 
 #[derive(Debug, Clone)]
 pub struct ComponentStyle {
+    pub right_align: bool,
     pub color: Color,
     pub styles: Vec<Styles>,
 }
@@ -69,7 +78,7 @@ impl Default for Palette {
             commit_hash: new_style!(Color::Cyan, Styles::Italic),
             author_name: new_style!(Color::BrightCyan, Styles::Clear),
             author_email: new_style!(Color::BrightBlack, Styles::Clear),
-            relative_time: new_style!(Color::BrightRed, Styles::Clear),
+            relative_time: new_style!(right_align: true, Color::BrightRed, Styles::Clear),
             absolute_time: new_style!(Color::White, Styles::Clear),
             dirty_style: new_style!(Color::Red, Styles::Bold, Styles::Italic),
             bare_style: new_style!(Color::BrightRed, Styles::Bold, Styles::Italic, Styles::Dimmed),

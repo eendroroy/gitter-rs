@@ -18,18 +18,14 @@ pub struct Holder {
 
 fn apply_style(value: &str, width: Option<usize>, style: Option<&ComponentStyle>) -> String {
     let val = match width {
-        Some(width) => format!("{:<width$}", value, width = width),
+        Some(w) if style.is_some_and(|s| s.right_align) => format!("{:>w$}", value, w = w),
+        Some(w) => format!("{:<w$}", value, w = w),
         None => value.to_string(),
     };
-
     if val.trim().is_empty() {
-        return val.to_string();
+        return val;
     }
-
-    match style {
-        Some(style) => style.apply(val.as_str()),
-        None => val,
-    }
+    style.map_or(val.clone(), |s| s.apply(&val))
 }
 
 macro_rules! create_holder {
