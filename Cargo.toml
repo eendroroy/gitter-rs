@@ -24,7 +24,6 @@ lazy_static = "1.5.0"
 regex = "1.12.4"
 tokio = { version = "1.52.3", features = ["full"] }
 walkdir = "2.5.0"
-pathdiff = "0.2.3"
 tokei = "14.0.0"
 serde = { version = "1.0.228", features = ["derive"] }
 toml = "1.1.2"
