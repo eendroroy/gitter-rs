@@ -147,6 +147,13 @@ define_holders! {
     }
 
     {
+        "nesting", "{_nesting_}", "Nesting level of the repository relative to Working Directory",
+
+        |s, _c| s.nesting.to_string(),
+        |s, _c, l| apply_style(&s.nesting.to_string(), l.map(|i| i.nesting), Some(&STYLE.nesting))
+    }
+
+    {
         "branch:n", "{_branch:n_}", "The active checked-out Git branch head.",
 
         |s, _c| s.branch.clone(),

@@ -18,6 +18,7 @@ pub struct Properties {
     pub repo_path: String, // to use as repo working directory, not a placeholder
     pub absolute_path: String,
     pub relative_path: String,
+    pub nesting: usize,
     pub repo_size: String,
     pub remote_name: String,
     pub remote_fetch: String,
@@ -43,7 +44,7 @@ impl Properties {
         let repository = git2::Repository::open(path).ok()?;
 
         let absolute_path = get_absolute_path(path);
-        let relative_path = get_relative_path(path, base_path);
+        let (relative_path, nesting) = get_relative_path(path, base_path);
         let name = get_repo_name(path);
         let repo_size = get_repo_size(&repository);
         let (remote_name, remote_fetch, remote_push) = get_remote(&repository);
@@ -65,6 +66,7 @@ impl Properties {
             repo_path: path.display().to_string(),
             absolute_path,
             relative_path,
+            nesting,
             repo_size,
             remote_name,
             remote_fetch,
@@ -91,6 +93,7 @@ impl Properties {
 pub struct PropertyLengths {
     pub absolute_path: usize,
     pub relative_path: usize,
+    pub nesting: usize,
     pub repo_size: usize,
     pub remote_name: usize,
     pub remote_fetch: usize,
@@ -171,6 +174,7 @@ impl Repositories {
         self.props.iter().for_each(|s| {
             self.lens.absolute_path = max(self.lens.absolute_path, s.absolute_path.len());
             self.lens.relative_path = max(self.lens.relative_path, s.relative_path.len());
+            self.lens.nesting = max(self.lens.nesting, digit_len(s.nesting));
             self.lens.repo_size = max(self.lens.repo_size, s.repo_size.len());
             self.lens.remote_name = max(self.lens.remote_name, s.remote_name.len());
             self.lens.remote_fetch = max(self.lens.remote_fetch, s.remote_fetch.len());

@@ -1,6 +1,6 @@
 use std::path::Path;
 
-pub fn get_relative_path(path: &Path, base_path: &Path) -> String {
+pub fn get_relative_path(path: &Path, base_path: &Path) -> (String, usize) {
     let mut result = if path == base_path {
         String::default()
     } else {
@@ -13,13 +13,11 @@ pub fn get_relative_path(path: &Path, base_path: &Path) -> String {
             .to_string()
     };
 
-    if !result.is_empty() && !result.starts_with("./") {
-        result = format!("./{}", result);
-    }
+    let nesting = if !result.is_empty() { result.trim().split('/').count() } else { 0 };
 
     if !result.is_empty() && !result.ends_with('/') {
         result.push('/');
     }
 
-    result
+    (result, nesting)
 }

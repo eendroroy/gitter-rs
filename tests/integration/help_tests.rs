@@ -35,6 +35,7 @@ fn test_help_placeholder() {
         .stdout(contains("{_name_}"))
         .stdout(contains("{_path:r_}"))
         .stdout(contains("{_path:a_}"))
+        .stdout(contains("{_nesting_}"))
         .stdout(contains("{_branch:n_}"))
         .stdout(contains("{_branch:c_}"))
         .stdout(contains("{_hash:f_}"))

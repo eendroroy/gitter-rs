@@ -43,6 +43,7 @@ impl ComponentStyle {
 #[derive(Debug, Clone)]
 pub struct Palette {
     pub path: ComponentStyle,
+    pub nesting: ComponentStyle,
     pub repo_size: ComponentStyle,
     pub remote_name: ComponentStyle,
     pub remote_fetch: ComponentStyle,
@@ -68,6 +69,7 @@ impl Default for Palette {
     fn default() -> Self {
         Self {
             path: new_style!(Color::BrightBlue, Styles::Dimmed, Styles::Bold),
+            nesting: new_style!(right_align: true, Color::BrightCyan, Styles::Dimmed, Styles::Bold),
             repo_size: new_style!(Color::BrightMagenta, Styles::Dimmed),
             remote_name: new_style!(Color::Green, Styles::Bold),
             remote_fetch: new_style!(Color::Blue, Styles::Clear),
