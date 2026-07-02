@@ -17,9 +17,7 @@ fn test_repo_listing_output() {
     );
 }
 #[test]
-fn
-
-    test_repo_listing_output_aligned() {
+fn test_repo_listing_output_aligned() {
     define_gitter_command_test!(
         args: ["list", "-d", "3", "-f", "! name:gitter-rs"],
         expected: [
@@ -38,7 +36,7 @@ fn
 }
 
 #[test]
-fn     test_repo_listing_filtered_output() {
+fn test_repo_listing_filtered_output() {
     define_gitter_command_test!(
         args: ["list", "-d", "3", "-a", "never", "-f", "branch:master"],
         expected: [
