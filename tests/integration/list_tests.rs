@@ -1,7 +1,7 @@
 #[test]
 fn test_repo_listing_output() {
     define_gitter_command_test!(
-        args: ["list", "-d", "3", "-a", "never"],
+        args: ["list", "-d", "3", "-a", "never", "-f", "! name:gitter-rs"],
         expected: [
             r"^\.local/repo_00 on master \[[0-9a-f]*\] by indrajit \d+ (s |mi|h |d |mo|y )\s*$",
             r"^\.local/repo_02 on master \[[0-9a-f]*\] by indrajit \d+ (s |mi|h |d |mo|y )\s*$",
@@ -51,7 +51,7 @@ fn test_repo_listing_filtered_output() {
 #[test]
 fn test_repo_listing_sorted_output() {
     define_gitter_command_test!(
-        args: ["list", "-d", "3", "-a", "never", "-s", "{_branch:n_}{_name_}"],
+        args: ["list", "-d", "3", "-a", "never", "-s", "{_branch:n_}{_name_}", "-f", "! name:gitter-rs"],
         expected: [
             r"^\.local/repo_06 on detached \[[0-9a-f]*\] by indrajit \d+ (s |mi|h |d |mo|y )\s*$",
             r"^\.local/repo_07 on detached \[.*\] by.*\s*$",

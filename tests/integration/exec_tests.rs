@@ -1,7 +1,7 @@
 #[test]
 fn test_repo_exec_echo_output() {
     define_gitter_command_test!(
-        args: ["exec", "-d", "3", "-i", "never", "-c", "never", "echo", "{_name_} {_commit:c_}"],
+        args: ["exec", "-d", "3", "-i", "never", "-c", "never", "-f", "! name:gitter-rs", "echo", "{_name_} {_commit:c_}"],
         expected: [
             "repo_00 1",
             "repo_02 1",
@@ -20,8 +20,7 @@ fn test_repo_exec_echo_output() {
 #[test]
 fn test_repo_exec_basename_output() {
     define_gitter_command_test!(
-        args: [ "exec", "-d", "3", "-i", "never", "-c", "never", "basename", "{_path:a_}{_name_}",
-        ],
+        args: [ "exec", "-d", "3", "-i", "never", "-c", "never", "-f", "! name:gitter-rs", "basename", "{_path:a_}{_name_}"],
         expected: [
             "repo_00",
             "repo_02",

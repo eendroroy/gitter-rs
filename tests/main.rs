@@ -77,10 +77,7 @@ macro_rules! define_gitter_command_test {
             if $empty_stdout {
                 assert!(stdout.is_empty(), "Expected empty stdout, but got:\n{}", stdout);
             } else {
-                let lines: Vec<&str> = stdout
-                    .lines()
-                    .filter(|line| !line.contains("gitter-rs"))
-                    .collect();
+                let lines: Vec<&str> = stdout.lines().collect();
 
                 let expected_patterns: Vec<&str> = vec![$($pattern),*];
 
