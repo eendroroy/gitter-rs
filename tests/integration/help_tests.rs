@@ -1,111 +1,107 @@
-use assert_cmd::Command;
-use predicates::str::contains;
+define_gitter_help_test!(
+    test_help,
+    args: ["help"],
+    contains: [
+        "Usage: gitter [COMMAND] [OPTIONS] [-- <RAW_ARGS>...]",
+        "Commands:",
+        "list", "[aliases: ls, l]",
+        "git", "[aliases: g]",
+        "exec", "[aliases: e]",
+        "script", "[aliases: s]",
+        "bash", "[aliases: b]",
+        "completion",
+        "help", "gitter help --help",
+        "meta",
+        "Arguments:",
+        "[RAW_ARGS]...",
+        "Options:",
+        "-h, --help",
+        "-V, --version",
+    ]
+);
 
-#[rustfmt::skip]
-#[test]
-fn test_help() {
-    let mut cmd = Command::cargo_bin("gitter").unwrap();
-    cmd.args(&["help"])
-        .assert()
-        .stdout(contains("Usage: gitter [COMMAND] [OPTIONS] [-- <RAW_ARGS>...]"))
-        .stdout(contains("Commands:"))
-        .stdout(contains("list")).stdout(contains("[aliases: ls, l]"))
-        .stdout(contains("git")).stdout(contains("[aliases: g]"))
-        .stdout(contains("exec")).stdout(contains("[aliases: e]"))
-        .stdout(contains("script")).stdout(contains("[aliases: s]"))
-        .stdout(contains("bash")).stdout(contains("[aliases: b]"))
-        .stdout(contains("completion"))
-        .stdout(contains("help")).stdout(contains("gitter help --help"))
-        .stdout(contains("meta"))
-        .stdout(contains("Arguments:"))
-        .stdout(contains("[RAW_ARGS]..."))
-        .stdout(contains("Options:"))
-        .stdout(contains("-h, --help"))
-        .stdout(contains("-V, --version"));
-}
+define_gitter_help_test!(
+    test_help_placeholder,
+    args: ["help", "--placeholders"],
+    contains: [
+        "{_remote:n_}",
+        "{_remote:f_}",
+        "{_remote:p_}",
+        "{_name_}",
+        "{_path:r_}",
+        "{_path:a_}",
+        "{_nesting_}",
+        "{_branch:n_}",
+        "{_branch:c_}",
+        "{_hash:f_}",
+        "{_hash:<n>_}",
+        "{_commit:c_}",
+        "{_author:e_}",
+        "{_author:n_}",
+        "{_time:r_}",
+        "{_time:a_}",
+        "{_dirty_}",
+        "{_bare_}",
+        "{_size_}",
+        "{_language_}",
+    ]
+);
 
-#[test]
-fn test_help_placeholder() {
-    let mut cmd = Command::cargo_bin("gitter").unwrap();
-    cmd.args(&["help", "--placeholders"])
-        .assert()
-        .stdout(contains("{_remote:n_}"))
-        .stdout(contains("{_remote:f_}"))
-        .stdout(contains("{_remote:p_}"))
-        .stdout(contains("{_name_}"))
-        .stdout(contains("{_path:r_}"))
-        .stdout(contains("{_path:a_}"))
-        .stdout(contains("{_nesting_}"))
-        .stdout(contains("{_branch:n_}"))
-        .stdout(contains("{_branch:c_}"))
-        .stdout(contains("{_hash:f_}"))
-        .stdout(contains("{_hash:<n>_}"))
-        .stdout(contains("{_commit:c_}"))
-        .stdout(contains("{_author:e_}"))
-        .stdout(contains("{_author:n_}"))
-        .stdout(contains("{_time:r_}"))
-        .stdout(contains("{_time:a_}"))
-        .stdout(contains("{_dirty_}"))
-        .stdout(contains("{_bare_}"))
-        .stdout(contains("{_size_}"))
-        .stdout(contains("{_language_}"));
-}
+define_gitter_help_test!(
+    test_help_gitterignore,
+    args: ["help", "--gitterignore"],
+    contains: [
+        "Gitterignore File Format",
+        "path/to/repo",
+        "prefix*",
+        "dir_name/*",
+        "dir_prefix*/*",
+    ]
+);
 
-#[test]
-fn test_help_gitterignore() {
-    let mut cmd = Command::cargo_bin("gitter").unwrap();
-    cmd.args(&["help", "--gitterignore"])
-        .assert()
-        .stdout(contains("Gitterignore File Format"))
-        .stdout(contains("path/to/repo"))
-        .stdout(contains("prefix*"))
-        .stdout(contains("dir_name/*"))
-        .stdout(contains("dir_prefix*/*"));
-}
+define_gitter_help_test!(
+    test_help_filter,
+    args: ["help", "--filters"],
+    contains: [
+        "Description:",
+        "General Syntax:",
+        "<filter_clause> && <filter_clause>",
+        "<filter_clause> || <filter_clause>",
+        "! <filter_clause>",
+        "(<expression>)",
+        "Filter Clause Format:",
+        "[!] <prefix>:<value_pattern>",
+        "Prefixes:",
+        "path",
+        "name",
+        "branch",
+        "dirty",
+        "bare",
+        "language",
+        "active",
+        "Value Patterns:",
+        "value",
+        "value+",
+        "+value",
+        "+value+",
+        "Active Filter Value Patterns:",
+        "<duration",
+        ">duration",
+        "duration",
+        "Examples:",
+        "Matches repositories",
+    ]
+);
 
-#[test]
-fn test_help_filter() {
-    let mut cmd = Command::cargo_bin("gitter").unwrap();
-    cmd.args(&["help", "--filters"])
-        .assert()
-        .stdout(contains("Description:"))
-        .stdout(contains("General Syntax:"))
-        .stdout(contains("<filter_clause> && <filter_clause>"))
-        .stdout(contains("<filter_clause> || <filter_clause>"))
-        .stdout(contains("! <filter_clause>"))
-        .stdout(contains("(<expression>)"))
-        .stdout(contains("Filter Clause Format:"))
-        .stdout(contains("[!] <prefix>:<value_pattern>"))
-        .stdout(contains("Prefixes:"))
-        .stdout(contains("path"))
-        .stdout(contains("name"))
-        .stdout(contains("branch"))
-        .stdout(contains("dirty"))
-        .stdout(contains("bare"))
-        .stdout(contains("language"))
-        .stdout(contains("active"))
-        .stdout(contains("Value Patterns:"))
-        .stdout(contains("value"))
-        .stdout(contains("value+"))
-        .stdout(contains("+value"))
-        .stdout(contains("+value+"))
-        .stdout(contains("Active Filter Value Patterns:"))
-        .stdout(contains("<duration"))
-        .stdout(contains(">duration"))
-        .stdout(contains("duration"))
-        .stdout(contains("Examples:"))
-        .stdout(contains("Matches repositories"));
-}
-
-#[test]
-fn test_help_completion() {
-    let mut cmd = Command::cargo_bin("gitter").unwrap();
-    cmd.args(&["help", "--completions"])
-        .assert()
-        .stdout(contains("Quick Setup Commands"))
-        .stdout(contains("gitter completion --bash"))
-        .stdout(contains("gitter completion --zsh"))
-        .stdout(contains("gitter completion --fish"))
-        .stdout(contains("gitter completion --elvish"))
-        .stdout(contains("gitter completion --powershell"));
-}
+define_gitter_help_test!(
+    test_help_completion,
+    args: ["help", "--completions"],
+    contains: [
+        "Quick Setup Commands",
+        "gitter completion --bash",
+        "gitter completion --zsh",
+        "gitter completion --fish",
+        "gitter completion --elvish",
+        "gitter completion --powershell",
+    ]
+);

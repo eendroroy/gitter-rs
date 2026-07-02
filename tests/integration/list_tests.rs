@@ -1,18 +1,7 @@
-use assert_cmd::Command;
-use regex::Regex;
-
-#[test]
-fn test_repo_listing_output() {
-    let output = Command::cargo_bin("gitter")
-        .unwrap()
-        .args(&["list", "-d", "3", "-a", "never"])
-        .output()
-        .unwrap();
-
-    let stdout = String::from_utf8_lossy(&output.stdout);
-    let lines: Vec<&str> = stdout.lines().filter(|line| !line.contains("gitter-rs")).collect();
-
-    let expected_patterns = vec![
+define_gitter_test!(
+    test_repo_listing_output,
+    args: ["list", "-d", "3", "-a", "never"],
+    expected: [
         r"^\.local/repo_00 on master \[[0-9a-f]*\] by indrajit \d+ (s |mi|h |d |mo|y )\s*$",
         r"^\.local/repo_02 on master \[[0-9a-f]*\] by indrajit \d+ (s |mi|h |d |mo|y )\s*$",
         r"^\.local/repo_03 on feature/feature-3 \[[0-9a-f]*\] by indrajit \d+ (s |mi|h |d |mo|y )\s*$",
@@ -23,28 +12,13 @@ fn test_repo_listing_output() {
         r"^\.local/repo_bare_00 bare on master \[[0-9a-f]*\] by indrajit \d+ (s |mi|h |d |mo|y )\s*$",
         r"^\.local/repo_bare_06 bare on detached \[[0-9a-f]*\] by indrajit \d+ (s |mi|h |d |mo|y )\s*$",
         r"^\.local/ign_10/repo_11 on master \[[0-9a-f]*\] by indrajit \d+ (s |mi|h |d |mo|y )\s*$",
-    ];
+    ]
+);
 
-    assert_eq!(lines.len(), expected_patterns.len(), "Unexpected number of lines");
-
-    for (line, pattern) in lines.iter().zip(expected_patterns.iter()) {
-        let re = Regex::new(pattern).unwrap();
-        assert!(re.is_match(line), "Line did not match:\n{}\nExpected pattern:\n{}", line, pattern);
-    }
-}
-
-#[test]
-fn test_repo_listing_output_aligned() {
-    let output = Command::cargo_bin("gitter")
-        .unwrap()
-        .args(&["list", "-d", "3", "-f", "! name:gitter-rs"])
-        .output()
-        .unwrap();
-
-    let stdout = String::from_utf8_lossy(&output.stdout);
-    let lines: Vec<&str> = stdout.lines().collect();
-
-    let expected_patterns = vec![
+define_gitter_test!(
+    test_repo_listing_output_aligned,
+    args: ["list", "-d", "3", "-f", "! name:gitter-rs"],
+    expected: [
         r"^\.local/       repo_00           on master            \[[0-9a-f]*\] by indrajit \s*\d+ (s |mi|h |d |mo|y )\s*$",
         r"^\.local/       repo_02           on master            \[[0-9a-f]*\] by indrajit \s*\d+ (s |mi|h |d |mo|y )\s*$",
         r"^\.local/       repo_03           on feature/feature-3 \[[0-9a-f]*\] by indrajit \s*\d+ (s |mi|h |d |mo|y )\s*$",
@@ -55,54 +29,24 @@ fn test_repo_listing_output_aligned() {
         r"^\.local/       repo_bare_00 bare on master            \[[0-9a-f]*\] by indrajit \s*\d+ (s |mi|h |d |mo|y )\s*$",
         r"^\.local/       repo_bare_06 bare on detached          \[[0-9a-f]*\] by indrajit \s*\d+ (s |mi|h |d |mo|y )\s*$",
         r"^\.local/ign_10/repo_11           on master            \[[0-9a-f]*\] by indrajit \s*\d+ (s |mi|h |d |mo|y )\s*$",
-    ];
+    ]
+);
 
-    assert_eq!(lines.len(), expected_patterns.len(), "Unexpected number of lines");
-
-    for (line, pattern) in lines.iter().zip(expected_patterns.iter()) {
-        let re = Regex::new(pattern).unwrap();
-        assert!(re.is_match(line), "Line did not match:\n{}\nExpected pattern:\n{}", line, pattern);
-    }
-}
-
-#[test]
-fn test_repo_listing_filtered_output() {
-    let output = Command::cargo_bin("gitter")
-        .unwrap()
-        .args(&["list", "-d", "3", "-a", "never", "-f", "branch:master"])
-        .output()
-        .unwrap();
-
-    let stdout = String::from_utf8_lossy(&output.stdout);
-    let lines: Vec<&str> = stdout.lines().filter(|line| !line.contains("gitter-rs")).collect();
-
-    let expected_patterns = vec![
+define_gitter_test!(
+    test_repo_listing_filtered_output,
+    args: ["list", "-d", "3", "-a", "never", "-f", "branch:master"],
+    expected: [
         r"^\.local/repo_00 on master \[[0-9a-f]*\] by indrajit \d+ (s |mi|h |d |mo|y )\s*$",
         r"^\.local/repo_02 on master \[[0-9a-f]*\] by indrajit \d+ (s |mi|h |d |mo|y )\s*$",
         r"^\.local/repo_bare_00 bare on master \[[0-9a-f]*\] by indrajit \d+ (s |mi|h |d |mo|y )\s*$",
         r"^\.local/ign_10/repo_11 on master \[[0-9a-f]*\] by indrajit \d+ (s |mi|h |d |mo|y )\s*$",
-    ];
+    ]
+);
 
-    assert_eq!(lines.len(), expected_patterns.len(), "Unexpected number of lines");
-
-    for (line, pattern) in lines.iter().zip(expected_patterns.iter()) {
-        let re = Regex::new(pattern).unwrap();
-        assert!(re.is_match(line), "Line did not match:\n{}\nExpected pattern:\n{}", line, pattern);
-    }
-}
-
-#[test]
-fn test_repo_listing_sorted_output() {
-    let output = Command::cargo_bin("gitter")
-        .unwrap()
-        .args(&["list", "-d", "3", "-a", "never", "-s", "{_branch:n_}{_name_}"])
-        .output()
-        .unwrap();
-
-    let stdout = String::from_utf8_lossy(&output.stdout);
-    let lines: Vec<&str> = stdout.lines().filter(|line| !line.contains("gitter-rs")).collect();
-
-    let expected_patterns = vec![
+define_gitter_test!(
+    test_repo_listing_sorted_output,
+    args: ["list", "-d", "3", "-a", "never", "-s", "{_branch:n_}{_name_}"],
+    expected: [
         r"^\.local/repo_06 on detached \[[0-9a-f]*\] by indrajit \d+ (s |mi|h |d |mo|y )\s*$",
         r"^\.local/repo_07 on detached \[.*\] by.*\s*$",
         r"^\.local/repo_bare_06 bare on detached \[[0-9a-f]*\] by indrajit \d+ (s |mi|h |d |mo|y )\s*$",
@@ -113,12 +57,5 @@ fn test_repo_listing_sorted_output() {
         r"^\.local/repo_02 on master \[[0-9a-f]*\] by indrajit \d+ (s |mi|h |d |mo|y )\s*$",
         r"^\.local/ign_10/repo_11 on master \[[0-9a-f]*\] by indrajit \d+ (s |mi|h |d |mo|y )\s*$",
         r"^\.local/repo_bare_00 bare on master \[[0-9a-f]*\] by indrajit \d+ (s |mi|h |d |mo|y )\s*$",
-    ];
-
-    assert_eq!(lines.len(), expected_patterns.len(), "Unexpected number of lines");
-
-    for (line, pattern) in lines.iter().zip(expected_patterns.iter()) {
-        let re = Regex::new(pattern).unwrap();
-        assert!(re.is_match(line), "Line did not match:\n{}\nExpected pattern:\n{}", line, pattern);
-    }
-}
+    ]
+);

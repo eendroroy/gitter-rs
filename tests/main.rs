@@ -5,6 +5,147 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::sync::Once;
 
+#[macro_export]
+macro_rules! define_gitter_test {
+    // Arm 1: Standard tests with only stdout regex checks
+    (
+        $name:ident,
+        args: [$($arg:expr),* $(,)?],
+        expected: [$($pattern:expr),* $(,)?] $(,)?
+    ) => {
+        define_gitter_test!(
+            @impl $name,
+            args: [$($arg),*],
+            expected: [$($pattern),*],
+            expect_empty_stdout: false,
+            stderr_contains: None::<&str> // <-- Added explicit type annotation here
+        );
+    };
+
+    // Arm 2: Tests with a stderr check that still look for stdout patterns
+    (
+        $name:ident,
+        args: [$($arg:expr),* $(,)?],
+        expected: [$($pattern:expr),* $(,)?],
+        stderr_contains: $stderr_pat:expr $(,)?
+    ) => {
+        define_gitter_test!(
+            @impl $name,
+            args: [$($arg),*],
+            expected: [$($pattern),*],
+            expect_empty_stdout: false,
+            stderr_contains: Some($stderr_pat)
+        );
+    };
+
+    // Arm 3: Failure path tests where stdout must be completely blank
+    (
+        $name:ident,
+        args: [$($arg:expr),* $(,)?],
+        expected: [$($pattern:expr),* $(,)?],
+        expect_empty_stdout: $empty_stdout:expr,
+        stderr_contains: $stderr_pat:expr $(,)?
+    ) => {
+        define_gitter_test!(
+            @impl $name,
+            args: [$($arg),*],
+            expected: [$($pattern),*],
+            expect_empty_stdout: $empty_stdout,
+            stderr_contains: Some($stderr_pat)
+        );
+    };
+
+    // Main Internal Implementation Engine
+    (
+        @impl $name:ident,
+        args: [$($arg:expr),* $(,)?],
+        expected: [$($pattern:expr),* $(,)?],
+        expect_empty_stdout: $empty_stdout:expr,
+        stderr_contains: $stderr_pat:expr
+    ) => {
+        #[test]
+        fn $name() {
+            use std::process::Command;
+            use assert_cmd::prelude::*;
+            use regex::Regex;
+
+            let output = Command::cargo_bin("gitter")
+                .unwrap()
+                .args(&[$($arg),*])
+                .output()
+                .unwrap();
+
+            let stdout = String::from_utf8_lossy(&output.stdout);
+
+            if $empty_stdout {
+                assert!(stdout.is_empty(), "Expected empty stdout, but got:\n{}", stdout);
+            } else {
+                let lines: Vec<&str> = stdout
+                    .lines()
+                    .filter(|line| !line.contains("gitter-rs"))
+                    .collect();
+
+                let expected_patterns: Vec<&str> = vec![$($pattern),*];
+
+                assert_eq!(
+                    lines.len(),
+                    expected_patterns.len(),
+                    "Unexpected number of lines. Got {}, expected {}.\nActual output:\n{}",
+                    lines.len(),
+                    expected_patterns.len(),
+                    stdout
+                );
+
+                for (line, pattern) in lines.iter().zip(expected_patterns.iter()) {
+                    let re = Regex::new(pattern).unwrap();
+                    assert!(
+                        re.is_match(line),
+                        "Line did not match:\n{}\nExpected pattern:\n{}",
+                        line,
+                        pattern
+                    );
+                }
+            }
+
+            if let Some(stderr_pat) = $stderr_pat {
+                let stderr = String::from_utf8_lossy(&output.stderr);
+                assert!(
+                    stderr.contains(stderr_pat),
+                    "Expected substring matching pattern in stderr, got:\n{}",
+                    stderr
+                );
+            }
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! define_gitter_help_test {
+    (
+        $name:ident,
+        args: [$($arg:expr),* $(,)?],
+        contains: [$($substring:expr),* $(,)?] $(,)?
+    ) => {
+        #[test]
+        fn $name() {
+            use std::process::Command;
+            use assert_cmd::prelude::*;
+            use predicates::prelude::predicate::str::contains;
+
+            let mut cmd = Command::cargo_bin("gitter").unwrap();
+            let assert = cmd.args(&[$($arg),*]).assert();
+
+            // Chain every string assertion dynamically on the asset reference
+            $(
+                let assert = assert.stdout(contains($substring));
+            )*
+
+            // Drop the reference to finalize evaluation
+            let _ = assert;
+        }
+    };
+}
+
 static GLOBAL_INIT: Once = Once::new();
 
 #[ctor(unsafe)]
