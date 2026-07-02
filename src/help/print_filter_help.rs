@@ -37,7 +37,7 @@ macro_rules! help_template {
 
 {usage}Active Filter Value Patterns:{usage:#}
   These patterns are used with the {literal}active{literal:#} prefix to filter by commit age.
-  Duration units: {literal}d{literal:#} (days), {literal}h{literal:#} (hours), {literal}m{literal:#} (minutes), {literal}mo{literal:#} (months), {literal}y{literal:#} (years).
+  Duration units: {literal}y{literal:#} (years), {literal}mo{literal:#} (months), {literal}d{literal:#} (days), {literal}h{literal:#} (hours), {literal}m{literal:#} (minutes), {literal}s{literal:#} (seconds).
   Units can be combined (e.g., {literal}1y3mo2d{literal:#}).
 
   - {literal}<duration{literal:#}  Last commit was less than the specified duration ago. Ex: {literal}active:<7d{literal:#} (last commit within the last 7 days).
