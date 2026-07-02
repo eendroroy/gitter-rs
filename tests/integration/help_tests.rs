@@ -1,8 +1,8 @@
 #[test]
 fn test_help() {
-    define_gitter_help_test!(
-        args: ["help"],
-        contains: [
+    gitter_test_partial!(
+        args: { "help" }
+        stdout: {
             "Usage: gitter [COMMAND] [OPTIONS] [-- <RAW_ARGS>...]",
             "Commands:",
             "list", "[aliases: ls, l]",
@@ -18,15 +18,16 @@ fn test_help() {
             "Options:",
             "-h, --help",
             "-V, --version",
-        ]
+        }
+        stderr: { }
     );
 }
 
 #[test]
 fn test_help_placeholder() {
-    define_gitter_help_test!(
-        args: ["help", "--placeholders"],
-        contains: [
+    gitter_test_partial!(
+        args: { "help", "--placeholders" }
+        stdout: {
             "{_remote:n_}",
             "{_remote:f_}",
             "{_remote:p_}",
@@ -47,29 +48,31 @@ fn test_help_placeholder() {
             "{_bare_}",
             "{_size_}",
             "{_language_}",
-        ]
+        }
+        stderr: { }
     );
 }
 
 #[test]
 fn test_help_gitterignore() {
-    define_gitter_help_test!(
-        args: ["help", "--gitterignore"],
-        contains: [
+    gitter_test_partial!(
+        args: { "help", "--gitterignore" }
+        stdout: {
             "Gitterignore File Format",
             "path/to/repo",
             "prefix*",
             "dir_name/*",
             "dir_prefix*/*",
-        ]
+        }
+        stderr: { }
     );
 }
 
 #[test]
 fn test_help_filter() {
-    define_gitter_help_test!(
-        args: ["help", "--filters"],
-        contains: [
+    gitter_test_partial!(
+        args: { "help", "--filters" }
+        stdout: {
             "Description:",
             "General Syntax:",
             "<filter_clause> && <filter_clause>",
@@ -97,21 +100,23 @@ fn test_help_filter() {
             "duration",
             "Examples:",
             "Matches repositories",
-        ]
+        }
+        stderr: { }
     );
 }
 
 #[test]
 fn test_help_completion() {
-    define_gitter_help_test!(
-        args: ["help", "--completions"],
-        contains: [
+    gitter_test_partial!(
+        args: { "help", "--completions" }
+        stdout: {
             "Quick Setup Commands",
             "gitter completion --bash",
             "gitter completion --zsh",
             "gitter completion --fish",
             "gitter completion --elvish",
             "gitter completion --powershell",
-        ]
+        }
+        stderr: { }
     );
 }

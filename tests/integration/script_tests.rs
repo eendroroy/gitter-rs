@@ -1,13 +1,13 @@
 #[test]
 fn test_repo_script_execution_output() {
-    define_gitter_command_test!(
-        args: [
+    gitter_test!(
+        args: {
             "script",
             "--filter", "! name:gitter-rs",
             "--placeholder",
             "--path", "./scripts/script_test.sh",
-        ],
-        expected: [
+        }
+        stdout: {
             r"^\.local/repo_00\s+on master\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$",
             r"^\$ zsh .* # Modified In-Memory$",
             r"^\.local/repo_00\s+on master\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$",
@@ -43,21 +43,22 @@ fn test_repo_script_execution_output() {
             r"^\.local/repo_bare_06 bare on detached\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$",
             r"^\$ zsh .* # Modified In-Memory$",
             r"^\.local/repo_bare_06\s+bare on detached\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$"
-        ]
+        }
+        stderr: { }
     );
 }
 
 #[test]
 fn test_repo_script_execution_quiet() {
-    define_gitter_command_test!(
-        args: [
+    gitter_test!(
+        args: {
             "script",
             "--filter", "! name:gitter-rs",
             "--placeholder",
             "--path", "./scripts/script_test.sh",
-            "--quiet"
-        ],
-        expected: [
+            "--quiet",
+        }
+        stdout: {
             r"^\.local/repo_00\s+on master\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$",
             r"^\$ zsh .* # Modified In-Memory$",
 
@@ -84,21 +85,22 @@ fn test_repo_script_execution_quiet() {
 
             r"^\.local/repo_bare_06 bare on detached\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$",
             r"^\$ zsh .* # Modified In-Memory$",
-        ]
+        }
+        stderr: { }
     );
 }
 
 #[test]
 fn test_repo_script_bash_execution_output() {
-    define_gitter_command_test!(
-        args: [
+    gitter_test!(
+        args: {
             "script",
             "--filter", "! name:gitter-rs",
             "--placeholder",
             "--path", "./scripts/script_test.sh",
-            "--bash"
-        ],
-        expected: [
+            "--bash",
+        }
+        stdout: {
             r"^\.local/repo_00\s+on master\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$",
             r"^\$ bash .* # Modified In-Memory$",
             r"^\.local/repo_00\s+on master\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$",
@@ -134,21 +136,22 @@ fn test_repo_script_bash_execution_output() {
             r"^\.local/repo_bare_06 bare on detached\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$",
             r"^\$ bash .* # Modified In-Memory$",
             r"^\.local/repo_bare_06\s+bare on detached\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$"
-        ]
+        }
+        stderr: { }
     );
 }
 
 #[test]
 fn test_repo_script_fish_execution_output() {
-    define_gitter_command_test!(
-        args: [
+    gitter_test!(
+        args: {
             "script",
             "--filter", "! name:gitter-rs",
             "--placeholder",
             "--path", "./scripts/script_test.sh",
             "--fish"
-        ],
-        expected: [
+        }
+        stdout: {
             r"^\.local/repo_00\s+on master\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$",
             r"^\$ fish .* # Modified In-Memory$",
             r"^\.local/repo_00\s+on master\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$",
@@ -184,21 +187,22 @@ fn test_repo_script_fish_execution_output() {
             r"^\.local/repo_bare_06 bare on detached\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$",
             r"^\$ fish .* # Modified In-Memory$",
             r"^\.local/repo_bare_06\s+bare on detached\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$"
-        ]
+        }
+        stderr: { }
     );
 }
 
 #[test]
 fn test_repo_script_elvish_execution_output() {
-    define_gitter_command_test!(
-        args: [
+    gitter_test!(
+        args: {
             "script",
             "--filter", "! name:gitter-rs",
             "--placeholder",
             "--path", "./scripts/script_test.sh",
-            "--elvish"
-        ],
-        expected: [
+            "--elvish",
+        }
+        stdout: {
             r"^\.local/repo_00\s+on master\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$",
             r"^\$ elvish .* # Modified In-Memory$",
             r"^\.local/repo_00\s+on master\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$",
@@ -234,22 +238,23 @@ fn test_repo_script_elvish_execution_output() {
             r"^\.local/repo_bare_06 bare on detached\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$",
             r"^\$ elvish .* # Modified In-Memory$",
             r"^\.local/repo_bare_06\s+bare on detached\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$"
-        ]
+        }
+        stderr: { }
     );
 }
 
 #[cfg(not(windows))]
 #[test]
 fn test_repo_script_pwsh_execution_output() {
-    define_gitter_command_test!(
-        args: [
+    gitter_test!(
+        args: {
             "script",
             "--filter", "! name:gitter-rs",
             "--placeholder",
             "--path", "./scripts/script_test.sh",
             "--power-shell"
-        ],
-        expected: [
+        }
+        stdout: {
             r"^\.local/repo_00\s+on master\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$",
             r"^\$ pwsh .* # Modified In-Memory$",
             r"^\.local/repo_00\s+on master\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$",
@@ -285,22 +290,23 @@ fn test_repo_script_pwsh_execution_output() {
             r"^\.local/repo_bare_06 bare on detached\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$",
             r"^\$ pwsh .* # Modified In-Memory$",
             r"^\.local/repo_bare_06\s+bare on detached\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$"
-        ]
+        }
+        stderr: { }
     );
 }
 
 #[cfg(windows)]
 #[test]
 fn test_repo_script_powershell_execution_output() {
-    define_gitter_command_test!(
-        args: [
+    gitter_test!(
+        args: {
             "script",
             "--filter", "! name:gitter-rs",
             "--placeholder",
             "--path", "./scripts/script_test.sh",
             "--power-shell"
-        ],
-        expected: [
+        }
+        stdout: {
             r"^\.local/repo_00\s+on master\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$",
             r"^\$ powershell .* # Modified In-Memory$",
             r"^\.local/repo_00\s+on master\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$",
@@ -336,19 +342,20 @@ fn test_repo_script_powershell_execution_output() {
             r"^\.local/repo_bare_06 bare on detached\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$",
             r"^\$ powershell .* # Modified In-Memory$",
             r"^\.local/repo_bare_06\s+bare on detached\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$"
-        ]
+        }
+        stderr: { }
     );
 }
 
 #[test]
 fn test_repo_script_execution_output_without_placeholders() {
-    define_gitter_command_test!(
-        args: [
+    gitter_test!(
+        args: {
             "script",
             "--filter", "! name:gitter-rs",
             "--path", "./scripts/script_test.sh",
-        ],
-        expected: [
+        }
+        stdout: {
             r"^\.local/repo_00\s+on master\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$",
             r"^\$ zsh .*$",
             r"^\{_path:r_\}\{_name_\} \{_language_\} \{_bare_\} on \{_branch:n_\} \[\{_hash:8_\}\] by \{_author:n_\} \{_time:r_\}",
@@ -384,20 +391,21 @@ fn test_repo_script_execution_output_without_placeholders() {
             r"^\.local/repo_bare_06 bare on detached\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$",
             r"^\$ zsh .*$",
             r"^\{_path:r_\}\{_name_\} \{_language_\} \{_bare_\} on \{_branch:n_\} \[\{_hash:8_\}\] by \{_author:n_\} \{_time:r_\}",
-        ]
+        }
+        stderr: { }
     );
 }
 
 #[test]
 fn test_repo_script_execution_without_placeholders_quiet() {
-    define_gitter_command_test!(
-        args: [
+    gitter_test!(
+        args: {
             "script",
             "--filter", "! name:gitter-rs",
             "--path", "./scripts/script_test.sh",
             "--quiet",
-        ],
-        expected: [
+        }
+        stdout: {
             r"^\.local/repo_00\s+on master\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$",
             r"^\$ zsh .*$",
 
@@ -424,6 +432,7 @@ fn test_repo_script_execution_without_placeholders_quiet() {
 
             r"^\.local/repo_bare_06 bare on detached\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$",
             r"^\$ zsh .*$",
-        ]
+        }
+        stderr: { }
     );
 }

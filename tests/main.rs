@@ -6,107 +6,67 @@ use std::process::Command;
 use std::sync::Once;
 
 #[macro_export]
-macro_rules! define_gitter_command_test {
-    // Arm 1: Standard tests with only stdout regex checks
+macro_rules! gitter_test {
     (
-        args: [$($arg:expr),* $(,)?],
-        expected: [$($pattern:expr),* $(,)?] $(,)?
+        args: {$($arg:expr),* $(,)?}
+        stdout: {$($out_pat:expr),* $(,)?}
+        stderr: {$($err_pat:expr),* $(,)?}
     ) => {
-        define_gitter_command_test!(
-            @impl
-            args: [$($arg),*],
-            expected: [$($pattern),*],
-            expect_empty_stdout: false,
-            stderr_contains: None::<&str>
-        );
-    };
-
-    // Arm 2: Tests with a stderr check that still look for stdout patterns
-    (
-        args: [$($arg:expr),* $(,)?],
-        expected: [$($pattern:expr),* $(,)?],
-        stderr_contains: $stderr_pat:expr $(,)?
-    ) => {
-        define_gitter_command_test!(
-            @impl
-            args: [$($arg),*],
-            expected: [$($pattern),*],
-            expect_empty_stdout: false,
-            stderr_contains: Some($stderr_pat)
-        );
-    };
-
-    // Arm 3: Failure path tests where stdout must be completely blank
-    (
-        args: [$($arg:expr),* $(,)?],
-        expected: [$($pattern:expr),* $(,)?],
-        expect_empty_stdout: $empty_stdout:expr,
-        stderr_contains: $stderr_pat:expr $(,)?
-    ) => {
-        define_gitter_command_test!(
-            @impl
-            args: [$($arg),*],
-            expected: [$($pattern),*],
-            expect_empty_stdout: $empty_stdout,
-            stderr_contains: Some($stderr_pat)
-        );
-    };
-
-    // Main Internal Implementation Engine (Generates code body ONLY)
-    (
-        @impl
-        args: [$($arg:expr),* $(,)?],
-        expected: [$($pattern:expr),* $(,)?],
-        expect_empty_stdout: $empty_stdout:expr,
-        stderr_contains: $stderr_pat:expr
-    ) => {
-        // Enclosing in a block prevents namespace polluting of imports inside your function
         {
             use std::process::Command;
             use assert_cmd::prelude::*;
             use regex::Regex;
 
-            let output = Command::cargo_bin("gitter")
-                .unwrap()
-                .args(&[$($arg),*])
-                .output()
-                .unwrap();
+            let mut command = Command::cargo_bin("gitter").unwrap();
+            command.args(&[$($arg),*]);
 
-            let stdout = String::from_utf8_lossy(&output.stdout);
 
-            if $empty_stdout {
-                assert!(stdout.is_empty(), "Expected empty stdout, but got:\n{}", stdout);
-            } else {
-                let lines: Vec<&str> = stdout.lines().collect();
+            let output = command.output().unwrap();
 
-                let expected_patterns: Vec<&str> = vec![$($pattern),*];
+            let (stdout, stderr) =
+                (String::from_utf8_lossy(&output.stdout), String::from_utf8_lossy(&output.stderr));
 
-                assert_eq!(
-                    lines.len(),
-                    expected_patterns.len(),
-                    "Unexpected number of lines. Got {}, expected {}.\nActual output:\n{}",
-                    lines.len(),
-                    expected_patterns.len(),
-                    stdout
+            let (out_patterns, err_patterns): (Vec<&str>, Vec<&str>) =
+                (vec![$($out_pat),*], vec![$($err_pat),*]);
+
+            let (out_lines, err_lines): (Vec<&str>, Vec<&str>) =
+                (stdout.lines().collect(), stderr.lines().collect());
+
+            assert_eq!(
+                out_lines.len(),
+                out_patterns.len(),
+                "STDOUT: Unexpected number of lines. Got {}, expected {}.\nActual output:\n{}",
+                out_lines.len(),
+                out_patterns.len(),
+                stdout
+            );
+
+            assert_eq!(
+                err_lines.len(),
+                err_patterns.len(),
+                "STDERR: Unexpected number of lines. Got {}, expected {}.\nActual output:\n{}",
+                err_lines.len(),
+                err_patterns.len(),
+                stdout
+            );
+
+            for (line, pattern) in out_lines.iter().zip(out_patterns.iter()) {
+                let re = Regex::new(pattern).unwrap();
+                assert!(
+                    re.is_match(line),
+                    "STDOUT: Line did not match:\n--{}--\nExpected pattern:\n--{}--",
+                    line,
+                    pattern
                 );
-
-                for (line, pattern) in lines.iter().zip(expected_patterns.iter()) {
-                    let re = Regex::new(pattern).unwrap();
-                    assert!(
-                        re.is_match(line),
-                        "Line did not match:\n{}\nExpected pattern:\n{}",
-                        line,
-                        pattern
-                    );
-                }
             }
 
-            if let Some(stderr_pat) = $stderr_pat {
-                let stderr = String::from_utf8_lossy(&output.stderr);
+            for (line, pattern) in err_lines.iter().zip(err_patterns.iter()) {
+                let re = Regex::new(pattern).unwrap();
                 assert!(
-                    stderr.contains(stderr_pat),
-                    "Expected substring matching pattern in stderr, got:\n{}",
-                    stderr
+                    re.is_match(line),
+                    "STDERR: Line did not match:\n--{}--\nExpected pattern:\n--{}--",
+                    line,
+                    pattern
                 );
             }
         }
@@ -114,10 +74,59 @@ macro_rules! define_gitter_command_test {
 }
 
 #[macro_export]
-macro_rules! define_gitter_help_test {
+macro_rules! gitter_test_present {
     (
-        args: [$($arg:expr),* $(,)?],
-        contains: [$($substring:expr),* $(,)?] $(,)?
+        args: {$($arg:expr),* $(,)?}
+        stdout: true
+        stderr: $err_sel:tt
+    ) => {
+        $crate::gitter_test_present!(@impl args: {$($arg),*} stdout_check: true, stderr_check: $err_sel);
+    };
+    (
+        args: {$($arg:expr),* $(,)?}
+        stdout: false
+        stderr: $err_sel:tt
+    ) => {
+        $crate::gitter_test_present!(@impl args: {$($arg),*} stdout_check: false, stderr_check: $err_sel);
+    };
+
+    (@impl args: {$($arg:expr),*} stdout_check: $out_bool:expr, stderr_check: true) => {
+        $crate::gitter_test_present!(@final args: {$($arg),*} out: $out_bool, err: true);
+    };
+    (@impl args: {$($arg:expr),*} stdout_check: $out_bool:expr, stderr_check: false) => {
+        $crate::gitter_test_present!(@final args: {$($arg),*} out: $out_bool, err: false);
+    };
+
+    (@final args: {$($arg:expr),*} out: $out_val:expr, err: $err_val:expr) => {
+        use std::process::Command;
+        use assert_cmd::prelude::*;
+        use predicates::prelude::*;
+
+        let mut cmd = Command::cargo_bin("gitter").unwrap();
+        let mut assert = cmd.args(&[$($arg),*]).assert();
+
+        if $out_val {
+            assert = assert.stdout(predicate::str::is_empty().not());
+        } else {
+            assert = assert.stdout(predicate::str::is_empty());
+        }
+
+        if $err_val {
+            assert = assert.stderr(predicate::str::is_empty().not());
+        } else {
+            assert = assert.stderr(predicate::str::is_empty());
+        }
+
+        let _ = assert;
+    };
+}
+
+#[macro_export]
+macro_rules! gitter_test_partial {
+    (
+        args: {$($arg:expr),* $(,)?}
+        stdout: {$($out_sub:expr),* $(,)?} $(,)?
+        stderr: {$($err_sub:expr),* $(,)?} $(,)?
     ) => {
         use std::process::Command;
         use assert_cmd::prelude::*;
@@ -126,9 +135,9 @@ macro_rules! define_gitter_help_test {
         let mut cmd = Command::cargo_bin("gitter").unwrap();
         let assert = cmd.args(&[$($arg),*]).assert();
 
-        $(
-            let assert = assert.stdout(contains($substring));
-        )*
+        $( let assert = assert.stdout(contains($out_sub)); )*
+
+        $( let assert = assert.stderr(contains($err_sub)); )*
 
         let _ = assert;
     };
@@ -296,6 +305,7 @@ fn run_provision() {
 }
 
 mod integration {
+    pub mod completion_tests;
     pub mod exec_tests;
     pub mod filter_tests;
     pub mod gitter_tests;
