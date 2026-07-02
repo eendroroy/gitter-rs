@@ -1,5 +1,5 @@
 #[test]
-fn gitter_completion() {
+fn completion() {
     gitter_test_present!(
         args: { "completion" }
         stdout: true
@@ -8,7 +8,7 @@ fn gitter_completion() {
 }
 
 #[test]
-fn gitter_completion_help() {
+fn completion_help() {
     gitter_test_partial!(
         args: { "completion", "--help" }
         stdout: {
@@ -33,7 +33,7 @@ fn gitter_completion_help() {
 }
 
 #[test]
-fn gitter_completion_bash() {
+fn completion_bash() {
     gitter_test_partial!(
         args: {"completion", "--bash"}
         stdout: { "_gitter() {" }
@@ -42,7 +42,7 @@ fn gitter_completion_bash() {
 }
 
 #[test]
-fn gitter_completion_zsh() {
+fn completion_zsh() {
     gitter_test_partial!(
         args: { "completion", "--zsh" }
         stdout: { "#compdef gitter" }
@@ -51,7 +51,7 @@ fn gitter_completion_zsh() {
 }
 
 #[test]
-fn gitter_completion_fish() {
+fn completion_fish() {
     gitter_test_partial!(
         args: { "completion", "--fish" }
         stdout: { "__fish_gitter_global_optspecs" }
@@ -60,7 +60,7 @@ fn gitter_completion_fish() {
 }
 
 #[test]
-fn gitter_completion_elvish() {
+fn completion_elvish() {
     gitter_test_partial!(
         args: { "completion", "--elvish" }
         stdout: { "edit:completion:arg-completer[gitter]" }
@@ -69,7 +69,7 @@ fn gitter_completion_elvish() {
 }
 
 #[test]
-fn gitter_completion_powershell() {
+fn completion_powershell() {
     gitter_test_partial!(
         args: {"completion", "--power-shell" }
         stdout: { "Register-ArgumentCompleter -Native -CommandName 'gitter'" }

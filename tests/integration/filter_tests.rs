@@ -1,5 +1,5 @@
 #[test]
-fn test_filter_active_errors() {
+fn filter_active_errors() {
     gitter_test!(
         args: { "list", "-d", "3", "-a", "never", "-f", "active:<48 && ! name:gitter-rs" }
         stdout: { }
@@ -18,7 +18,7 @@ fn test_filter_active_errors() {
 }
 
 #[test]
-fn test_filter_branch() {
+fn filter_branch() {
     gitter_test!(
         args: { "list", "-d", "3", "-a", "never", "-f", "branch:master" }
         stdout: {
@@ -32,7 +32,7 @@ fn test_filter_branch() {
 }
 
 #[test]
-fn test_filter_active_1y() {
+fn filter_active_1y() {
     gitter_test!(
         args: { "list", "-d", "3", "-a", "never", "-f", "active:<1y && ! name:gitter-rs" }
         stdout: {
@@ -51,7 +51,7 @@ fn test_filter_active_1y() {
 }
 
 #[test]
-fn test_filter_active_1mo() {
+fn filter_active_1mo() {
     gitter_test!(
         args: { "list", "-d", "3", "-a", "never", "-f", "active:<1mo && ! name:gitter-rs" }
         stdout: {
@@ -70,7 +70,7 @@ fn test_filter_active_1mo() {
 }
 
 #[test]
-fn test_filter_active_2d() {
+fn filter_active_2d() {
     gitter_test!(
         args: { "list", "-d", "3", "-a", "never", "-f", "active:<2d && ! name:gitter-rs" }
         stdout: {
@@ -82,7 +82,7 @@ fn test_filter_active_2d() {
 }
 
 #[test]
-fn test_filter_active_48h() {
+fn filter_active_48h() {
     gitter_test!(
         args: { "list", "-d", "3", "-a", "never", "-f", "active:<48h && ! name:gitter-rs" }
         stdout: {

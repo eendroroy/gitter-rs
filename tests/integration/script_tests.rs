@@ -1,5 +1,5 @@
 #[test]
-fn test_repo_script_execution_output() {
+fn script_execution_output() {
     gitter_test!(
         args: {
             "script",
@@ -49,7 +49,7 @@ fn test_repo_script_execution_output() {
 }
 
 #[test]
-fn test_repo_script_execution_quiet() {
+fn script_execution_quiet() {
     gitter_test!(
         args: {
             "script",
@@ -91,7 +91,7 @@ fn test_repo_script_execution_quiet() {
 }
 
 #[test]
-fn test_repo_script_zsh_execution_output() {
+fn script_zsh_execution_output() {
     gitter_test!(
         args: {
             "script",
@@ -142,7 +142,7 @@ fn test_repo_script_zsh_execution_output() {
 }
 
 #[test]
-fn test_repo_script_bash_execution_output() {
+fn script_bash_execution_output() {
     gitter_test!(
         args: {
             "script",
@@ -193,7 +193,7 @@ fn test_repo_script_bash_execution_output() {
 }
 
 #[test]
-fn test_repo_script_fish_execution_output() {
+fn script_fish_execution_output() {
     gitter_test!(
         args: {
             "script",
@@ -244,7 +244,7 @@ fn test_repo_script_fish_execution_output() {
 }
 
 #[test]
-fn test_repo_script_elvish_execution_output() {
+fn script_elvish_execution_output() {
     gitter_test!(
         args: {
             "script",
@@ -296,7 +296,7 @@ fn test_repo_script_elvish_execution_output() {
 
 #[cfg(not(windows))]
 #[test]
-fn test_repo_script_pwsh_execution_output() {
+fn script_pwsh_execution_output() {
     gitter_test!(
         args: {
             "script",
@@ -348,7 +348,7 @@ fn test_repo_script_pwsh_execution_output() {
 
 #[cfg(windows)]
 #[test]
-fn test_repo_script_powershell_execution_output() {
+fn script_powershell_execution_output() {
     gitter_test!(
         args: {
             "script",
@@ -399,7 +399,7 @@ fn test_repo_script_powershell_execution_output() {
 }
 
 #[test]
-fn test_repo_script_execution_output_without_placeholders() {
+fn script_execution_output_without_placeholders() {
     gitter_test!(
         args: {
             "script",
@@ -448,7 +448,7 @@ fn test_repo_script_execution_output_without_placeholders() {
 }
 
 #[test]
-fn test_repo_script_execution_without_placeholders_quiet() {
+fn script_execution_without_placeholders_quiet() {
     gitter_test!(
         args: {
             "script",

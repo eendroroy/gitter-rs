@@ -1,5 +1,5 @@
 #[test]
-fn test_repo_exec_echo_output() {
+fn exec_echo_output() {
     gitter_test!(
         args:  {"exec", "-d", "3", "-i", "never", "-c", "never", "-f", "! name:gitter-rs", "echo", "{_name_} {_commit:c_}"}
         stdout: {
@@ -19,7 +19,7 @@ fn test_repo_exec_echo_output() {
 }
 
 #[test]
-fn test_repo_exec_basename_output() {
+fn exec_basename_output() {
     gitter_test!(
         args: { "exec", "-d", "3", "-i", "never", "-c", "never", "-f", "! name:gitter-rs", "basename", "{_path:a_}{_name_}" }
         stdout: {

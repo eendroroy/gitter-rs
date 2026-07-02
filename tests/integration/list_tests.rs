@@ -1,5 +1,5 @@
 #[test]
-fn test_repo_listing_output() {
+fn list_output() {
     gitter_test!(
         args: { "list", "-d", "3", "-a", "never", "-f", "! name:gitter-rs" }
         stdout: {
@@ -18,7 +18,7 @@ fn test_repo_listing_output() {
     );
 }
 #[test]
-fn test_repo_listing_output_aligned() {
+fn list_output_aligned() {
     gitter_test!(
         args: { "list", "-d", "3", "-f", "! name:gitter-rs" }
         stdout: {
@@ -38,7 +38,7 @@ fn test_repo_listing_output_aligned() {
 }
 
 #[test]
-fn test_repo_listing_filtered_output() {
+fn list_filtered_output() {
     gitter_test!(
         args: { "list", "-d", "3", "-a", "never", "-f", "branch:master" }
         stdout: {
@@ -52,7 +52,7 @@ fn test_repo_listing_filtered_output() {
 }
 
 #[test]
-fn test_repo_listing_sorted_output() {
+fn list_sorted_output() {
     gitter_test!(
         args: { "list", "-d", "3", "-a", "never", "-s", "{_branch:n_}{_name_}", "-f", "! name:gitter-rs" }
         stdout: {
