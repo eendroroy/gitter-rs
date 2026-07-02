@@ -6,31 +6,29 @@ use std::process::Command;
 use std::sync::Once;
 
 #[macro_export]
-macro_rules! define_gitter_test {
+macro_rules! define_gitter_command_test {
     // Arm 1: Standard tests with only stdout regex checks
     (
-        $name:ident,
         args: [$($arg:expr),* $(,)?],
         expected: [$($pattern:expr),* $(,)?] $(,)?
     ) => {
-        define_gitter_test!(
-            @impl $name,
+        define_gitter_command_test!(
+            @impl
             args: [$($arg),*],
             expected: [$($pattern),*],
             expect_empty_stdout: false,
-            stderr_contains: None::<&str> // <-- Added explicit type annotation here
+            stderr_contains: None::<&str>
         );
     };
 
     // Arm 2: Tests with a stderr check that still look for stdout patterns
     (
-        $name:ident,
         args: [$($arg:expr),* $(,)?],
         expected: [$($pattern:expr),* $(,)?],
         stderr_contains: $stderr_pat:expr $(,)?
     ) => {
-        define_gitter_test!(
-            @impl $name,
+        define_gitter_command_test!(
+            @impl
             args: [$($arg),*],
             expected: [$($pattern),*],
             expect_empty_stdout: false,
@@ -40,14 +38,13 @@ macro_rules! define_gitter_test {
 
     // Arm 3: Failure path tests where stdout must be completely blank
     (
-        $name:ident,
         args: [$($arg:expr),* $(,)?],
         expected: [$($pattern:expr),* $(,)?],
         expect_empty_stdout: $empty_stdout:expr,
         stderr_contains: $stderr_pat:expr $(,)?
     ) => {
-        define_gitter_test!(
-            @impl $name,
+        define_gitter_command_test!(
+            @impl
             args: [$($arg),*],
             expected: [$($pattern),*],
             expect_empty_stdout: $empty_stdout,
@@ -55,16 +52,16 @@ macro_rules! define_gitter_test {
         );
     };
 
-    // Main Internal Implementation Engine
+    // Main Internal Implementation Engine (Generates code body ONLY)
     (
-        @impl $name:ident,
+        @impl
         args: [$($arg:expr),* $(,)?],
         expected: [$($pattern:expr),* $(,)?],
         expect_empty_stdout: $empty_stdout:expr,
         stderr_contains: $stderr_pat:expr
     ) => {
-        #[test]
-        fn $name() {
+        // Enclosing in a block prevents namespace polluting of imports inside your function
+        {
             use std::process::Command;
             use assert_cmd::prelude::*;
             use regex::Regex;
@@ -122,27 +119,21 @@ macro_rules! define_gitter_test {
 #[macro_export]
 macro_rules! define_gitter_help_test {
     (
-        $name:ident,
         args: [$($arg:expr),* $(,)?],
         contains: [$($substring:expr),* $(,)?] $(,)?
     ) => {
-        #[test]
-        fn $name() {
-            use std::process::Command;
-            use assert_cmd::prelude::*;
-            use predicates::prelude::predicate::str::contains;
+        use std::process::Command;
+        use assert_cmd::prelude::*;
+        use predicates::prelude::predicate::str::contains;
 
-            let mut cmd = Command::cargo_bin("gitter").unwrap();
-            let assert = cmd.args(&[$($arg),*]).assert();
+        let mut cmd = Command::cargo_bin("gitter").unwrap();
+        let assert = cmd.args(&[$($arg),*]).assert();
 
-            // Chain every string assertion dynamically on the asset reference
-            $(
-                let assert = assert.stdout(contains($substring));
-            )*
+        $(
+            let assert = assert.stdout(contains($substring));
+        )*
 
-            // Drop the reference to finalize evaluation
-            let _ = assert;
-        }
+        let _ = assert;
     };
 }
 
