@@ -230,10 +230,17 @@ define_holders! {
     }
 
     {
-        "time:r", "{_time:r_}", "The human-readable relative time interval (e.g., '2 hours ago').",
+        "time:r", "{_time:r_}", "The human-readable relative time interval (e.g., '2h').",
 
         |s, _c| s.relative_time.clone(),
         |s, _c, l| apply_style(&s.relative_time, l.map(|i| i.relative_time), Some(&STYLE.relative_time))
+    }
+
+    {
+        "time:rc", "{_time:rc_}", "The human-readable relative time (more granular breakdown) interval (e.g., '2mo6y').",
+
+        |s, _c| s.relative_time_combined.clone(),
+        |s, _c, l| apply_style(&s.relative_time_combined, l.map(|i| i.relative_time_combined), Some(&STYLE.relative_time))
     }
 
     {

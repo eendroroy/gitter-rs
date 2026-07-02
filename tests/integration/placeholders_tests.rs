@@ -26,6 +26,7 @@ fn placeholders_output_script() {
             r"\{ _author:e_ \} -- .*",
             r"\{ _author:n_ \} -- .*",
             r"\{ _time:r_ \}   -- 7 d",
+            r"\{ _time:rc_ \}  -- 7 d",
             r"\{ _time:a_ \}   -- \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}",
             r"\{ _dirty_ \}    --",
             r"\{ _bare_ \}     -- bare",

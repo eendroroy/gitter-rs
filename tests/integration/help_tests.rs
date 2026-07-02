@@ -43,6 +43,7 @@ fn help_placeholder() {
             "{_author:e_}",
             "{_author:n_}",
             "{_time:r_}",
+            "{_time:rc_}",
             "{_time:a_}",
             "{_dirty_}",
             "{_bare_}",

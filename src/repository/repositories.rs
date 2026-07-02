@@ -31,6 +31,7 @@ pub struct Properties {
     pub author_name: String,
     pub author_email: String,
     pub relative_time: String,
+    pub relative_time_combined: String,
     pub absolute_time: String,
     pub dirty: String,
     pub is_dirty: bool,
@@ -54,7 +55,7 @@ impl Properties {
 
         let (commit_hash, author_name, author_email) = get_current_commit_info(&repository);
         let commit_count = get_commit_count(&repository);
-        let relative_time = get_relative_time(&repository);
+        let (relative_time, relative_time_combined) = get_relative_time(&repository);
         let absolute_time = get_absolute_time(&repository);
 
         let (dirty, is_dirty) = get_dirty(&repository);
@@ -79,6 +80,7 @@ impl Properties {
             author_name,
             author_email,
             relative_time,
+            relative_time_combined,
             absolute_time,
             dirty,
             is_dirty,
@@ -106,6 +108,7 @@ pub struct PropertyLengths {
     pub author_name: usize,
     pub author_email: usize,
     pub relative_time: usize,
+    pub relative_time_combined: usize,
     pub absolute_time: usize,
     pub dirty: usize,
     pub bare: usize,
@@ -187,6 +190,8 @@ impl Repositories {
             self.lens.author_name = max(self.lens.author_name, s.author_name.len());
             self.lens.author_email = max(self.lens.author_email, s.author_email.len());
             self.lens.relative_time = max(self.lens.relative_time, s.relative_time.len());
+            self.lens.relative_time_combined =
+                max(self.lens.relative_time_combined, s.relative_time_combined.len());
             self.lens.absolute_time = max(self.lens.absolute_time, s.absolute_time.len());
             self.lens.dirty = max(self.lens.dirty, s.dirty.len());
             self.lens.bare = max(self.lens.bare, s.bare.len());
