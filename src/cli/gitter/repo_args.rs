@@ -48,7 +48,7 @@ impl Default for RepoArgs {
             info_template: "{_path:r_}{_name_} {_language_} {_bare_} on {_branch:n_} [{_hash:8_}] by {_author:n_} {_time:r_}".to_string(),
             filter: None,
             align: BoolChoice::Always,
-            sort: "{_path:r_}/{_name_}".to_string(),
+            sort: "{_nesting_}{_path:r_}{_name_}".to_string(),
             reverse: false,
         }
     }
