@@ -313,5 +313,6 @@ mod integration {
     pub mod gitter_tests;
     pub mod help_tests;
     pub mod list_tests;
+    pub mod placeholders_tests;
     pub mod script_tests;
 }

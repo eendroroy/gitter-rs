@@ -68,27 +68,27 @@ fn silent_git_bare_quiet_output() {
             r"^\$ git rev-parse --is-inside-work-tree\s*$",
             r"^true\s*$",
 
-            r"^\.local/repo_00\s+on master\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$",
+            r"^\.local/repo_00\s+on master\s+\[[0-9a-f]{8}\] by indrajit\s+\d+ (s|mi|h|d|mo|y)\s*$",
             r"^\$ git rev-parse --is-inside-work-tree\s*$",
             r"^true\s*$",
 
-            r"^\.local/repo_02\s+on master\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$",
+            r"^\.local/repo_02\s+on master\s+\[[0-9a-f]{8}\] by indrajit\s+\d+ (s|mi|h|d|mo|y)\s*$",
             r"^\$ git rev-parse --is-inside-work-tree\s*$",
             r"^true\s*$",
 
-            r"^\.local/repo_03\s+on feature/feature-3\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$",
+            r"^\.local/repo_03\s+on feature/feature-3\s+\[[0-9a-f]{8}\] by indrajit\s+\d+ (s|mi|h|d|mo|y)\s*$",
             r"^\$ git rev-parse --is-inside-work-tree\s*$",
             r"^true\s*$",
 
-            r"^\.local/repo_04\s+on feature/feature-4\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$",
+            r"^\.local/repo_04\s+on feature/feature-4\s+\[[0-9a-f]{8}\] by indrajit\s+\d+ (s|mi|h|d|mo|y)\s*$",
             r"^\$ git rev-parse --is-inside-work-tree\s*$",
             r"^true\s*$",
 
-            r"^\.local/repo_05\s+on feature/feature-5\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$",
+            r"^\.local/repo_05\s+on feature/feature-5\s+\[[0-9a-f]{8}\] by indrajit\s+\d+ (s|mi|h|d|mo|y)\s*$",
             r"^\$ git rev-parse --is-inside-work-tree\s*$",
             r"^true\s*$",
 
-            r"^\.local/repo_06\s+on detached\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$",
+            r"^\.local/repo_06\s+on detached\s+\[[0-9a-f]{8}\] by indrajit\s+\d+ (s|mi|h|d|mo|y)\s*$",
             r"^\$ git rev-parse --is-inside-work-tree\s*$",
             r"^true\s*$",
 
@@ -96,11 +96,11 @@ fn silent_git_bare_quiet_output() {
             r"^\$ git rev-parse --is-inside-work-tree\s*$",
             r"^true\s*$",
 
-            r"^\.local/repo_bare_00\s+bare on master\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$",
+            r"^\.local/repo_bare_00\s+bare on master\s+\[[0-9a-f]{8}\] by indrajit\s+\d+ (s|mi|h|d|mo|y)\s*$",
             r"^\$ git rev-parse --is-inside-work-tree\s*$",
             r"^false\s*$",
 
-            r"^\.local/repo_bare_06\s+bare on detached\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$",
+            r"^\.local/repo_bare_06\s+bare on detached\s+\[[0-9a-f]{8}\] by indrajit\s+\d+ (s|mi|h|d|mo|y)\s*$",
             r"^\$ git rev-parse --is-inside-work-tree\s*$",
             r"^false\s*$",
         }
