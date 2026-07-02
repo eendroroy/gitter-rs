@@ -305,6 +305,7 @@ fn run_provision() {
 }
 
 mod integration {
+    pub mod bash_tests;
     pub mod completion_tests;
     pub mod exec_tests;
     pub mod filter_tests;
