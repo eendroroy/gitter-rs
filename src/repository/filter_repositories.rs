@@ -1,11 +1,12 @@
 use crate::repository::repositories::{Properties, PropertyLengths, Repositories};
+use crate::repository::{DAYS, HOURS, MINUTES, MONTHS, SECONDS, YEARS};
 use crate::{print_error, print_warn};
 use chrono::{DateTime, Duration, Local, NaiveDateTime, Utc};
 use lazy_static::lazy_static;
 use regex::Regex;
 
 lazy_static! {
-    static ref DURATION_REGEX: Regex = Regex::new(r"(\d+)([yMwdhm])").unwrap();
+    static ref DURATION_REGEX: Regex = Regex::new(r"(\d+)(s|mi|h|d|mo|y)").unwrap();
 }
 
 fn parse_duration_string(s: &str) -> Option<Duration> {
@@ -18,12 +19,12 @@ fn parse_duration_string(s: &str) -> Option<Duration> {
         let unit = &cap[2];
 
         match unit {
-            "y" => total_duration += Duration::days(value * 365),
-            "M" => total_duration += Duration::days(value * 30),
-            "w" => total_duration += Duration::weeks(value),
-            "d" => total_duration += Duration::days(value),
-            "h" => total_duration += Duration::hours(value),
-            "m" => total_duration += Duration::minutes(value),
+            v if v == YEARS.trim() => total_duration += Duration::days(value * 365),
+            v if v == MONTHS.trim() => total_duration += Duration::days(value * 30),
+            v if v == DAYS.trim() => total_duration += Duration::days(value),
+            v if v == HOURS.trim() => total_duration += Duration::hours(value),
+            v if v == MINUTES.trim() => total_duration += Duration::minutes(value),
+            v if v == SECONDS.trim() => total_duration += Duration::seconds(value),
             _ => return None,
         }
     }
