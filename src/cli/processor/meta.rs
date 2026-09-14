@@ -7,14 +7,13 @@ use std::fs;
 use std::path::Path;
 
 pub async fn meta(repo: &RepoArgs, args: &MetaArgs) {
-    if args.add
-        && let Some(url) = &args.url
-    {
-        add(repo, url, &args.name, &args.path, &args.branch, &args.dry_run)
+    if args.add && let Some(url) = &args.url {
+        let path = args.path.as_deref().unwrap_or(Path::new("."));
+        add(repo, url, &args.name, path, &args.branch, &args.dry_run)
     } else if args.save {
         save(repo, &args.dry_run).await
     } else if args.restore {
-        restore(repo, &args.dry_run)
+        restore(repo, &args.dry_run, &args.no_checkout);
     } else if args.info {
         info(repo)
     }
@@ -100,7 +99,7 @@ async fn save(cli: &RepoArgs, dry_run: &bool) {
     }
 }
 
-fn restore(cli: &RepoArgs, dry_run: &bool) {
+fn restore(cli: &RepoArgs, dry_run: &bool, no_checkout: &bool) {
     let data = load_meta_file(cli);
     if data.repos.is_empty() {
         println!("No repositories found to load.");
@@ -141,7 +140,7 @@ fn restore(cli: &RepoArgs, dry_run: &bool) {
             );
         }
 
-        if let Some(branch) = &meta.branch {
+        if !no_checkout && let Some(branch) = &meta.branch {
             println!(
                 "$({} {} {} {} {})",
                 "git".green(),

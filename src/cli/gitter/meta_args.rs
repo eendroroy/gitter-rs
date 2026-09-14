@@ -23,17 +23,21 @@ pub struct MetaArgs {
     #[arg(short = 'R', long, group = "MetaArg", conflicts_with_all = ["url", "path", "name", "branch"])]
     pub restore: bool,
 
+    /// Skip checking out files after cloning
+    #[arg(long, action = clap::ArgAction::SetTrue, requires = "restore")]
+    pub no_checkout: bool,
+
     /// Show meta information
     #[arg(short = 'I', long, group = "MetaArg", conflicts_with_all = ["url", "path", "name", "branch", "dry_run"])]
     pub info: bool,
 
     /// Repository remote url
-    #[arg(short, long, requires = "add", required_if_eq("add", "true"))]
+    #[arg(short, long, required_if_eq("add", "true"))]
     pub url: Option<String>,
 
-    /// Parent directory to clone the project
-    #[arg(short, long, default_value = ".", requires = "add")]
-    pub path: PathBuf,
+    /// Parent directory to clone the project (defaults to "." when adding)
+    #[arg(short, long, requires = "add", default_value_if("add", "true", "."))]
+    pub path: Option<PathBuf>,
 
     /// Name of the repository (Required if path is provided)
     #[arg(short = 'n', long, requires = "path")]
