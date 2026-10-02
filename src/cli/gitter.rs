@@ -18,7 +18,8 @@ pub use bool_choice::BoolChoice;
 pub use completion_args::CompletionArgs;
 pub use help_args::{HelpArgs, HelpTopic};
 pub use meta_args::{
-    MetaAddArgs, MetaArgs, MetaCommand, MetaInfoArgs, MetaRestoreArgs, MetaSaveArgs,
+    MetaAddArgs, MetaArgs, MetaCommand, MetaInitArgs, MetaListArgs, MetaRemoveArgs,
+    MetaRestoreArgs, MetaSaveArgs, MetaStatusArgs,
 };
 pub use output_args::OutputArgs;
 pub use repo_args::RepoArgs;

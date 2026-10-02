@@ -89,11 +89,13 @@ gitter bash 'ls | wc -l'                 # bash -c
 gitter script ./task.sh                  # run a script (uses $SHELL)
 gitter script ./task.sh --shell zsh -P   # pick shell, process placeholders
 
-gitter meta save                         # write .gitter.meta.toml
-gitter meta add https://host/repo.git -b main
-gitter meta restore --dry-run            # preview clones
-gitter meta info
-
+gitter meta init                         # create .gitter.meta.toml
+gitter meta add https://host/repo.git -b main --clone
+gitter meta remove repo                  # alias: rm (never deletes from disk)
+gitter meta save --merge --prune         # record repos found in the workspace
+gitter meta restore -j 8 --dry-run       # preview parallel clones
+gitter meta status                       # ok / missing / wrong-remote / wrong-branch / untracked
+gitter meta list                         # alias: ls
 gitter completion zsh > ~/.zfunc/_gitter # shell completion
 gitter help placeholders                 # topics: placeholders, gitterignore, filters, completions
 ```
