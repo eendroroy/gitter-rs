@@ -1,5 +1,5 @@
-use crate::cli::gitter::{BoolChoice, CommandArgs, RepoArgs, ScriptArgs};
-use crate::cli::processor::helper::{command, find_repos, get_default_shell};
+use crate::cli::gitter::{BoolChoice, ScriptArgs, resolve_shell, shell_bin};
+use crate::cli::processor::helper::{command, find_repos};
 use crate::placeholder::processor::{evaluate_placeholders, replace_placeholders};
 use crate::print_error;
 use crate::repository::print_info::print_info_line;
@@ -8,11 +8,11 @@ use std::fs;
 use std::path::absolute;
 use std::process::Stdio;
 
-pub async fn script_processed(repo: &RepoArgs, cmd: &CommandArgs, scpt: &ScriptArgs) {
+pub async fn script_processed(scpt: &ScriptArgs) {
+    let (repo, cmd) = (&scpt.repo, &scpt.output);
     let repos = find_repos(repo).await;
 
-    let default_bin = get_default_shell();
-    let bin = scpt.get_bin_name(&default_bin);
+    let bin = shell_bin(resolve_shell(scpt.shell));
 
     let script_path = absolute(&scpt.path).expect("Unable to find script");
     let original = fs::read_to_string(&script_path).expect("Unable to read script file contents");

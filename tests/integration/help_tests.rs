@@ -3,7 +3,8 @@ fn help() {
     gitter_test_partial!(
         args: { "help" }
         stdout: {
-            "Usage: gitter [COMMAND] [OPTIONS] [-- <RAW_ARGS>...]",
+            "Usage: gitter [OPTIONS] <GIT_ARGS>...",
+            "gitter <COMMAND>",
             "Commands:",
             "list", "[aliases: ls, l]",
             "git", "[alias: g]",
@@ -11,10 +12,10 @@ fn help() {
             "script", "[alias: s]",
             "bash", "[alias: b]",
             "completion",
-            "help", "gitter help --help",
+            "help", "Show help topics",
             "meta",
             "Arguments:",
-            "[RAW_ARGS]...",
+            "<GIT_ARGS>...",
             "Options:",
             "-h, --help",
             "-V, --version",
@@ -26,7 +27,7 @@ fn help() {
 #[test]
 fn help_placeholder() {
     gitter_test_partial!(
-        args: { "help", "--placeholders" }
+        args: { "help", "placeholders" }
         stdout: {
             "{_remote:n_}",
             "{_remote:f_}",
@@ -57,7 +58,7 @@ fn help_placeholder() {
 #[test]
 fn help_gitterignore() {
     gitter_test_partial!(
-        args: { "help", "--gitterignore" }
+        args: { "help", "gitterignore" }
         stdout: {
             "Gitterignore File Format",
             "path/to/repo",
@@ -72,7 +73,7 @@ fn help_gitterignore() {
 #[test]
 fn help_filter() {
     gitter_test_partial!(
-        args: { "help", "--filters" }
+        args: { "help", "filters" }
         stdout: {
             "Description:",
             "General Syntax:",
@@ -116,14 +117,14 @@ fn help_filter() {
 #[test]
 fn help_completion() {
     gitter_test_partial!(
-        args: { "help", "--completions" }
+        args: { "help", "completions" }
         stdout: {
             "Quick Setup Commands",
-            "gitter completion --bash",
-            "gitter completion --zsh",
-            "gitter completion --fish",
-            "gitter completion --elvish",
-            "gitter completion --powershell",
+            "gitter completion bash",
+            "gitter completion zsh",
+            "gitter completion fish",
+            "gitter completion elvish",
+            "gitter completion powershell",
         }
         stderr: { }
     );

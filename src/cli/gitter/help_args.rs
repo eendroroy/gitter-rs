@@ -1,22 +1,20 @@
-use clap::Args;
-use std::fmt::Debug;
+use clap::{Args, ValueEnum};
 
-#[derive(Args, Debug, Default, Clone)]
-#[command(
-    group(
-        clap::ArgGroup::new("HelpArg")
-            .required(false)
-            .multiple(false)
-            .args(["placeholders", "gitterignore", "filters", "completions"])
-    )
-)]
+#[derive(Debug, Clone, Copy, ValueEnum)]
+pub enum HelpTopic {
+    /// Placeholders usable in templates, commands and scripts
+    Placeholders,
+    /// `.gitterignore` file format
+    Gitterignore,
+    /// Filter expression syntax
+    Filters,
+    /// Shell completion setup
+    Completions,
+}
+
+#[derive(Args, Debug)]
 pub struct HelpArgs {
-    #[arg(long, group = "HelpArg")]
-    pub placeholders: bool,
-    #[arg(long, group = "HelpArg")]
-    pub gitterignore: bool,
-    #[arg(long, group = "HelpArg")]
-    pub filters: bool,
-    #[arg(long, group = "HelpArg")]
-    pub completions: bool,
+    /// Topic to explain (omit for the general help)
+    #[arg(value_enum)]
+    pub topic: Option<HelpTopic>,
 }

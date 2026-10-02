@@ -1,53 +1,77 @@
-use clap::Args;
+use crate::cli::gitter::RepoArgs;
+use clap::{Args, Subcommand, ValueHint};
 use std::path::PathBuf;
 
 #[derive(Args, Debug)]
-#[command(
-    group(
-        clap::ArgGroup::new("MetaArg")
-            .required(true)
-            .multiple(false)
-            .args(["add", "save", "restore", "info"])
-    )
-)]
 pub struct MetaArgs {
-    /// Add a repository to metafile
-    #[arg(short = 'A', long, group = "MetaArg")]
-    pub add: bool,
+    #[command(subcommand)]
+    pub command: MetaCommand,
+}
 
-    /// Create metafile from current workdir
-    #[arg(short = 'S', long, group = "MetaArg", conflicts_with_all = ["url", "path", "name", "branch"])]
-    pub save: bool,
+#[derive(Subcommand, Debug)]
+pub enum MetaCommand {
+    /// Add a repository to the metafile
+    Add(MetaAddArgs),
+    /// Create the metafile from repositories in the working directory
+    Save(MetaSaveArgs),
+    /// Restore (clone) repositories listed in the metafile
+    Restore(MetaRestoreArgs),
+    /// Show the metafile contents
+    Info(MetaInfoArgs),
+}
 
-    /// Restore (clone) repositories from metafile
-    #[arg(short = 'R', long, group = "MetaArg", conflicts_with_all = ["url", "path", "name", "branch"])]
-    pub restore: bool,
-
-    /// Skip checking out files after cloning
-    #[arg(long, action = clap::ArgAction::SetTrue, requires = "restore")]
-    pub no_checkout: bool,
-
-    /// Show meta information
-    #[arg(short = 'I', long, group = "MetaArg", conflicts_with_all = ["url", "path", "name", "branch", "dry_run"])]
-    pub info: bool,
+#[derive(Args, Debug)]
+pub struct MetaAddArgs {
+    #[command(flatten)]
+    pub repo: RepoArgs,
 
     /// Repository remote url
-    #[arg(short, long, required_if_eq("add", "true"))]
-    pub url: Option<String>,
+    #[arg(value_hint = ValueHint::Url)]
+    pub url: String,
 
-    /// Parent directory to clone the project (defaults to "." when adding)
-    #[arg(short, long, requires = "add", default_value_if("add", "true", "."))]
-    pub path: Option<PathBuf>,
+    /// Parent directory the repository is cloned into
+    #[arg(short, long, default_value = ".", value_hint = ValueHint::DirPath)]
+    pub path: PathBuf,
 
-    /// Name of the repository (Required if path is provided)
-    #[arg(short = 'n', long, requires = "path")]
+    /// Repository name (defaults to the name in the url)
+    #[arg(short = 'N', long)]
     pub name: Option<String>,
 
     /// Branch to check out
-    #[arg(short, long, requires = "add")]
+    #[arg(short, long)]
     pub branch: Option<String>,
 
-    /// Display actions to be taken
-    #[arg(short = 'N', long, action = clap::ArgAction::SetTrue)]
+    /// Display actions without performing them
+    #[arg(short = 'n', long)]
     pub dry_run: bool,
+}
+
+#[derive(Args, Debug)]
+pub struct MetaSaveArgs {
+    #[command(flatten)]
+    pub repo: RepoArgs,
+
+    /// Display actions without performing them
+    #[arg(short = 'n', long)]
+    pub dry_run: bool,
+}
+
+#[derive(Args, Debug)]
+pub struct MetaRestoreArgs {
+    #[command(flatten)]
+    pub repo: RepoArgs,
+
+    /// Skip checking out branches after cloning
+    #[arg(long)]
+    pub no_checkout: bool,
+
+    /// Display actions without performing them
+    #[arg(short = 'n', long)]
+    pub dry_run: bool,
+}
+
+#[derive(Args, Debug)]
+pub struct MetaInfoArgs {
+    #[command(flatten)]
+    pub repo: RepoArgs,
 }

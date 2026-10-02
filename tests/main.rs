@@ -5,6 +5,14 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::sync::Once;
 
+/// Make git behave the same regardless of the developer's global config
+/// (e.g. `safe.bareRepository=explicit` breaks commands inside bare repos).
+pub const GIT_TEST_ENV: [(&str, &str); 3] = [
+    ("GIT_CONFIG_COUNT", "1"),
+    ("GIT_CONFIG_KEY_0", "safe.bareRepository"),
+    ("GIT_CONFIG_VALUE_0", "all"),
+];
+
 #[macro_export]
 macro_rules! gitter_test {
     (
@@ -18,6 +26,7 @@ macro_rules! gitter_test {
             use regex::Regex;
 
             let mut command = Command::cargo_bin("gitter").unwrap();
+            command.envs($crate::GIT_TEST_ENV);
             command.args(&[$($arg),*]);
 
 
@@ -103,6 +112,7 @@ macro_rules! gitter_test_present {
         use predicates::prelude::*;
 
         let mut cmd = Command::cargo_bin("gitter").unwrap();
+        cmd.envs($crate::GIT_TEST_ENV);
         let mut assert = cmd.args(&[$($arg),*]).assert();
 
         if $out_val {
@@ -133,6 +143,7 @@ macro_rules! gitter_test_partial {
         use predicates::prelude::predicate::str::contains;
 
         let mut cmd = Command::cargo_bin("gitter").unwrap();
+        cmd.envs($crate::GIT_TEST_ENV);
         let assert = cmd.args(&[$($arg),*]).assert();
 
         $( let assert = assert.stdout(contains($out_sub)); )*

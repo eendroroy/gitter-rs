@@ -5,7 +5,7 @@ fn script_execution_output() {
             "script",
             "--filter", "! name:gitter-rs",
             "--placeholder",
-            "--path", "./scripts/script_test.sh",
+            "./scripts/script_test.sh",
         }
         stdout: {
             r"^\.local/repo_00\s+on master\s+\[[0-9a-f]{8}\] by indrajit\s+\d+ (s|mi|h|d|mo|y)\s*$",
@@ -55,7 +55,7 @@ fn script_execution_quiet() {
             "script",
             "--filter", "! name:gitter-rs",
             "--placeholder",
-            "--path", "./scripts/script_test.sh",
+            "./scripts/script_test.sh",
             "--quiet",
         }
         stdout: {
@@ -97,8 +97,8 @@ fn script_zsh_execution_output() {
             "script",
             "--filter", "! name:gitter-rs",
             "--placeholder",
-            "--path", "./scripts/script_test.sh",
-            "--zsh",
+            "./scripts/script_test.sh",
+            "--shell", "zsh",
         }
         stdout: {
             r"^\.local/repo_00\s+on master\s+\[[0-9a-f]{8}\] by indrajit\s+\d+ (s|mi|h|d|mo|y)\s*$",
@@ -148,8 +148,8 @@ fn script_bash_execution_output() {
             "script",
             "--filter", "! name:gitter-rs",
             "--placeholder",
-            "--path", "./scripts/script_test.sh",
-            "--bash",
+            "./scripts/script_test.sh",
+            "--shell", "bash",
         }
         stdout: {
             r"^\.local/repo_00\s+on master\s+\[[0-9a-f]{8}\] by indrajit\s+\d+ (s|mi|h|d|mo|y)\s*$",
@@ -199,8 +199,8 @@ fn script_fish_execution_output() {
             "script",
             "--filter", "! name:gitter-rs",
             "--placeholder",
-            "--path", "./scripts/script_test.sh",
-            "--fish"
+            "./scripts/script_test.sh",
+            "--shell", "fish"
         }
         stdout: {
             r"^\.local/repo_00\s+on master\s+\[[0-9a-f]{8}\] by indrajit\s+\d+ (s|mi|h|d|mo|y)\s*$",
@@ -250,8 +250,8 @@ fn script_elvish_execution_output() {
             "script",
             "--filter", "! name:gitter-rs",
             "--placeholder",
-            "--path", "./scripts/script_test.sh",
-            "--elvish",
+            "./scripts/script_test.sh",
+            "--shell", "elvish",
         }
         stdout: {
             r"^\.local/repo_00\s+on master\s+\[[0-9a-f]{8}\] by indrajit\s+\d+ (s|mi|h|d|mo|y)\s*$",
@@ -302,8 +302,8 @@ fn script_pwsh_execution_output() {
             "script",
             "--filter", "! name:gitter-rs",
             "--placeholder",
-            "--path", "./scripts/script_test.sh",
-            "--power-shell"
+            "./scripts/script_test.sh",
+            "--shell", "powershell"
         }
         stdout: {
             r"^\.local/repo_00\s+on master\s+\[[0-9a-f]{8}\] by indrajit\s+\d+ (s|mi|h|d|mo|y)\s*$",
@@ -354,8 +354,8 @@ fn script_powershell_execution_output() {
             "script",
             "--filter", "! name:gitter-rs",
             "--placeholder",
-            "--path", "./scripts/script_test.sh",
-            "--power-shell"
+            "./scripts/script_test.sh",
+            "--shell", "powershell"
         }
         stdout: {
             r"^\.local/repo_00\s+on master\s+\[[0-9a-f]{8}\] by indrajit\s+\d+ (s|mi|h|d|mo|y)\s*$",
@@ -404,7 +404,7 @@ fn script_execution_output_without_placeholders() {
         args: {
             "script",
             "--filter", "! name:gitter-rs",
-            "--path", "./scripts/script_test.sh",
+            "./scripts/script_test.sh",
         }
         stdout: {
             r"^\.local/repo_00\s+on master\s+\[[0-9a-f]{8}\] by indrajit\s+\d+ (s|mi|h|d|mo|y)\s*$",
@@ -453,7 +453,7 @@ fn script_execution_without_placeholders_quiet() {
         args: {
             "script",
             "--filter", "! name:gitter-rs",
-            "--path", "./scripts/script_test.sh",
+            "./scripts/script_test.sh",
             "--quiet",
         }
         stdout: {

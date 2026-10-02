@@ -65,16 +65,37 @@ Prebuilt binaries available at [GitHub releases](https://github.com/eendroroy/gi
 Use the help menu
 
 ```bash
-gitter help        # help menu
-gitter help --help # help topics
+gitter help          # help menu
+gitter help filters  # topics: placeholders, gitterignore, filters, completions
 ```
 
 ## Examples
 
+`git` is the default command, so `gitter <args>` is the same as `gitter git <args>`.
+
 ```bash
-gitter git -- pull        # $(git pull)
-gitter exec -- cargo test # $(cargo test)
-gitter checkout develop   # $(git checkout development)
+gitter list                              # list repositories (aliases: ls, l)
+gitter ls -d 3 -f 'branch:master'        # deeper search, filtered
+
+gitter pull                              # $(git pull) in every repo
+gitter git checkout develop              # same as above, explicit
+gitter -f '! name:gitter-rs' status -s   # gitter options go before git args
+gitter -- -c color.ui=never log -1       # `--` for git flags clashing with gitter's
+
+gitter exec cargo test                   # run any program
+gitter exec -q basename '{_path:a_}'     # placeholders, hide stdout
+gitter bash 'ls | wc -l'                 # bash -c
+
+gitter script ./task.sh                  # run a script (uses $SHELL)
+gitter script ./task.sh --shell zsh -P   # pick shell, process placeholders
+
+gitter meta save                         # write .gitter.meta.toml
+gitter meta add https://host/repo.git -b main
+gitter meta restore --dry-run            # preview clones
+gitter meta info
+
+gitter completion zsh > ~/.zfunc/_gitter # shell completion
+gitter help placeholders                 # topics: placeholders, gitterignore, filters, completions
 ```
 
 ## License

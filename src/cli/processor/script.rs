@@ -1,9 +1,9 @@
-use crate::cli::gitter::{CommandArgs, RepoArgs, ScriptArgs};
+use crate::cli::gitter::ScriptArgs;
 use crate::cli::processor::{script_processed, script_raw};
 
-pub async fn script(repo: &RepoArgs, cmd: &CommandArgs, scpt: &ScriptArgs) {
-    match scpt.placeholder {
-        true => script_processed(repo, cmd, scpt).await,
-        false => script_raw(repo, cmd, scpt).await,
+pub async fn script(args: &ScriptArgs) {
+    match args.placeholder {
+        true => script_processed(args).await,
+        false => script_raw(args).await,
     };
 }

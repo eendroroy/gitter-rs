@@ -1,4 +1,6 @@
-use crate::cli::gitter::{MetaArgs, RepoArgs};
+use crate::cli::gitter::{
+    MetaAddArgs, MetaArgs, MetaCommand, MetaInfoArgs, MetaRestoreArgs, MetaSaveArgs, RepoArgs,
+};
 use crate::cli::processor::helper::{command, find_repos};
 use crate::meta::{MetaFile, Metadata};
 use crate::{META_FILE, STYLE, print_error, print_warn};
@@ -6,16 +8,12 @@ use colored::Colorize;
 use std::fs;
 use std::path::Path;
 
-pub async fn meta(repo: &RepoArgs, args: &MetaArgs) {
-    if args.add && let Some(url) = &args.url {
-        let path = args.path.as_deref().unwrap_or(Path::new("."));
-        add(repo, url, &args.name, path, &args.branch, &args.dry_run)
-    } else if args.save {
-        save(repo, &args.dry_run).await
-    } else if args.restore {
-        restore(repo, &args.dry_run, &args.no_checkout);
-    } else if args.info {
-        info(repo)
+pub async fn meta(args: &MetaArgs) {
+    match &args.command {
+        MetaCommand::Add(a) => add(a),
+        MetaCommand::Save(a) => save(a).await,
+        MetaCommand::Restore(a) => restore(a),
+        MetaCommand::Info(a) => info(a),
     }
 }
 
@@ -35,14 +33,8 @@ fn save_meta_file(cli: &RepoArgs, data: &MetaFile) {
     fs::write(meta_file, content).expect("Unable to save metafile");
 }
 
-fn add(
-    cli: &RepoArgs,
-    url: &str,
-    name: &Option<String>,
-    path: &Path,
-    branch: &Option<String>,
-    dry_run: &bool,
-) {
+fn add(args: &MetaAddArgs) {
+    let MetaAddArgs { repo: cli, url, path, name, branch, dry_run } = args;
     let mut data = load_meta_file(cli);
     let path = path.join("");
 
@@ -76,7 +68,8 @@ fn add(
     }
 }
 
-async fn save(cli: &RepoArgs, dry_run: &bool) {
+async fn save(args: &MetaSaveArgs) {
+    let (cli, dry_run) = (&args.repo, &args.dry_run);
     let repos = find_repos(cli).await;
     let mut new_repos = Vec::new();
 
@@ -99,7 +92,8 @@ async fn save(cli: &RepoArgs, dry_run: &bool) {
     }
 }
 
-fn restore(cli: &RepoArgs, dry_run: &bool, no_checkout: &bool) {
+fn restore(args: &MetaRestoreArgs) {
+    let MetaRestoreArgs { repo: cli, no_checkout, dry_run } = args;
     let data = load_meta_file(cli);
     if data.repos.is_empty() {
         println!("No repositories found to load.");
@@ -162,7 +156,8 @@ fn restore(cli: &RepoArgs, dry_run: &bool, no_checkout: &bool) {
     }
 }
 
-fn info(cli: &RepoArgs) {
+fn info(args: &MetaInfoArgs) {
+    let cli = &args.repo;
     let data = load_meta_file(cli);
     if data.repos.is_empty() {
         print_warn!("No metadata information found.");

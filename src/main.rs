@@ -8,7 +8,7 @@ mod meta;
 mod repository;
 mod style;
 
-use crate::cli::gitter::{CommandArgs, Gitter, GitterCommand, HelpArgs, RepoArgs};
+use crate::cli::gitter::{Gitter, GitterCommand};
 use crate::cli::processor::{bash, completion, exec, git, help, list, meta, script};
 use crate::style::Palette;
 use clap::Parser;
@@ -21,38 +21,14 @@ pub static META_FILE: &str = ".gitter.meta.toml";
 #[tokio::main]
 async fn main() {
     let cli = Gitter::parse();
-
-    let command = if let Some(command) = &cli.command {
-        command
-    } else {
-        if cli.raw_args.raw_args.is_empty() {
-            help(&HelpArgs::default());
-            std::process::exit(0);
-        } else {
-            &GitterCommand::Git {
-                repo_args: RepoArgs::default(),
-                cmd_args: CommandArgs::default(),
-                raw_args: cli.raw_args,
-            }
-        }
-    };
-
-    match command {
-        GitterCommand::Git { repo_args, cmd_args, raw_args } => {
-            git(repo_args, cmd_args, raw_args).await
-        }
-        GitterCommand::List { repo_args } => list(repo_args).await,
-        GitterCommand::Exec { repo_args, cmd_args, raw_args } => {
-            exec(repo_args, cmd_args, raw_args).await
-        }
-        GitterCommand::Script { repo_args, cmd_args, scpt_args } => {
-            script(repo_args, cmd_args, scpt_args).await
-        }
-        GitterCommand::Bash { repo_args, cmd_args, raw_args } => {
-            bash(repo_args, cmd_args, raw_args).await
-        }
-        GitterCommand::Completion { args } => completion(args),
-        GitterCommand::Help { args } => help(args),
-        GitterCommand::Meta { repo_args, meta_args } => meta(repo_args, meta_args).await,
+    match cli.command.unwrap_or(GitterCommand::Git(cli.git)) {
+        GitterCommand::List(args) => list(&args).await,
+        GitterCommand::Git(args) => git(&args).await,
+        GitterCommand::Exec(args) => exec(&args).await,
+        GitterCommand::Bash(args) => bash(&args).await,
+        GitterCommand::Script(args) => script(&args).await,
+        GitterCommand::Meta(args) => meta(&args).await,
+        GitterCommand::Completion(args) => completion(&args),
+        GitterCommand::Help(args) => help(&args),
     }
 }

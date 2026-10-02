@@ -1,14 +1,15 @@
-use crate::cli::gitter::{BoolChoice, CommandArgs, RawArgs, RepoArgs};
+use crate::cli::gitter::{BoolChoice, ExecArgs};
 use crate::cli::processor::helper::{command, find_repos};
 use crate::placeholder::processor::{evaluate_placeholders, replace_placeholders};
 use crate::repository::print_info::print_info_line;
 use colored::Colorize;
 use std::process::Stdio;
 
-pub async fn exec(repo: &RepoArgs, cmd: &CommandArgs, raw: &RawArgs) {
+pub async fn exec(opts: &ExecArgs) {
+    let (repo, cmd) = (&opts.repo, &opts.output);
     let repos = find_repos(repo).await;
-    let bin = raw.raw_args[0].clone();
-    let args = raw.raw_args[1..].join(" ");
+    let bin = opts.program.clone();
+    let args = opts.args.join(" ");
 
     repos.props.iter().for_each(|status| {
         let evaluation = evaluate_placeholders(&args.clone(), status);

@@ -1,13 +1,14 @@
-use crate::cli::gitter::{BoolChoice, CommandArgs, RawArgs, RepoArgs};
+use crate::cli::gitter::{BashArgs, BoolChoice};
 use crate::cli::processor::helper::{command, find_repos};
 use crate::placeholder::processor::{evaluate_placeholders, replace_placeholders};
 use crate::repository::print_info::print_info_line;
 use colored::Colorize;
 use std::process::Stdio;
 
-pub async fn bash(repo: &RepoArgs, cmd: &CommandArgs, raw: &RawArgs) {
+pub async fn bash(opts: &BashArgs) {
+    let (repo, cmd) = (&opts.repo, &opts.output);
     let repos = find_repos(repo).await;
-    let args = raw.raw_args.join(" ");
+    let args = opts.command.join(" ");
 
     let bin = "bash".to_string();
 

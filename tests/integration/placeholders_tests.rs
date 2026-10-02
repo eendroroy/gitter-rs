@@ -5,7 +5,7 @@ fn placeholders_output_script() {
             "script",
             "--filter", "name:repo_bare_06",
             "--placeholder",
-            "--path", "./scripts/print_placeholders.sh",
+            "./scripts/print_placeholders.sh",
         }
         stdout: {
             r"^\.local/repo_bare_06 bare on detached\s+\[[0-9a-f]{8}\] by indrajit \d+ (s|mi|h|d|mo|y)\s*$",

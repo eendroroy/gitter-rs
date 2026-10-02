@@ -12,19 +12,12 @@ fn completion_help() {
     gitter_test_partial!(
         args: { "completion", "--help" }
         stdout: {
-            "(experimental, may not work)",
-            "Usage: gitter completion [OPTIONS]",
+            "Generate shell completion",
+            "Usage: gitter completion [SHELL]",
+            "Arguments:",
+            "[SHELL]",
+            "Shell to generate completion for",
             "Options:",
-            "--bash",
-            "Generate completion for bash",
-            "--elvish",
-            "Generate completion for elvish",
-            "--fish",
-            "Generate completion for fish",
-            "--power-shell",
-            "Generate completion for PowerShell",
-            "--zsh",
-            "Generate completion for zsh",
             "-h, --help",
             "Print help"
         }
@@ -35,7 +28,7 @@ fn completion_help() {
 #[test]
 fn completion_bash() {
     gitter_test_partial!(
-        args: {"completion", "--bash"}
+        args: {"completion", "bash"}
         stdout: { "_gitter() {" }
         stderr: { }
     );
@@ -44,7 +37,7 @@ fn completion_bash() {
 #[test]
 fn completion_zsh() {
     gitter_test_partial!(
-        args: { "completion", "--zsh" }
+        args: { "completion", "zsh" }
         stdout: { "#compdef gitter" }
         stderr: { }
     );
@@ -53,7 +46,7 @@ fn completion_zsh() {
 #[test]
 fn completion_fish() {
     gitter_test_partial!(
-        args: { "completion", "--fish" }
+        args: { "completion", "fish" }
         stdout: { "__fish_gitter_global_optspecs" }
         stderr: { }
     );
@@ -62,7 +55,7 @@ fn completion_fish() {
 #[test]
 fn completion_elvish() {
     gitter_test_partial!(
-        args: { "completion", "--elvish" }
+        args: { "completion", "elvish" }
         stdout: { "edit:completion:arg-completer[gitter]" }
         stderr: { }
     );
@@ -71,7 +64,7 @@ fn completion_elvish() {
 #[test]
 fn completion_powershell() {
     gitter_test_partial!(
-        args: {"completion", "--power-shell" }
+        args: {"completion", "powershell" }
         stdout: { "Register-ArgumentCompleter -Native -CommandName 'gitter'" }
         stderr: { }
     );

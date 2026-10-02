@@ -40,7 +40,7 @@ fn list_output_aligned() {
 #[test]
 fn list_filtered_output() {
     gitter_test!(
-        args: { "list", "-d", "3", "-a", "never", "-f", "branch:master" }
+        args: { "list", "-d", "3", "-a", "never", "-f", "branch:master && ! name:gitter-rs" }
         stdout: {
             r"^\.local/repo_00 on master \[[0-9a-f]*\] by indrajit \d+ (s |mi|h |d |mo|y )\s*$",
             r"^\.local/repo_02 on master \[[0-9a-f]*\] by indrajit \d+ (s |mi|h |d |mo|y )\s*$",
