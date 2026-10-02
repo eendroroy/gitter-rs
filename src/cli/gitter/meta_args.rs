@@ -1,4 +1,3 @@
-use crate::cli::gitter::RepoArgs;
 use clap::{Args, Subcommand, ValueHint};
 use std::path::PathBuf;
 
@@ -35,21 +34,10 @@ pub struct MetaFileArg {
     pub file: Option<PathBuf>,
 }
 
-/// Where the workspace and its metafile live
-#[derive(Args, Debug, Clone)]
-pub struct MetaLocation {
-    /// Workspace directory
-    #[arg(short = 'C', long = "pwd", default_value = ".", value_hint = ValueHint::DirPath)]
-    pub directory: PathBuf,
-
-    #[command(flatten)]
-    pub file: MetaFileArg,
-}
-
 #[derive(Args, Debug)]
 pub struct MetaInitArgs {
     #[command(flatten)]
-    pub location: MetaLocation,
+    pub file: MetaFileArg,
 
     /// Overwrite an existing metafile
     #[arg(long)]
@@ -63,7 +51,7 @@ pub struct MetaInitArgs {
 #[derive(Args, Debug)]
 pub struct MetaAddArgs {
     #[command(flatten)]
-    pub location: MetaLocation,
+    pub file: MetaFileArg,
 
     /// Repository remote url
     #[arg(value_hint = ValueHint::Url)]
@@ -93,7 +81,7 @@ pub struct MetaAddArgs {
 #[derive(Args, Debug)]
 pub struct MetaRemoveArgs {
     #[command(flatten)]
-    pub location: MetaLocation,
+    pub file: MetaFileArg,
 
     /// Repository paths or names to remove
     #[arg(required = true, value_name = "REPO")]
@@ -106,9 +94,6 @@ pub struct MetaRemoveArgs {
 
 #[derive(Args, Debug)]
 pub struct MetaSaveArgs {
-    #[command(flatten)]
-    pub repo: RepoArgs,
-
     #[command(flatten)]
     pub file: MetaFileArg,
 
@@ -128,7 +113,7 @@ pub struct MetaSaveArgs {
 #[derive(Args, Debug)]
 pub struct MetaRestoreArgs {
     #[command(flatten)]
-    pub location: MetaLocation,
+    pub file: MetaFileArg,
 
     /// Skip checking out branches after cloning
     #[arg(long)]
@@ -146,14 +131,11 @@ pub struct MetaRestoreArgs {
 #[derive(Args, Debug)]
 pub struct MetaStatusArgs {
     #[command(flatten)]
-    pub repo: RepoArgs,
-
-    #[command(flatten)]
     pub file: MetaFileArg,
 }
 
 #[derive(Args, Debug)]
 pub struct MetaListArgs {
     #[command(flatten)]
-    pub location: MetaLocation,
+    pub file: MetaFileArg,
 }

@@ -13,7 +13,7 @@ fn completion_help() {
         args: { "completion", "--help" }
         stdout: {
             "Generate shell completion",
-            "Usage: gitter completion [SHELL]",
+            "Usage: gitter completion [OPTIONS] [SHELL]",
             "Arguments:",
             "[SHELL]",
             "Shell to generate completion for",

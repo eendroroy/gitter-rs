@@ -1,5 +1,5 @@
 use super::{fail, load_or_fail};
-use crate::cli::gitter::MetaStatusArgs;
+use crate::cli::gitter::{MetaStatusArgs, RepoArgs};
 use crate::cli::processor::helper::find_repos;
 use crate::meta::{Metadata, same_url, store};
 use crate::repository::helper::{get_current_branch, get_dirty, get_remote};
@@ -16,8 +16,8 @@ enum State {
     WrongBranch(String),
 }
 
-pub async fn status(args: &MetaStatusArgs) {
-    let directory = &args.repo.directory;
+pub async fn status(repo: &RepoArgs, args: &MetaStatusArgs) {
+    let directory = &repo.directory;
     let file = store::resolve(directory, &args.file.file);
     let data = load_or_fail(&file);
     let base = fs::canonicalize(directory).unwrap_or_else(|e| fail(e));
@@ -39,7 +39,7 @@ pub async fn status(args: &MetaStatusArgs) {
     }
 
     let known: HashSet<&str> = data.repos.iter().map(|m| m.path.as_str()).collect();
-    let found = find_repos(&args.repo).await;
+    let found = find_repos(repo).await;
     for repo in found.props.iter() {
         let Ok(relative) = Path::new(&repo.repo_path).strip_prefix(&base) else {
             continue;

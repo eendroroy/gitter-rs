@@ -1,12 +1,11 @@
-use crate::cli::gitter::{BoolChoice, ExecArgs};
+use crate::cli::gitter::{BoolChoice, ExecArgs, OutputArgs, RepoArgs};
 use crate::cli::processor::helper::{command, find_repos};
 use crate::placeholder::processor::{evaluate_placeholders, replace_placeholders};
 use crate::repository::print_info::print_info_line;
 use colored::Colorize;
 use std::process::Stdio;
 
-pub async fn exec(opts: &ExecArgs) {
-    let (repo, cmd) = (&opts.repo, &opts.output);
+pub async fn exec(repo: &RepoArgs, cmd: &OutputArgs, opts: &ExecArgs) {
     let repos = find_repos(repo).await;
     let bin = opts.program.clone();
     let args = opts.args.join(" ");

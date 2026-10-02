@@ -1,12 +1,11 @@
-use crate::cli::gitter::{BoolChoice, GitArgs};
+use crate::cli::gitter::{BoolChoice, GitArgs, OutputArgs, RepoArgs};
 use crate::cli::processor::helper::{command, find_repos};
 use crate::placeholder::processor::{evaluate_placeholders, replace_placeholders};
 use crate::repository::print_info::print_info_line;
 use colored::Colorize;
 use std::process::Stdio;
 
-pub async fn git(args: &GitArgs) {
-    let (repo, cmd) = (&args.repo, &args.output);
+pub async fn git(repo: &RepoArgs, cmd: &OutputArgs, args: &GitArgs) {
     let repos = find_repos(repo).await;
     let args = args.args.join(" ");
 

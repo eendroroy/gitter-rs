@@ -1,10 +1,10 @@
 use super::plan::{Action, run_git};
 use super::{fail, warn, write_or_fail};
-use crate::cli::gitter::MetaAddArgs;
+use crate::cli::gitter::{MetaAddArgs, RepoArgs};
 use crate::meta::{Metadata, normalize_path, same_url, store};
 
-pub fn add(args: &MetaAddArgs) {
-    let file = store::resolve(&args.location.directory, &args.location.file.file);
+pub fn add(repo: &RepoArgs, args: &MetaAddArgs) {
+    let file = store::resolve(&repo.directory, &args.file.file);
     let mut data = store::load_or_default(&file).unwrap_or_else(|e| fail(e));
 
     let url_name = args.url.trim_end_matches('/').rsplit(['/', ':']).next().unwrap_or("");
@@ -51,7 +51,7 @@ pub fn add(args: &MetaAddArgs) {
     write_or_fail(&file, &data);
 
     for action in actions.iter().skip(1) {
-        if let Err(e) = run_git(action, &args.location.directory) {
+        if let Err(e) = run_git(action, &repo.directory) {
             fail(e);
         }
     }

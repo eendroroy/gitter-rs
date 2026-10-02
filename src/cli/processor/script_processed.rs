@@ -1,4 +1,4 @@
-use crate::cli::gitter::{BoolChoice, ScriptArgs, resolve_shell, shell_bin};
+use crate::cli::gitter::{BoolChoice, OutputArgs, RepoArgs, ScriptArgs, resolve_shell, shell_bin};
 use crate::cli::processor::helper::{command, find_repos};
 use crate::placeholder::processor::{evaluate_placeholders, replace_placeholders};
 use crate::print_error;
@@ -8,8 +8,7 @@ use std::fs;
 use std::path::absolute;
 use std::process::Stdio;
 
-pub async fn script_processed(scpt: &ScriptArgs) {
-    let (repo, cmd) = (&scpt.repo, &scpt.output);
+pub async fn script_processed(repo: &RepoArgs, cmd: &OutputArgs, scpt: &ScriptArgs) {
     let repos = find_repos(repo).await;
 
     let bin = shell_bin(resolve_shell(scpt.shell));

@@ -5,14 +5,14 @@ use clap::Args;
 #[derive(Args, Debug, Clone)]
 pub struct OutputArgs {
     /// Show or hide the command being executed
-    #[arg(short = 'c', long, value_name = "WHEN", default_value = "always")]
+    #[arg(short = 'c', long, value_name = "WHEN", default_value = "always", global = true)]
     pub show_command: BoolChoice,
 
     /// Show or hide the repository info line
-    #[arg(short = 'i', long, value_name = "WHEN", default_value = "always")]
+    #[arg(short = 'i', long, value_name = "WHEN", default_value = "always", global = true)]
     pub show_info: BoolChoice,
 
     /// Hide the command's stdout
-    #[arg(short, long)]
+    #[arg(short, long, global = true)]
     pub quiet: bool,
 }

@@ -1,9 +1,9 @@
 use super::{load_or_fail, warn};
-use crate::cli::gitter::MetaListArgs;
+use crate::cli::gitter::{MetaListArgs, RepoArgs};
 use crate::meta::store;
 
-pub fn list(args: &MetaListArgs) {
-    let path = store::resolve(&args.location.directory, &args.location.file.file);
+pub fn list(repo: &RepoArgs, args: &MetaListArgs) {
+    let path = store::resolve(&repo.directory, &args.file.file);
     let data = load_or_fail(&path);
     if data.repos.is_empty() {
         warn("No repositories recorded in the metafile.");

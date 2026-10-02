@@ -1,15 +1,9 @@
-use crate::cli::gitter::{OutputArgs, RepoArgs, Shell};
+use crate::cli::gitter::Shell;
 use clap::{Args, ValueHint};
 use std::path::PathBuf;
 
 #[derive(Args, Debug)]
 pub struct ScriptArgs {
-    #[command(flatten)]
-    pub repo: RepoArgs,
-
-    #[command(flatten)]
-    pub output: OutputArgs,
-
     /// Path to the script
     #[arg(value_hint = ValueHint::FilePath)]
     pub path: PathBuf,

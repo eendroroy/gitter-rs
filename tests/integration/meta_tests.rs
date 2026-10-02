@@ -74,7 +74,7 @@ fn meta_requires_a_subcommand() {
     let sb = Sandbox::new("nosub");
     let o = sb.gitter(&[]);
     assert!(!o.status.success());
-    assert!(err(&o).contains("Usage: gitter meta <COMMAND>"));
+    assert!(err(&o).contains("Usage: gitter meta [OPTIONS] <COMMAND>"));
 }
 
 #[test]

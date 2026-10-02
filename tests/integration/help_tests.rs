@@ -3,8 +3,8 @@ fn help() {
     gitter_test_partial!(
         args: { "help" }
         stdout: {
-            "Usage: gitter [OPTIONS] <GIT_ARGS>...",
-            "gitter <COMMAND>",
+            "Usage: gitter [OPTIONS] <COMMAND>",
+            "gitter [OPTIONS] <GIT_ARGS>...",
             "Commands:",
             "list", "[aliases: ls, l]",
             "git", "[alias: g]",

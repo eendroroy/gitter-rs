@@ -1,6 +1,6 @@
 use super::plan::{Action, run_git};
 use super::{fail, load_or_fail};
-use crate::cli::gitter::MetaRestoreArgs;
+use crate::cli::gitter::{MetaRestoreArgs, RepoArgs};
 use crate::meta::{Metadata, same_url, store};
 use crate::repository::helper::get_remote;
 use colored::Colorize;
@@ -14,8 +14,8 @@ struct Outcome {
     ok: bool,
 }
 
-pub async fn restore(args: &MetaRestoreArgs) {
-    let file = store::resolve(&args.location.directory, &args.location.file.file);
+pub async fn restore(repo: &RepoArgs, args: &MetaRestoreArgs) {
+    let file = store::resolve(&repo.directory, &args.file.file);
     let data = load_or_fail(&file);
     if data.repos.is_empty() {
         println!("No repositories recorded in the metafile.");
@@ -25,7 +25,7 @@ pub async fn restore(args: &MetaRestoreArgs) {
     let semaphore = Arc::new(Semaphore::new(args.jobs as usize));
     let mut tasks = JoinSet::new();
     for meta in data.repos {
-        let base = args.location.directory.clone();
+        let base = repo.directory.clone();
         let (no_checkout, dry_run) = (args.no_checkout, args.dry_run);
         let semaphore = semaphore.clone();
         tasks.spawn(async move {

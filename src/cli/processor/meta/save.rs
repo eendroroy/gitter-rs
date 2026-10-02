@@ -1,13 +1,13 @@
 use super::plan::Action;
 use super::{fail, load_or_fail, warn, write_or_fail};
-use crate::cli::gitter::MetaSaveArgs;
+use crate::cli::gitter::{MetaSaveArgs, RepoArgs};
 use crate::cli::processor::helper::find_repos;
 use crate::meta::{MetaFile, Metadata, store};
 use crate::repository::helper::DETACHED;
 use std::fs;
 
-pub async fn save(args: &MetaSaveArgs) {
-    let directory = &args.repo.directory;
+pub async fn save(repo: &RepoArgs, args: &MetaSaveArgs) {
+    let directory = &repo.directory;
     let file = store::resolve(directory, &args.file.file);
     let base = fs::canonicalize(directory).unwrap_or_else(|e| fail(e));
 
@@ -28,7 +28,7 @@ pub async fn save(args: &MetaSaveArgs) {
         });
     }
 
-    let repos = find_repos(&args.repo).await;
+    let repos = find_repos(repo).await;
     for status in repos.props.iter() {
         let Ok(relative) = std::path::Path::new(&status.repo_path).strip_prefix(&base) else {
             continue;

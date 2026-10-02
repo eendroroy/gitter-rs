@@ -43,25 +43,37 @@ pub const CLAP_STYLE: Styles = Styles::styled()
     about,
     disable_help_subcommand = true,
     arg_required_else_help = true,
-    args_conflicts_with_subcommands = true,
+    override_usage = "gitter [OPTIONS] <COMMAND>\n       gitter [OPTIONS] <GIT_ARGS>...",
     subcommand_precedence_over_arg = true,
     styles = CLAP_STYLE,
     max_term_width = 150
 )]
 pub struct Gitter {
+    #[command(flatten, next_help_heading = "Common Options")]
+    pub repo: RepoArgs,
+
+    #[command(flatten, next_help_heading = "Common Options")]
+    pub output: OutputArgs,
+
     #[command(subcommand)]
     pub command: Option<GitterCommand>,
 
     /// Without a subcommand, arguments are run as `git <GIT_ARGS>`
-    #[command(flatten)]
-    pub git: GitArgs,
+    #[arg(
+        value_name = "GIT_ARGS",
+        help_heading = "Arguments",
+        trailing_var_arg = true,
+        allow_hyphen_values = true,
+        value_hint = clap::ValueHint::Other
+    )]
+    pub git_args: Vec<String>,
 }
 
 #[derive(Subcommand, Debug)]
 pub enum GitterCommand {
     /// List repositories
     #[command(visible_aliases = ["ls", "l"])]
-    List(RepoArgs),
+    List,
 
     /// Run a git command in each repository
     #[command(visible_alias = "g")]

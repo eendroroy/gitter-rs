@@ -1,12 +1,11 @@
-use crate::cli::gitter::{BoolChoice, ScriptArgs, resolve_shell, shell_bin};
+use crate::cli::gitter::{BoolChoice, OutputArgs, RepoArgs, ScriptArgs, resolve_shell, shell_bin};
 use crate::cli::processor::helper::{command, find_repos};
 use crate::repository::print_info::print_info_line;
 use colored::Colorize;
 use std::path::absolute;
 use std::process::Stdio;
 
-pub async fn script_raw(scripting: &ScriptArgs) {
-    let (repo, cmd) = (&scripting.repo, &scripting.output);
+pub async fn script_raw(repo: &RepoArgs, cmd: &OutputArgs, scripting: &ScriptArgs) {
     let repos = find_repos(repo).await;
 
     let bin = shell_bin(resolve_shell(scripting.shell));

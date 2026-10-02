@@ -1,10 +1,10 @@
 use super::plan::Action;
 use super::{fail, load_or_fail, write_or_fail};
-use crate::cli::gitter::MetaRemoveArgs;
+use crate::cli::gitter::{MetaRemoveArgs, RepoArgs};
 use crate::meta::{normalize_path, store};
 
-pub fn remove(args: &MetaRemoveArgs) {
-    let file = store::resolve(&args.location.directory, &args.location.file.file);
+pub fn remove(repo: &RepoArgs, args: &MetaRemoveArgs) {
+    let file = store::resolve(&repo.directory, &args.file.file);
     let mut data = load_or_fail(&file);
 
     let mut doomed = Vec::new();

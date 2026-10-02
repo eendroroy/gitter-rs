@@ -7,20 +7,20 @@ mod restore;
 mod save;
 mod status;
 
-use crate::cli::gitter::{MetaArgs, MetaCommand};
+use crate::cli::gitter::{MetaArgs, MetaCommand, RepoArgs};
 use crate::meta::{MetaFile, store};
 use crate::style::{ERROR, WARN};
 use std::path::Path;
 
-pub async fn meta(args: &MetaArgs) {
+pub async fn meta(repo: &RepoArgs, args: &MetaArgs) {
     match &args.command {
-        MetaCommand::Init(a) => init::init(a),
-        MetaCommand::Add(a) => add::add(a),
-        MetaCommand::Remove(a) => remove::remove(a),
-        MetaCommand::Save(a) => save::save(a).await,
-        MetaCommand::Restore(a) => restore::restore(a).await,
-        MetaCommand::Status(a) => status::status(a).await,
-        MetaCommand::List(a) => list::list(a),
+        MetaCommand::Init(a) => init::init(repo, a),
+        MetaCommand::Add(a) => add::add(repo, a),
+        MetaCommand::Remove(a) => remove::remove(repo, a),
+        MetaCommand::Save(a) => save::save(repo, a).await,
+        MetaCommand::Restore(a) => restore::restore(repo, a).await,
+        MetaCommand::Status(a) => status::status(repo, a).await,
+        MetaCommand::List(a) => list::list(repo, a),
     }
 }
 
