@@ -147,7 +147,7 @@ fn ignore_file_patterns_exclude_repositories_and_preserve_nonmatches() {
 }
 
 #[test]
-fn list_placeholders_exercise_old_commit_time_and_large_repo_size() {
+fn list_renders_old_commit_age_and_large_repository_size() {
     let workspace = Workspace::new();
     workspace.add_old_large_repo("aged/repository");
 

@@ -1,5 +1,5 @@
 #[test]
-fn completion() {
+fn completion_generates_output_for_the_default_shell() {
     gitter_test_present!(
         args: { "completion" }
         stdout: true
@@ -8,7 +8,7 @@ fn completion() {
 }
 
 #[test]
-fn completion_help() {
+fn completion_displays_command_help() {
     gitter_test_partial!(
         args: { "completion", "--help" }
         stdout: {

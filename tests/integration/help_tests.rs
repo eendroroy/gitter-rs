@@ -1,5 +1,5 @@
 #[test]
-fn help() {
+fn help_displays_command_usage() {
     gitter_test_partial!(
         args: { "help" }
         stdout: {
@@ -25,7 +25,7 @@ fn help() {
 }
 
 #[test]
-fn help_placeholder() {
+fn help_lists_available_placeholders() {
     gitter_test_partial!(
         args: { "help", "placeholders" }
         stdout: {
@@ -56,7 +56,7 @@ fn help_placeholder() {
 }
 
 #[test]
-fn help_gitterignore() {
+fn help_describes_gitterignore_patterns() {
     gitter_test_partial!(
         args: { "help", "gitterignore" }
         stdout: {
@@ -71,7 +71,7 @@ fn help_gitterignore() {
 }
 
 #[test]
-fn help_filter() {
+fn help_describes_filter_syntax() {
     gitter_test_partial!(
         args: { "help", "filters" }
         stdout: {
@@ -115,7 +115,7 @@ fn help_filter() {
 }
 
 #[test]
-fn help_completion() {
+fn help_documents_shell_completion_setup() {
     gitter_test_partial!(
         args: { "help", "completions" }
         stdout: {

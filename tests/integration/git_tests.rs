@@ -1,5 +1,5 @@
 #[test]
-fn git_head_output() {
+fn git_reports_current_head_in_each_repository() {
     gitter_test!(
         args:  {"git", "-i", "never", "-c", "never", "-f", "! name:gitter-rs", "rev-parse", "--abbrev-ref", "HEAD"}
         stdout: {
@@ -22,7 +22,7 @@ fn git_head_output() {
 }
 
 #[test]
-fn git_bare_output() {
+fn git_reports_worktree_status_for_regular_and_bare_repositories() {
     gitter_test!(
         args:  {"git", "-i", "never", "-f", "! name:gitter-rs", "rev-parse", "--is-inside-work-tree"}
         stdout: {
@@ -41,7 +41,7 @@ fn git_bare_output() {
 }
 
 #[test]
-fn git_bare_quiet_output() {
+fn quiet_git_mode_prints_commands_without_results() {
     gitter_test!(
         args:  {"git", "-i", "never", "-q", "-f", "! name:gitter-rs", "rev-parse", "--is-inside-work-tree"}
         stdout: {
@@ -60,7 +60,7 @@ fn git_bare_quiet_output() {
 }
 
 #[test]
-fn silent_git_bare_quiet_output() {
+fn implicit_git_command_runs_in_workspace_repositories() {
     gitter_test!(
         args:  {"rev-parse", "--is-inside-work-tree"}
         stdout: {

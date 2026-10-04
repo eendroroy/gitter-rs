@@ -1,5 +1,5 @@
 #[test]
-fn exec_echo_output() {
+fn exec_runs_echo_with_repository_placeholders() {
     gitter_test!(
         args:  {"exec", "-d", "3", "-i", "never", "-c", "never", "-f", "! name:gitter-rs", "echo", "{_name_} {_commit:c_}"}
         stdout: {
@@ -19,7 +19,7 @@ fn exec_echo_output() {
 }
 
 #[test]
-fn exec_with_command_echo_output() {
+fn exec_displays_commands_and_their_output() {
     gitter_test!(
         args:  {"exec", "-d", "3", "-i", "never", "-f", "! name:gitter-rs", "echo", "{_name_} {_commit:c_}"}
         stdout: {
@@ -49,7 +49,7 @@ fn exec_with_command_echo_output() {
 }
 
 #[test]
-fn exec_with_command_echo_quiet_output() {
+fn exec_quiet_mode_suppresses_child_output() {
     gitter_test!(
         args:  {"exec", "-d", "3", "-i", "never", "-q", "-f", "! name:gitter-rs", "echo", "{_name_} {_commit:c_}"}
         stdout: {
@@ -69,7 +69,7 @@ fn exec_with_command_echo_quiet_output() {
 }
 
 #[test]
-fn exec_basename_output() {
+fn exec_resolves_repository_path_placeholders() {
     gitter_test!(
         args: { "exec", "-d", "3", "-i", "never", "-c", "never", "-f", "! name:gitter-rs", "basename", "{_path:a_}{_name_}" }
         stdout: {

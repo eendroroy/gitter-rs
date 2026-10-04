@@ -1,5 +1,5 @@
 #[test]
-fn gitter_should_fail_on_invalid_directory() {
+fn list_rejects_a_nonexistent_working_directory() {
     gitter_test!(
         args: { "list", "-d", "3", "-C", "/non/existent/directory" }
         stdout: { }

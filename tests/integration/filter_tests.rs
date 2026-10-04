@@ -1,5 +1,5 @@
 #[test]
-fn filter_active_errors() {
+fn filter_rejects_invalid_active_durations() {
     gitter_test!(
         args: { "list", "-d", "3", "-a", "never", "-f", "active:<48 && ! name:gitter-rs" }
         stdout: { }
@@ -18,7 +18,7 @@ fn filter_active_errors() {
 }
 
 #[test]
-fn filter_branch() {
+fn filter_selects_repositories_by_branch() {
     gitter_test!(
         args: { "list", "-d", "3", "-a", "never", "-f", "branch:master && ! name:gitter-rs" }
         stdout: {
@@ -114,7 +114,7 @@ fn filter_rejects_malformed_boolean_expressions() {
 }
 
 #[test]
-fn filter_active_1y() {
+fn filter_selects_commits_younger_than_one_year() {
     gitter_test!(
         args: { "list", "-d", "3", "-a", "never", "-f", "active:<1y && ! name:gitter-rs" }
         stdout: {
@@ -133,7 +133,7 @@ fn filter_active_1y() {
 }
 
 #[test]
-fn filter_active_1mo() {
+fn filter_selects_commits_younger_than_one_month() {
     gitter_test!(
         args: { "list", "-d", "3", "-a", "never", "-f", "active:<1mo && ! name:gitter-rs" }
         stdout: {
@@ -152,7 +152,7 @@ fn filter_active_1mo() {
 }
 
 #[test]
-fn filter_active_2d() {
+fn filter_selects_commits_younger_than_two_days() {
     gitter_test!(
         args: { "list", "-d", "3", "-a", "never", "-f", "active:<2d && ! name:gitter-rs" }
         stdout: {
@@ -164,7 +164,7 @@ fn filter_active_2d() {
 }
 
 #[test]
-fn filter_active_48h() {
+fn filter_selects_commits_younger_than_forty_eight_hours() {
     gitter_test!(
         args: { "list", "-d", "3", "-a", "never", "-f", "active:<48h && ! name:gitter-rs" }
         stdout: {

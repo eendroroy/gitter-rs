@@ -194,7 +194,7 @@ fn meta_remove_rejects_ambiguous_names() {
 }
 
 #[test]
-fn meta_list_and_missing_file() {
+fn meta_list_reports_missing_file_and_lists_recorded_repositories() {
     let sb = Sandbox::new("list");
     let o = sb.gitter(&["list"]);
     assert!(!o.status.success());
@@ -256,7 +256,7 @@ fn meta_reads_legacy_layout() {
 }
 
 #[test]
-fn meta_restore_status_roundtrip() {
+fn meta_restore_changes_repository_status_from_missing_to_ok() {
     let sb = Sandbox::new("restore");
     sb.gitter(&["add", &sb.remote, "-p", "libs", "-N", "lib", "-b", "dev"]);
 
@@ -353,7 +353,7 @@ fn meta_status_reports_wrong_branch_dirty_and_wrong_remote() {
 }
 
 #[test]
-fn meta_save_merge_prune_and_untracked() {
+fn meta_save_merges_repositories_prunes_missing_entries_and_reports_untracked() {
     let sb = Sandbox::new("save");
     sb.gitter(&["add", &sb.remote, "-N", "lib", "--clone"]);
     sb.gitter(&["add", &sb.remote, "-N", "gone"]);
@@ -382,7 +382,7 @@ fn meta_save_merge_prune_and_untracked() {
 }
 
 #[test]
-fn meta_custom_file_option() {
+fn meta_commands_write_to_a_custom_metafile_path() {
     let sb = Sandbox::new("file");
     let o = sb.gitter(&["add", &sb.remote, "-N", "lib", "--file", "other.toml"]);
     assert!(o.status.success());

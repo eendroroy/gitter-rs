@@ -1,5 +1,5 @@
 #[test]
-fn placeholders_output_script() {
+fn script_prints_all_repository_placeholders() {
     gitter_test!(
         args: {
             "script",
@@ -38,7 +38,7 @@ fn placeholders_output_script() {
 }
 
 #[test]
-fn placeholders_output_list() {
+fn list_renders_all_repository_placeholders() {
     gitter_test!(
         args: {
             "list",
