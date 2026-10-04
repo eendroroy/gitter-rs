@@ -62,6 +62,8 @@ Prebuilt binaries available at [GitHub releases](https://github.com/eendroroy/gi
 
 ## Manual
 
+See the [usage guide](USAGE.md) for commands, options, filters, placeholders, and examples.
+
 Use the help menu
 
 ```bash
