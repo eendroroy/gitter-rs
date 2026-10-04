@@ -9,5 +9,6 @@ pub const YEARS: &str = "y ";
 
 pub mod filter_repositories;
 pub mod helper;
+pub mod needed;
 pub mod print_info;
 pub mod repositories;

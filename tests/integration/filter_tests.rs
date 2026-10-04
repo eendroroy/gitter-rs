@@ -174,3 +174,29 @@ fn filter_selects_commits_younger_than_forty_eight_hours() {
         stderr: { "WARN: repo_07 =>  Failed to parse timestamp" }
     );
 }
+
+#[test]
+fn filter_fields_are_computed_even_when_template_does_not_use_them() {
+    gitter_test!(
+        args: {
+            "list",
+            "--filter", "name:repo_bare_06 & bare: & branch:detached & active:>1d",
+            "--info-template", "{_name_}\\s{_size_}",
+        }
+        stdout: { r"^repo_bare_06 \d+K\s*$" }
+        stderr: { }
+    );
+}
+
+#[test]
+fn filter_that_matches_nothing_prints_nothing() {
+    gitter_test!(
+        args: {
+            "list",
+            "--filter", "name:repo_bare_06 & !bare:",
+            "--info-template", "{_name_}\\s{_size_}",
+        }
+        stdout: { }
+        stderr: { }
+    );
+}

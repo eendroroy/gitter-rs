@@ -1,3 +1,4 @@
+use crate::repository::needed::Needed;
 use super::{fail, load_or_fail};
 use crate::cli::gitter::{MetaStatusArgs, RepoArgs};
 use crate::cli::processor::helper::find_repos;
@@ -39,7 +40,7 @@ pub async fn status(repo: &RepoArgs, args: &MetaStatusArgs) {
     }
 
     let known: HashSet<&str> = data.repos.iter().map(|m| m.path.as_str()).collect();
-    let found = find_repos(repo).await;
+    let found = find_repos(repo, Needed::NONE).await;
     for repo in found.props.iter() {
         let Ok(relative) = Path::new(&repo.repo_path).strip_prefix(&base) else {
             continue;

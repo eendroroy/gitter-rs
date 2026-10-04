@@ -1,4 +1,6 @@
 use crate::cli::gitter::RepoArgs;
+use crate::repository::filter_repositories::Filter;
+use crate::repository::needed::Needed;
 use crate::placeholder::processor::{evaluate_placeholders, replace_placeholders};
 use crate::repository::helper::{
     get_absolute_path, get_absolute_time, get_bare, get_branch_count, get_commit_count,
@@ -55,77 +57,85 @@ pub struct Properties {
 }
 
 impl Properties {
-    pub fn new(path: &Path, base_path: &Path) -> Option<Self> {
+    /// Opens the repository and computes the always-cheap fields plus those in `needed`.
+    pub fn new(path: &Path, base_path: &Path, needed: Needed) -> Option<Self> {
         let mut repository = git2::Repository::open(path).ok()?;
-        let stash_count = get_stash_count(&mut repository);
-        let head_commit = repository.head().ok().and_then(|h| h.peel_to_commit().ok());
-        let head_commit = head_commit.as_ref();
 
-        let absolute_path = get_absolute_path(path);
         let (relative_path, nesting) = get_relative_path(path, base_path);
-        let name = get_repo_name(path);
-        let repo_size = get_repo_size(&repository);
-        let (remote_name, remote_fetch, remote_push) = get_remote(&repository);
-
-        let branch = get_current_branch(&repository);
-        let branch_count = get_branch_count(&repository);
-
-        let (commit_hash, author_name, author_email) = get_current_commit_info(head_commit);
-        let commit_count = get_commit_count(&repository);
-        let (relative_time, relative_time_combined) = get_relative_time(head_commit);
-        let absolute_time = get_absolute_time(head_commit);
-
-        let (dirty, is_dirty) = get_dirty(&repository);
         let (bare, is_bare) = get_bare(&repository);
 
-        let top_lang = get_top_language(&repository);
-
-        let (upstream, ahead, behind) = get_tracking(&repository);
-        let repo_state = get_repo_state(&repository);
-        let shallow = get_shallow(&repository);
-        let (user_name, user_email) = get_user(&repository);
-        let commit_summary = get_commit_summary(head_commit);
-        let remote_count = get_remote_count(&repository);
-        let tag_count = get_tag_count(&repository);
-        let worktree_count = get_worktree_count(&repository);
-
-        Some(Self {
+        let mut props = Self {
             repo_path: path.display().to_string(),
-            absolute_path,
+            absolute_path: get_absolute_path(path),
             relative_path,
             nesting,
-            repo_size,
-            remote_name,
-            remote_fetch,
-            remote_push,
-            name,
-            branch,
-            branch_count,
-            commit_hash,
-            commit_count,
-            author_name,
-            author_email,
-            relative_time,
-            relative_time_combined,
-            absolute_time,
-            dirty,
-            is_dirty,
+            name: get_repo_name(path),
             bare,
             is_bare,
-            top_lang,
-            upstream,
-            ahead,
-            behind,
-            repo_state,
-            shallow,
-            user_name,
-            user_email,
-            commit_summary,
-            remote_count,
-            tag_count,
-            worktree_count,
-            stash_count,
-        })
+            ..Default::default()
+        };
+        props.fill(&mut repository, needed);
+        Some(props)
+    }
+
+    /// Computes additional fields on an already built `Properties`.
+    pub fn extend(&mut self, needed: Needed) {
+        if let Ok(mut repository) = git2::Repository::open(&self.repo_path) {
+            self.fill(&mut repository, needed);
+        }
+    }
+
+    fn fill(&mut self, repository: &mut git2::Repository, needed: Needed) {
+        if needed.has(Needed::REMOTE) {
+            (self.remote_name, self.remote_fetch, self.remote_push) = get_remote(repository);
+        }
+        if needed.has(Needed::BRANCH) {
+            self.branch = get_current_branch(repository);
+        }
+        if needed.has(Needed::BRANCH_COUNT) {
+            self.branch_count = get_branch_count(repository);
+        }
+        if needed.has(Needed::COMMIT_COUNT) {
+            self.commit_count = get_commit_count(repository);
+        }
+        if needed.has(Needed::DIRTY) {
+            (self.dirty, self.is_dirty) = get_dirty(repository);
+        }
+        if needed.has(Needed::SIZE) {
+            self.repo_size = get_repo_size(repository);
+        }
+        if needed.has(Needed::LANGUAGE) {
+            self.top_lang = get_top_language(repository);
+        }
+        if needed.has(Needed::TRACKING) {
+            (self.upstream, self.ahead, self.behind) = get_tracking(repository);
+        }
+        if needed.has(Needed::STATE) {
+            self.repo_state = get_repo_state(repository);
+            self.shallow = get_shallow(repository);
+        }
+        if needed.has(Needed::USER) {
+            (self.user_name, self.user_email) = get_user(repository);
+        }
+        if needed.has(Needed::COUNTS) {
+            self.remote_count = get_remote_count(repository);
+            self.tag_count = get_tag_count(repository);
+            self.worktree_count = get_worktree_count(repository);
+            self.stash_count = get_stash_count(repository);
+        }
+        if needed.has(Needed::COMMIT) || needed.has(Needed::SUMMARY) {
+            let head_commit = repository.head().ok().and_then(|h| h.peel_to_commit().ok());
+            let head_commit = head_commit.as_ref();
+            if needed.has(Needed::COMMIT) {
+                (self.commit_hash, self.author_name, self.author_email) =
+                    get_current_commit_info(head_commit);
+                (self.relative_time, self.relative_time_combined) = get_relative_time(head_commit);
+                self.absolute_time = get_absolute_time(head_commit);
+            }
+            if needed.has(Needed::SUMMARY) {
+                self.commit_summary = get_commit_summary(head_commit);
+            }
+        }
     }
 }
 
@@ -171,49 +181,74 @@ pub struct Repositories {
     pub lens: PropertyLengths,
 }
 
+/// Runs `work` over `items` on the blocking pool with bounded concurrency; result order is unspecified.
+async fn run_bounded<T, F>(items: Vec<T>, work: F) -> Vec<Properties>
+where
+    T: Send + 'static,
+    F: Fn(T) -> Option<Properties> + Send + Sync + 'static,
+{
+    let work = Arc::new(work);
+    let semaphore = Arc::new(Semaphore::new(MAX_CONCURRENT_TASKS));
+    let mut tasks = JoinSet::new();
+    let count = items.len();
+
+    for item in items {
+        let work = Arc::clone(&work);
+        let sem = Arc::clone(&semaphore);
+
+        tasks.spawn(async move {
+            let _permit = sem.acquire_owned().await.ok()?;
+            tokio::task::spawn_blocking(move || work(item)).await.ok().flatten()
+        });
+    }
+
+    let mut results = Vec::with_capacity(count);
+    while let Some(result) = tasks.join_next().await {
+        match result {
+            Ok(Some(props)) => results.push(props),
+            Ok(None) => {}
+            Err(e) => eprintln!("Task panicked or was canceled: {e}"),
+        }
+    }
+    results
+}
+
 impl Repositories {
-    pub async fn new(repositories: Vec<PathBuf>, path: &Path) -> Self {
+    /// Cheap fields needed by the filter are computed first; the rest (`display`) only for repositories that pass.
+    pub async fn new(
+        repositories: Vec<PathBuf>,
+        path: &Path,
+        filter: Option<&Filter>,
+        display: Needed,
+    ) -> Self {
         let base_path = Arc::new(path.to_owned());
-        let mut tasks = JoinSet::new();
+        let first = filter.map_or(display, Filter::needed);
 
-        let semaphore = Arc::new(Semaphore::new(MAX_CONCURRENT_TASKS));
+        let mut props =
+            run_bounded(repositories, move |repo| Properties::new(&repo, &base_path, first)).await;
 
-        let repo_count = repositories.len();
-
-        for repo in repositories {
-            let base_path = Arc::clone(&base_path);
-            let sem = Arc::clone(&semaphore);
-
-            tasks.spawn(async move {
-                let _permit = sem.acquire_owned().await.ok()?;
-
-                tokio::task::spawn_blocking(move || Properties::new(&repo, &base_path))
-                    .await
-                    .ok()
-                    .flatten()
-            });
+        if let Some(filter) = filter {
+            props.retain(|p| filter.matches(p));
         }
 
-        let mut statuses: Vec<Properties> = Vec::with_capacity(repo_count);
-
-        while let Some(result) = tasks.join_next().await {
-            match result {
-                Ok(Some(status)) => statuses.push(status),
-                Ok(None) => {}
-                Err(e) => eprintln!("Task panicked or was canceled: {e}"),
-            }
+        let remaining = display.without(first);
+        if !remaining.is_empty() {
+            props = run_bounded(props, move |mut p| {
+                p.extend(remaining);
+                Some(p)
+            })
+            .await;
         }
 
         Self {
-            props: statuses,
+            props,
             lens: PropertyLengths::default(),
         }
     }
 
     pub fn sort(&mut self, repo: &RepoArgs) {
-        self.props.sort_by(|a, b| {
-            replace_placeholders(&repo.sort, &evaluate_placeholders(&repo.sort, a))
-                .cmp(&replace_placeholders(&repo.sort, &evaluate_placeholders(&repo.sort, b)))
+        self.props.sort_by_cached_key(|p| {
+            replace_placeholders(&repo.sort, &evaluate_placeholders(&repo.sort, p))
         });
 
         if repo.reverse {

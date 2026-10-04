@@ -1,9 +1,10 @@
+use crate::repository::needed::Needed;
 use crate::cli::gitter::{BoolChoice, RepoArgs};
 use crate::cli::processor::helper::find_repos;
 use crate::repository::print_info::print_info_line;
 
 pub async fn list(repo: &RepoArgs) {
-    let repos = find_repos(repo).await;
+    let repos = find_repos(repo, Needed::NONE).await;
 
     repos.props.iter().for_each(|status| {
         print_info_line(

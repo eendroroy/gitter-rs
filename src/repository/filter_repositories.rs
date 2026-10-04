@@ -1,4 +1,5 @@
-use crate::repository::repositories::{Properties, PropertyLengths, Repositories};
+use crate::repository::needed::Needed;
+use crate::repository::repositories::Properties;
 use crate::repository::{DAYS, HOURS, MINUTES, MONTHS, SECONDS, YEARS};
 use crate::{print_error, print_warn};
 use chrono::{DateTime, Duration, Local, NaiveDateTime, Utc};
@@ -192,6 +193,20 @@ enum Expression {
 }
 
 impl Expression {
+    fn needed(&self) -> Needed {
+        match self {
+            Expression::Filter(f) => match f.filter_type {
+                FilterType::Branch => Needed::BRANCH,
+                FilterType::Dirty => Needed::DIRTY,
+                FilterType::Language => Needed::LANGUAGE,
+                FilterType::Active => Needed::COMMIT,
+                FilterType::Path | FilterType::Name | FilterType::Bare => Needed::NONE,
+            },
+            Expression::Not(expr) => expr.needed(),
+            Expression::And(l, r) | Expression::Or(l, r) => l.needed() | r.needed(),
+        }
+    }
+
     fn evaluate(&self, repo_prop: &Properties) -> bool {
         match self {
             Expression::Filter(f) => f.matches(repo_prop),
@@ -375,36 +390,39 @@ impl<'a> FilterParser<'a> {
     }
 }
 
-pub fn filter_repositories(repositories: &mut Repositories, filter_str: &str) -> Repositories {
+/// A parsed filter expression.
+pub struct Filter(Expression);
+
+impl Filter {
+    /// Properties the expression reads (name/path/bare are always available).
+    pub fn needed(&self) -> Needed {
+        self.0.needed()
+    }
+
+    pub fn matches(&self, props: &Properties) -> bool {
+        self.0.evaluate(props)
+    }
+}
+
+/// Parses a filter; `None` means "no filtering" (empty or unusable tokenizer input).
+pub fn parse_filter(filter_str: &str) -> Option<Filter> {
     if filter_str.is_empty() {
-        return repositories.clone();
+        return None;
     }
 
     let mut parser = match FilterParser::new(filter_str) {
         Ok(p) => p,
         Err(e) => {
             print_error!("Error initializing parser: {}", e);
-            return repositories.clone();
+            return None;
         }
     };
 
-    let expression = match parser.parse() {
-        Ok(expr) => expr,
+    match parser.parse() {
+        Ok(expr) => Some(Filter(expr)),
         Err(e) => {
             print_error!("Error parsing filter expression: {}", e);
             std::process::exit(1);
         }
-    };
-
-    let filtered_props: Vec<Properties> = repositories
-        .props
-        .iter()
-        .filter(|prop| expression.evaluate(prop))
-        .cloned()
-        .collect();
-
-    Repositories {
-        props: filtered_props,
-        lens: PropertyLengths::default(),
     }
 }

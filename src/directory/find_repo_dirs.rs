@@ -46,12 +46,14 @@ pub fn find_repo_dirs<P: AsRef<Path>>(target_dir: P, depth: usize) -> Vec<PathBu
             }
         }
 
-        let all_active_rules: Vec<&IgnoreRule> =
-            active_ignore_rules_stack.iter().flat_map(|(_, rules)| rules.iter()).collect();
+        if entry.file_type().is_dir() && !active_ignore_rules_stack.is_empty() {
+            let all_active_rules: Vec<&IgnoreRule> =
+                active_ignore_rules_stack.iter().flat_map(|(_, rules)| rules.iter()).collect();
 
-        if entry.file_type().is_dir() && is_ignored(current_entry_path, &all_active_rules) {
-            it.skip_current_dir();
-            continue;
+            if is_ignored(current_entry_path, &all_active_rules) {
+                it.skip_current_dir();
+                continue;
+            }
         }
 
         if entry.file_type().is_dir() {

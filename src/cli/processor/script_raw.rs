@@ -1,3 +1,4 @@
+use crate::repository::needed::Needed;
 use crate::cli::gitter::{BoolChoice, OutputArgs, RepoArgs, ScriptArgs, resolve_shell, shell_bin};
 use crate::cli::processor::helper::{command, find_repos};
 use crate::repository::print_info::print_info_line;
@@ -6,7 +7,7 @@ use std::path::absolute;
 use std::process::Stdio;
 
 pub async fn script_raw(repo: &RepoArgs, cmd: &OutputArgs, scripting: &ScriptArgs) {
-    let repos = find_repos(repo).await;
+    let repos = find_repos(repo, Needed::NONE).await;
 
     let bin = shell_bin(resolve_shell(scripting.shell));
 

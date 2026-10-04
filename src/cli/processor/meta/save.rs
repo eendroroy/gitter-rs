@@ -1,3 +1,4 @@
+use crate::repository::needed::Needed;
 use super::plan::Action;
 use super::{fail, load_or_fail, warn, write_or_fail};
 use crate::cli::gitter::{MetaSaveArgs, RepoArgs};
@@ -28,7 +29,7 @@ pub async fn save(repo: &RepoArgs, args: &MetaSaveArgs) {
         });
     }
 
-    let repos = find_repos(repo).await;
+    let repos = find_repos(repo, Needed::REMOTE | Needed::BRANCH).await;
     for status in repos.props.iter() {
         let Ok(relative) = std::path::Path::new(&status.repo_path).strip_prefix(&base) else {
             continue;

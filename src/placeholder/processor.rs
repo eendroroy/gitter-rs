@@ -1,4 +1,5 @@
 use crate::placeholder::HOLDERS;
+use crate::repository::needed::Needed;
 use crate::repository::repositories::{Properties, PropertyLengths};
 use lazy_static::lazy_static;
 use regex::{Captures, Regex};
@@ -63,4 +64,11 @@ pub fn replace_placeholders(base_string: &str, evaluation: &HashMap<String, Stri
             }
         })
         .into_owned()
+}
+
+/// Properties that must be computed to render every placeholder found in `text`.
+pub fn needed_for(text: &str) -> Needed {
+    PLACEHOLDER_RE
+        .captures_iter(text)
+        .fold(Needed::NONE, |acc, caps| acc | Needed::for_tag(caps.get(1).unwrap().as_str()))
 }

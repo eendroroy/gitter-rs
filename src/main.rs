@@ -19,7 +19,7 @@ pub static STYLE: LazyLock<Palette> = LazyLock::new(Palette::default);
 pub static IGNORE_FILE: &str = ".gitterignore";
 pub static META_FILE: &str = ".gitter.meta.toml";
 
-#[tokio::main]
+#[tokio::main(flavor = "current_thread")]
 async fn main() {
     let cli = Gitter::parse();
     let (repo, output) = (&cli.repo, &cli.output);

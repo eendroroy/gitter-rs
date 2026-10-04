@@ -1,17 +1,20 @@
 use git2::Repository;
+use std::sync::LazyLock;
 use tokei::{Config, Languages};
 
+static CONFIG: LazyLock<Config> = LazyLock::new(Config::from_config_files);
+
 pub fn get_top_language(repository: &Repository) -> String {
-    let config = Config::from_config_files();
+    let config = &*CONFIG;
     let mut languages = Languages::new();
 
     if let Some(repo_root) = repository.workdir() {
         let excluded: &[&str] = &[];
 
-        languages.get_statistics(&[repo_root], excluded, &config);
+        languages.get_statistics(&[repo_root], excluded, config);
     } else {
         if let Some(repo_path) = repository.path().parent() {
-            languages.get_statistics(&[repo_path], &[], &config);
+            languages.get_statistics(&[repo_path], &[], config);
         }
     }
 

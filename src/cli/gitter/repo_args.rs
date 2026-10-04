@@ -19,7 +19,7 @@ pub struct RepoArgs {
         short = 't',
         long,
         global = true,
-        default_value = "{_path:r_}{_name_} {_language_} {_bare_} on {_branch:n_} [{_hash:8_}] by {_author:n_} {_time:r_}"
+        default_value = "{_path:r_}{_name_} {_bare_} on {_branch:n_} [{_hash:8_}] by {_author:n_} {_time:r_}"
     )]
     pub info_template: String,
 
