@@ -1,6 +1,6 @@
 [package]
 name = "gitter-rs"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["indrajit"]
 edition = "2024"
 rust-version = "1.96.0"
