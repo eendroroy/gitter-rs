@@ -323,6 +323,7 @@ mod integration {
     pub mod git_tests;
     pub mod gitter_tests;
     pub mod help_tests;
+    pub mod ignore_tests;
     pub mod list_tests;
     pub mod meta_tests;
     pub mod placeholders_tests;

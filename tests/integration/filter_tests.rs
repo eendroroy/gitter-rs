@@ -32,6 +32,88 @@ fn filter_branch() {
 }
 
 #[test]
+fn filter_boolean_precedence_grouping_and_negation() {
+    gitter_test!(
+        args: { "list", "-d", "3", "-a", "never", "-f", "name:repo_00 || name:repo_02 && branch:feature/feature-3" }
+        stdout: {
+            r"^\.local/repo_00 on master \[[0-9a-f]*\] by indrajit \d+ (s |mi|h |d |mo|y )\s*$"
+        }
+        stderr: {}
+    );
+    gitter_test!(
+        args: { "list", "-d", "3", "-a", "never", "-f", "(name:repo_00 || name:repo_02) && ! branch:feature/feature-3" }
+        stdout: {
+            r"^\.local/repo_00 on master \[[0-9a-f]*\] by indrajit \d+ (s |mi|h |d |mo|y )\s*$",
+            r"^\.local/repo_02 on master \[[0-9a-f]*\] by indrajit \d+ (s |mi|h |d |mo|y )\s*$"
+        }
+        stderr: {}
+    );
+}
+
+#[test]
+fn filter_path_name_and_suffix_patterns() {
+    gitter_test!(
+        args: { "list", "-d", "3", "-a", "never", "-f", "path:.local/ign_10/" }
+        stdout: {
+            r"^\.local/ign_10/repo_11 on master \[[0-9a-f]*\] by indrajit \d+ (s |mi|h |d |mo|y )\s*$"
+        }
+        stderr: {}
+    );
+    gitter_test!(
+        args: { "list", "-d", "3", "-a", "never", "-f", "name:+00" }
+        stdout: {
+            r"^\.local/repo_00 on master \[[0-9a-f]*\] by indrajit \d+ (s |mi|h |d |mo|y )\s*$",
+            r"^\.local/repo_bare_00 bare on master \[[0-9a-f]*\] by indrajit \d+ (s |mi|h |d |mo|y )\s*$"
+        }
+        stderr: {}
+    );
+    gitter_test!(
+        args: { "list", "-d", "3", "-a", "never", "-f", "name:+bare+" }
+        stdout: {
+            r"^\.local/repo_bare_00 bare on master \[[0-9a-f]*\] by indrajit \d+ (s |mi|h |d |mo|y )\s*$",
+            r"^\.local/repo_bare_06 bare on detached \[[0-9a-f]*\] by indrajit \d+ (s |mi|h |d |mo|y )\s*$"
+        }
+        stderr: {}
+    );
+}
+
+#[test]
+fn filter_bare_and_active_greater_than_conditions() {
+    gitter_test!(
+        args: { "list", "-d", "3", "-a", "never", "-f", "bare:" }
+        stdout: {
+            r"^\.local/repo_bare_00 bare on master \[[0-9a-f]*\] by indrajit \d+ (s |mi|h |d |mo|y )\s*$",
+            r"^\.local/repo_bare_06 bare on detached \[[0-9a-f]*\] by indrajit \d+ (s |mi|h |d |mo|y )\s*$"
+        }
+        stderr: {}
+    );
+    gitter_test!(
+        args: { "list", "-d", "3", "-a", "never", "-f", "active:>100y" }
+        stdout: {}
+        stderr: { "WARN: repo_07 =>  Failed to parse timestamp" }
+    );
+}
+
+#[test]
+fn filter_rejects_malformed_boolean_expressions() {
+    gitter_test!(
+        args: { "list", "-d", "3", "-a", "never", "-f", "name:repo_00 &&" }
+        stdout: {}
+        stderr: { "ERR:  Error parsing filter expression:" }
+    );
+    gitter_test!(
+        args: { "list", "-d", "3", "-a", "never", "-f", "(name:repo_00 || name:repo_02" }
+        stdout: {}
+        stderr: { "ERR:  Error parsing filter expression:" }
+    );
+    gitter_test!(
+        args: { "list", "-d", "3", "-a", "never", "-f", "unknown:repo_00" }
+        stdout: {}
+        stderr: { "ERR:  Error parsing filter expression: Invalid filter clause: unknown:repo_00" }
+    );
+}
+
+#[test]
 fn filter_active_1y() {
     gitter_test!(
         args: { "list", "-d", "3", "-a", "never", "-f", "active:<1y && ! name:gitter-rs" }
