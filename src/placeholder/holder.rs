@@ -277,4 +277,88 @@ define_holders! {
         |s, _c| s.top_lang.to_string(),
         |s, _c, l| apply_style(&s.top_lang.to_string(), l.map(|i| i.top_lang), Some(&STYLE.top_lang))
     }
+
+    {
+        "upstream", "{_upstream_}", "Upstream tracking branch of HEAD (empty if none).",
+
+        |s, _c| s.upstream.clone(),
+        |s, _c, l| apply_style(&s.upstream, l.map(|i| i.upstream), Some(&STYLE.upstream))
+    }
+
+    {
+        "ahead", "{_ahead_}", "Commits ahead of upstream (empty if no upstream).",
+
+        |s, _c| s.ahead.clone(),
+        |s, _c, l| apply_style(&s.ahead, l.map(|i| i.ahead), Some(&STYLE.ahead_behind))
+    }
+
+    {
+        "behind", "{_behind_}", "Commits behind upstream (empty if no upstream).",
+
+        |s, _c| s.behind.clone(),
+        |s, _c, l| apply_style(&s.behind, l.map(|i| i.behind), Some(&STYLE.ahead_behind))
+    }
+
+    {
+        "state", "{_state_}", "In-progress operation: merge, rebase, cherry-pick, revert, bisect or mailbox.",
+
+        |s, _c| s.repo_state.clone(),
+        |s, _c, l| apply_style(&s.repo_state, l.map(|i| i.repo_state), Some(&STYLE.repo_state))
+    }
+
+    {
+        "shallow", "{_shallow_}", "Marker for shallow clones.",
+
+        |s, _c| s.shallow.clone(),
+        |s, _c, l| apply_style(&s.shallow, l.map(|i| i.shallow), Some(&STYLE.repo_state))
+    }
+
+    {
+        "remote:c", "{_remote:c_}", "Total number of remotes.",
+
+        |s, _c| s.remote_count.to_string(),
+        |s, _c, l| apply_style(&s.remote_count.to_string(), l.map(|i| i.remote_count), Some(&STYLE.count))
+    }
+
+    {
+        "tag:c", "{_tag:c_}", "Total number of tags.",
+
+        |s, _c| s.tag_count.to_string(),
+        |s, _c, l| apply_style(&s.tag_count.to_string(), l.map(|i| i.tag_count), Some(&STYLE.count))
+    }
+
+    {
+        "worktree:c", "{_worktree:c_}", "Number of linked worktrees.",
+
+        |s, _c| s.worktree_count.to_string(),
+        |s, _c, l| apply_style(&s.worktree_count.to_string(), l.map(|i| i.worktree_count), Some(&STYLE.count))
+    }
+
+    {
+        "stash:c", "{_stash:c_}", "Number of stash entries.",
+
+        |s, _c| s.stash_count.to_string(),
+        |s, _c, l| apply_style(&s.stash_count.to_string(), l.map(|i| i.stash_count), Some(&STYLE.count))
+    }
+
+    {
+        "user:n", "{_user:n_}", "Configured git user.name.",
+
+        |s, _c| s.user_name.clone(),
+        |s, _c, l| apply_style(&s.user_name, l.map(|i| i.user_name), Some(&STYLE.user))
+    }
+
+    {
+        "user:e", "{_user:e_}", "Configured git user.email.",
+
+        |s, _c| s.user_email.clone(),
+        |s, _c, l| apply_style(&s.user_email, l.map(|i| i.user_email), Some(&STYLE.user))
+    }
+
+    {
+        "commit:s", "{_commit:s_}", "Summary (first line) of the latest commit.",
+
+        |s, _c| s.commit_summary.clone(),
+        |s, _c, l| apply_style(&s.commit_summary, l.map(|i| i.commit_summary), Some(&STYLE.summary))
+    }
 }

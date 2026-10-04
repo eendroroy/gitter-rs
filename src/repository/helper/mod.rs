@@ -12,6 +12,10 @@ mod get_remote;
 mod get_repo_name;
 mod get_repo_size;
 mod get_top_language;
+mod get_tracking;
+mod get_repo_state;
+mod get_counts;
+mod get_user_and_summary;
 
 pub use get_absolute_path::get_absolute_path;
 pub use get_absolute_time::get_absolute_time;
@@ -27,6 +31,10 @@ pub use get_remote::get_remote;
 pub use get_repo_name::get_repo_name;
 pub use get_repo_size::get_repo_size;
 pub use get_top_language::get_top_language;
+pub use get_tracking::get_tracking;
+pub use get_repo_state::{get_repo_state, get_shallow};
+pub use get_counts::{get_remote_count, get_stash_count, get_tag_count, get_worktree_count};
+pub use get_user_and_summary::{get_commit_summary, get_user};
 
 pub const DETACHED: &str = "detached";
 pub const BARE: &str = "bare";

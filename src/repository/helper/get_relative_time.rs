@@ -1,6 +1,6 @@
 use crate::repository::{DAYS, FUTURE, HOURS, MINUTES, MONTHS, SECONDS, UNKNOWN_TIME, YEARS};
 use chrono::{DateTime, Utc};
-use git2::Repository;
+use git2::Commit;
 
 fn format_relative_time(commit_time_epoch: i64) -> (String, String) {
     let commit_time = match DateTime::from_timestamp(commit_time_epoch, 0) {
@@ -75,11 +75,8 @@ fn format_relative_time(commit_time_epoch: i64) -> (String, String) {
     (non_combined, combined)
 }
 
-pub fn get_relative_time(repository: &Repository) -> (String, String) {
-    repository
-        .head()
-        .and_then(|head| head.peel_to_commit())
-        .map(|commit| commit.time().seconds())
-        .map(format_relative_time)
-        .unwrap_or_else(|_| ("".to_string(), "".to_string()))
+pub fn get_relative_time(commit: Option<&Commit>) -> (String, String) {
+    commit
+        .map(|commit| format_relative_time(commit.time().seconds()))
+        .unwrap_or_default()
 }

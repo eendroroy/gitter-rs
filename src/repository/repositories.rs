@@ -3,7 +3,9 @@ use crate::placeholder::processor::{evaluate_placeholders, replace_placeholders}
 use crate::repository::helper::{
     get_absolute_path, get_absolute_time, get_bare, get_branch_count, get_commit_count,
     get_current_branch, get_current_commit_info, get_dirty, get_relative_path, get_relative_time,
-    get_remote, get_repo_name, get_repo_size, get_top_language,
+    get_commit_summary, get_remote, get_remote_count, get_repo_name, get_repo_size, get_repo_state,
+    get_shallow, get_stash_count, get_tag_count, get_top_language, get_tracking, get_user,
+    get_worktree_count,
 };
 use std::cmp::max;
 use std::path::{Path, PathBuf};
@@ -38,11 +40,26 @@ pub struct Properties {
     pub bare: String,
     pub is_bare: bool,
     pub top_lang: String,
+    pub upstream: String,
+    pub ahead: String,
+    pub behind: String,
+    pub repo_state: String,
+    pub shallow: String,
+    pub user_name: String,
+    pub user_email: String,
+    pub commit_summary: String,
+    pub remote_count: usize,
+    pub tag_count: usize,
+    pub worktree_count: usize,
+    pub stash_count: usize,
 }
 
 impl Properties {
     pub fn new(path: &Path, base_path: &Path) -> Option<Self> {
-        let repository = git2::Repository::open(path).ok()?;
+        let mut repository = git2::Repository::open(path).ok()?;
+        let stash_count = get_stash_count(&mut repository);
+        let head_commit = repository.head().ok().and_then(|h| h.peel_to_commit().ok());
+        let head_commit = head_commit.as_ref();
 
         let absolute_path = get_absolute_path(path);
         let (relative_path, nesting) = get_relative_path(path, base_path);
@@ -53,15 +70,24 @@ impl Properties {
         let branch = get_current_branch(&repository);
         let branch_count = get_branch_count(&repository);
 
-        let (commit_hash, author_name, author_email) = get_current_commit_info(&repository);
+        let (commit_hash, author_name, author_email) = get_current_commit_info(head_commit);
         let commit_count = get_commit_count(&repository);
-        let (relative_time, relative_time_combined) = get_relative_time(&repository);
-        let absolute_time = get_absolute_time(&repository);
+        let (relative_time, relative_time_combined) = get_relative_time(head_commit);
+        let absolute_time = get_absolute_time(head_commit);
 
         let (dirty, is_dirty) = get_dirty(&repository);
         let (bare, is_bare) = get_bare(&repository);
 
         let top_lang = get_top_language(&repository);
+
+        let (upstream, ahead, behind) = get_tracking(&repository);
+        let repo_state = get_repo_state(&repository);
+        let shallow = get_shallow(&repository);
+        let (user_name, user_email) = get_user(&repository);
+        let commit_summary = get_commit_summary(head_commit);
+        let remote_count = get_remote_count(&repository);
+        let tag_count = get_tag_count(&repository);
+        let worktree_count = get_worktree_count(&repository);
 
         Some(Self {
             repo_path: path.display().to_string(),
@@ -87,6 +113,18 @@ impl Properties {
             bare,
             is_bare,
             top_lang,
+            upstream,
+            ahead,
+            behind,
+            repo_state,
+            shallow,
+            user_name,
+            user_email,
+            commit_summary,
+            remote_count,
+            tag_count,
+            worktree_count,
+            stash_count,
         })
     }
 }
@@ -113,6 +151,18 @@ pub struct PropertyLengths {
     pub dirty: usize,
     pub bare: usize,
     pub top_lang: usize,
+    pub upstream: usize,
+    pub ahead: usize,
+    pub behind: usize,
+    pub repo_state: usize,
+    pub shallow: usize,
+    pub user_name: usize,
+    pub user_email: usize,
+    pub commit_summary: usize,
+    pub remote_count: usize,
+    pub tag_count: usize,
+    pub worktree_count: usize,
+    pub stash_count: usize,
 }
 
 #[derive(Debug, Clone)]
@@ -196,6 +246,18 @@ impl Repositories {
             self.lens.dirty = max(self.lens.dirty, s.dirty.len());
             self.lens.bare = max(self.lens.bare, s.bare.len());
             self.lens.top_lang = max(self.lens.top_lang, s.top_lang.len());
+            self.lens.upstream = max(self.lens.upstream, s.upstream.len());
+            self.lens.ahead = max(self.lens.ahead, s.ahead.len());
+            self.lens.behind = max(self.lens.behind, s.behind.len());
+            self.lens.repo_state = max(self.lens.repo_state, s.repo_state.len());
+            self.lens.shallow = max(self.lens.shallow, s.shallow.len());
+            self.lens.user_name = max(self.lens.user_name, s.user_name.len());
+            self.lens.user_email = max(self.lens.user_email, s.user_email.len());
+            self.lens.commit_summary = max(self.lens.commit_summary, s.commit_summary.len());
+            self.lens.remote_count = max(self.lens.remote_count, digit_len(s.remote_count));
+            self.lens.tag_count = max(self.lens.tag_count, digit_len(s.tag_count));
+            self.lens.worktree_count = max(self.lens.worktree_count, digit_len(s.worktree_count));
+            self.lens.stash_count = max(self.lens.stash_count, digit_len(s.stash_count));
         });
     }
 }

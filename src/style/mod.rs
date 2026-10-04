@@ -63,6 +63,12 @@ pub struct Palette {
     pub cs_top_author_name: ComponentStyle,
     pub cs_top_author_email: ComponentStyle,
     pub top_lang: ComponentStyle,
+    pub upstream: ComponentStyle,
+    pub ahead_behind: ComponentStyle,
+    pub repo_state: ComponentStyle,
+    pub count: ComponentStyle,
+    pub user: ComponentStyle,
+    pub summary: ComponentStyle,
 }
 
 impl Default for Palette {
@@ -89,6 +95,12 @@ impl Default for Palette {
             cs_top_author_name: new_style!(Color::BrightCyan, Styles::Bold),
             cs_top_author_email: new_style!(Color::BrightWhite, Styles::Dimmed),
             top_lang: new_style!(Color::BrightYellow, Styles::Dimmed, Styles::Bold),
+            upstream: new_style!(Color::Blue, Styles::Italic),
+            ahead_behind: new_style!(right_align: true, Color::BrightGreen, Styles::Clear),
+            repo_state: new_style!(Color::BrightRed, Styles::Bold),
+            count: new_style!(right_align: true, Color::BrightCyan, Styles::Clear),
+            user: new_style!(Color::BrightBlack, Styles::Clear),
+            summary: new_style!(Color::White, Styles::Dimmed),
         }
     }
 }

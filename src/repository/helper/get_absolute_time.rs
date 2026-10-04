@@ -1,17 +1,14 @@
 use chrono::{Local, TimeZone};
-use git2::Repository;
+use git2::Commit;
 
-pub fn get_absolute_time(repository: &Repository) -> String {
-    repository
-        .head()
-        .and_then(|head| head.peel_to_commit())
+pub fn get_absolute_time(commit: Option<&Commit>) -> String {
+    commit
         .map(|commit| {
-            let seconds = commit.time().seconds();
             Local
-                .timestamp_opt(seconds, 0)
+                .timestamp_opt(commit.time().seconds(), 0)
                 .single()
                 .map(|dt| dt.format("%Y-%m-%d %H:%M:%S").to_string())
                 .unwrap_or_else(|| "invalid timestamp".to_string())
         })
-        .unwrap_or_else(|_| "".to_string())
+        .unwrap_or_default()
 }

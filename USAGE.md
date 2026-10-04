@@ -222,6 +222,18 @@ Placeholders use the `{_tag_}` form and can appear in info templates, sort templ
 | `{_bare_}` | Bare-repository marker |
 | `{_size_}` | Repository size |
 | `{_language_}` | Detected top language |
+| `{_upstream_}` | Upstream tracking branch (empty if none) |
+| `{_ahead_}` | Commits ahead of upstream |
+| `{_behind_}` | Commits behind upstream |
+| `{_state_}` | In-progress operation (merge, rebase, cherry-pick, ...) |
+| `{_shallow_}` | Shallow-clone marker |
+| `{_remote:c_}` | Number of remotes |
+| `{_tag:c_}` | Number of tags |
+| `{_worktree:c_}` | Number of linked worktrees |
+| `{_stash:c_}` | Number of stash entries |
+| `{_user:n_}` | Configured `user.name` |
+| `{_user:e_}` | Configured `user.email` |
+| `{_commit:s_}` | Latest commit summary |
 
 ## Ignore repositories
 
