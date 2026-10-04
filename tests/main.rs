@@ -327,5 +327,6 @@ mod integration {
     pub mod list_tests;
     pub mod meta_tests;
     pub mod placeholders_tests;
+    pub mod report_tests;
     pub mod script_tests;
 }

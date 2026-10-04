@@ -4,6 +4,7 @@ mod help_args;
 mod meta_args;
 mod output_args;
 mod repo_args;
+mod report_args;
 mod run_args;
 mod script_args;
 mod shell;
@@ -23,6 +24,7 @@ pub use meta_args::{
 };
 pub use output_args::OutputArgs;
 pub use repo_args::RepoArgs;
+pub use report_args::{ReportArgs, ReportCommand};
 pub use run_args::{BashArgs, ExecArgs, GitArgs};
 pub use script_args::ScriptArgs;
 pub use shell::{Shell, resolve_shell, shell_bin};
@@ -93,6 +95,9 @@ pub enum GitterCommand {
 
     /// Create, save and restore the workspace metafile
     Meta(MetaArgs),
+
+    /// Generate reports
+    Report(ReportArgs),
 
     /// Generate shell completion
     Completion(CompletionArgs),

@@ -98,6 +98,7 @@ gitter meta save --merge --prune         # record repos found in the workspace
 gitter meta restore -j 8 --dry-run       # preview parallel clones
 gitter meta status                       # ok / missing / wrong-remote / wrong-branch / untracked
 gitter meta list                         # alias: ls
+gitter report metadata                   # per-repo commits, branches, LOC, languages...
 gitter completion zsh > ~/.zfunc/_gitter # shell completion
 gitter help placeholders                 # topics: placeholders, gitterignore, filters, completions
 ```

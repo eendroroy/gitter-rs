@@ -14,6 +14,7 @@ fn help_displays_command_usage() {
             "completion",
             "help", "Show help topics",
             "meta",
+            "report",
             "Arguments:",
             "<GIT_ARGS>...",
             "Options:",

@@ -141,6 +141,14 @@ gitter meta status
 gitter meta list --file workspace-repos.toml
 ```
 
+### Generate reports
+
+```sh
+gitter report metadata
+```
+
+`metadata` prints one block per repository with its remote, branch, state, last commit date and author, and counts of commits, branches, tags, contributors, and lines of code, plus the languages used with their code line counts (lines of code come from `tokei`). It uses the selected workspace, depth, and repository filter options.
+
 ### Generate shell completions
 
 ```sh
