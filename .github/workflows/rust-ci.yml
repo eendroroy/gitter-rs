@@ -111,6 +111,11 @@ jobs:
           for dir in artifacts/*; do
             target_name=$(basename "$dir")
             if [ -f "$dir/gitter" ]; then
+              chmod +x "$dir/gitter"
+              echo "Checking executable:"
+              ls -l "$dir/gitter"
+              file "$dir/gitter"
+          
               zip -9 -j "release_assets/${target_name}.zip" "$dir/gitter"
             elif [ -f "$dir/gitter.exe" ]; then
               zip -9 -j "release_assets/${target_name}.zip" "$dir/gitter.exe"
