@@ -36,6 +36,14 @@ brew trust eendroroy/tools             # trust
 brew install eendroroy/tools/gitter-rs # install
 ```
 
+### Using mise
+
+```bash
+mise ls-remote github:eendroroy/gitter-rs      # check releases
+mise install github:eendroroy/gitter-rs@latest # install
+mise use -g github:eendroroy/gitter-rs@latest  # global use
+```
+
 ### From source
 
 ```bash
